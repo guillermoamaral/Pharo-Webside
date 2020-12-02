@@ -83,7 +83,7 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 WebsideAPI >> classVariables [
 	| class |
 	class := self requestedClass.
-	class isNil ifTrue: [^self notFound].
+	class ifNil: [^self notFound].
 	^class withAllSuperclasses
 		gather: [:c | 
 			c classVarNames asArray sort collect: [:v | 
@@ -96,19 +96,19 @@ WebsideAPI >> classVariables [
 { #category : #'code endpoints' }
 WebsideAPI >> classes [
 	| root tree classes names depth json |
-	root := request at: 'root' ifAbsent: nil.
+	root := self queryAt: 'root'.
 	root := root notNil
 		ifTrue: [self classNamed: root]
 		ifFalse: [self rootClass].
 	root ifNil: [^self notFound].
-	tree := request at: 'tree' ifAbsent: nil.
+	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
-		depth := request at: 'depth' ifAbsent: nil.
+		depth := self queryAt:'depth'.
 		depth notNil ifTrue: [depth := depth asInteger].
 		json := self classTreeFrom: root depth: depth.
 		^Array with: json].
 	classes := root withAllSubclasses.
-	names := request at: 'names' ifAbsent: nil.
+	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [^(classes collect: #name) sort].
 	^classes collect: #asWebsideJson
 ]
@@ -248,6 +248,11 @@ WebsideAPI >> queriedSending [
 	| selector |
 	selector := request at: 'sending' ifAbsent: nil.
 	^selector ifNotNil: [selector asSymbol]
+]
+
+{ #category : #private }
+WebsideAPI >> queryAt: aString [
+	^request at: aString ifAbsent: nil.
 ]
 
 { #category : #private }
