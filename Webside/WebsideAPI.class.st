@@ -21,7 +21,7 @@ WebsideAPI >> addChange [
 		useAuthor: (json at: 'author')
 		during: [ change := RBRefactoryChange fromWebsideJson: json.
 			change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
-			change ifNil: [ ^ self halt badRequest: 'Change not supported' ].
+			change ifNil: [ ^ self badRequest: 'Change not supported' ].
 			"change
 				owner: changes;
 				changes: changes."
