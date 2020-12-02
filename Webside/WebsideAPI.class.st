@@ -99,7 +99,7 @@ WebsideAPI >> classes [
 	root := self queryAt: 'root'.
 	root := root notNil
 		ifTrue: [self classNamed: root]
-		ifFalse: [self rootClass].
+		ifFalse: [self defaultRootClass].
 	root ifNil: [^self notFound].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
@@ -111,6 +111,11 @@ WebsideAPI >> classes [
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [^(classes collect: #name) sort].
 	^classes collect: #asWebsideJson
+]
+
+{ #category : #private }
+WebsideAPI >> defaultRootClass [
+	^Object
 ]
 
 { #category : #'code endpoints' }
@@ -144,10 +149,9 @@ WebsideAPI >> filterByVariable: aCollection [
 WebsideAPI >> implementorsOf: aSymbol [
 	| scope |
 	scope := self queriedScope.
-	^scope
-		ifNotNil: [scope implementorsOf: aSymbol]
-		ifNil: [SystemNavigation default allImplementorsOf: aSymbol]		
-	
+	^ scope
+		ifNotNil: [ scope implementorsOf: aSymbol ]
+		ifNil: [ SystemNavigation default allImplementorsOf: aSymbol ]
 ]
 
 { #category : #'code endpoints' }
@@ -192,7 +196,7 @@ WebsideAPI >> methods [
 	class := self requestedClass ifNil: [self queriedClass].
 	(class notNil and: [methods notNil])
 		ifTrue: [methods := methods select: [:m | m methodClass == class]].
-	methods ifNil: [methods := (class ifNil: [self rootClass]) methodDictionary asArray].
+	methods ifNil: [methods := (class ifNil: [self defaultRootClass]) methodDictionary asArray].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	^methods collect: #asWebsideJson
@@ -276,15 +280,12 @@ WebsideAPI >> requestedClass [
 ]
 
 { #category : #private }
-WebsideAPI >> rootClass [
-	^Object
-]
-
-{ #category : #private }
 WebsideAPI >> sendersOf: aSymbol [
 	| scope |
-	scope := self queriedScope ifNil: [Smalltalk].
-	^scope sendersOf: aSymbol
+	scope := self queriedScope.
+	^ scope
+		ifNotNil: [ scope sendersOf: aSymbol ]
+		ifNil: [ SystemNavigation default allSendersOf: aSymbol ]
 ]
 
 { #category : #'code endpoints' }
