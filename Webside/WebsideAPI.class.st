@@ -12,7 +12,7 @@ Class {
 	#category : #'Webside-Base'
 }
 
-{ #category : #api }
+{ #category : #'changes endpoints' }
 WebsideAPI >> addChange [
 	| changes change json result |
 	self halt.
@@ -34,7 +34,7 @@ WebsideAPI >> badRequest: aString [
 	^ZnResponse badRequest: aString
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> categories [
 	| class |
 	class := self requestedClass.
@@ -42,7 +42,7 @@ WebsideAPI >> categories [
 	^class protocols
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> classDefinition [
 	| class |
 	class := self requestedClass.
@@ -79,7 +79,7 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 	^json
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> classVariables [
 	| class |
 	class := self requestedClass.
@@ -93,7 +93,7 @@ WebsideAPI >> classVariables [
 					yourself]]
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> classes [
 	| root tree classes names depth json |
 	root := request at: 'root' ifAbsent: nil.
@@ -113,7 +113,7 @@ WebsideAPI >> classes [
 	^classes collect: #asWebsideJson
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> dialect [
 	^'Pharo'
 ]
@@ -150,7 +150,7 @@ WebsideAPI >> implementorsOf: aSymbol [
 	
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> instanceVariables [
 	| class |
 	class := self requestedClass.
@@ -164,7 +164,7 @@ WebsideAPI >> instanceVariables [
 					yourself]]
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> method [
 	| class selector method |
 	class := self requestedClass.
@@ -176,7 +176,7 @@ WebsideAPI >> method [
 	^method asWebsideJson
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> methods [
 	| selector methods senders global references class |
 	selector := self queriedSelector.
@@ -282,7 +282,7 @@ WebsideAPI >> sendersOf: aSymbol [
 	^scope sendersOf: aSymbol
 ]
 
-{ #category : #api }
+{ #category : #'code endpoints' }
 WebsideAPI >> variables [
 	| class |
 	class := self requestedClass.
