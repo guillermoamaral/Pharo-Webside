@@ -2,10 +2,12 @@ Extension { #name : #ClassDescription }
 
 { #category : #'*Webside' }
 ClassDescription >> asWebsideJson [
-	^NeoJSONObject new
+	^ super asWebsideJson
 		at: 'name' put: self name;
 		at: 'definition' put: self oldDefinition;
-		at: 'superclass' put: self superclass name;
+		at: 'superclass' put: (self superclass ifNotNil: [ :c | c name ]);
 		at: 'comment' put: self comment;
+		at: 'variable' put: self isVariable;
+		at: 'project' put: self package;
 		yourself
 ]
