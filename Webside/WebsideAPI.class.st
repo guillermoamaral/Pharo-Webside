@@ -17,7 +17,7 @@ WebsideAPI >> addChange [
 	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
-	author := ((NeoJSONReader fromString: request entity) at: 'author').
+	author := (NeoJSONReader fromString: request entity) at: 'author'.
 	Author
 		useAuthor: author
 		during: [ [ change execute ]
