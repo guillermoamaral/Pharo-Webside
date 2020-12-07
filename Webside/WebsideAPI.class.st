@@ -14,19 +14,15 @@ Class {
 
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
-	| changes change json result |
-	self halt.
-	json := NeoJSONReader fromString: request entity.
+	| change |
+	change := self requestedChange.
+	change ifNil: [ ^ self badRequest: 'Change not supported' ].
 	Author
-		useAuthor: (json at: 'author')
-		during: [ change := RBRefactoryChange fromWebsideJson: json.
-			change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
-			change ifNil: [ ^ self badRequest: 'Change not supported' ].
-			"change
-				owner: changes;
-				changes: changes."
-			result := change execute on: Error do: [:e | e halt]].
-	^ result asWebsideJson
+		useAuthor: (change propertyAt: #author)
+		during: [ [ change execute ]
+				on: Error
+				do: [ :e | self compilationError: e ] ].
+	^ change asWebsideJson
 ]
 
 { #category : #private }
@@ -111,6 +107,18 @@ WebsideAPI >> classes [
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [^(classes collect: #name) sort].
 	^classes collect: #asWebsideJson
+]
+
+{ #category : #private }
+WebsideAPI >> compilationError: aCompilationError [
+	|  entity |
+	entity := ZnStringEntity
+		with: (NeoJSONWriter toString: aCompilationError asWebsideJson)
+		type:
+			(ZnMimeType applicationJson
+				charSet: 'utf-8';
+				yourself).
+	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
 { #category : #private }
@@ -277,6 +285,16 @@ WebsideAPI >> referencesTo: anAssociation [
 { #category : #accessing }
 WebsideAPI >> request: aTeaRequest [ 
 	request := aTeaRequest
+]
+
+{ #category : #private }
+WebsideAPI >> requestedChange [
+	| json change |
+	json := NeoJSONReader fromString: request entity.
+	change := RBRefactoryChange fromWebsideJson: json.
+   change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
+change ifNotNil: [ change propertyAt: #author put: (json at: 'author') ].
+	^ change
 ]
 
 { #category : #private }
