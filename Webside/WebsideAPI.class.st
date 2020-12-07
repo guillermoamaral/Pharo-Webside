@@ -204,7 +204,6 @@ WebsideAPI >> methods [
 	methods
 		ifNil: [ methods := (class ifNil: [ self defaultRootClass ]) methodDictionary
 				asArray ].
-			self halt.
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	^ methods collect: #asWebsideJson
