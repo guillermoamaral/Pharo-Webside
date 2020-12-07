@@ -14,11 +14,12 @@ Class {
 
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
-	| change |
+	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
+	author := ((NeoJSONReader fromString: request entity) at: 'author').
 	Author
-		useAuthor: (change propertyAt: #author)
+		useAuthor: author
 		during: [ [ change execute ]
 				on: Error
 				do: [ :e | self compilationError: e ] ].
@@ -293,7 +294,6 @@ WebsideAPI >> requestedChange [
 	json := NeoJSONReader fromString: request entity.
 	change := RBRefactoryChange fromWebsideJson: json.
    change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
-change ifNotNil: [ change propertyAt: #author put: (json at: 'author') ].
 	^ change
 ]
 
