@@ -8,6 +8,6 @@ ClassDescription >> asWebsideJson [
 		at: 'superclass' put: (self superclass ifNotNil: [ :c | c name ]);
 		at: 'comment' put: self comment;
 		at: 'variable' put: self isVariable;
-		at: 'project' put: self package;
+		at: 'project' put: self package name;
 		yourself
 ]

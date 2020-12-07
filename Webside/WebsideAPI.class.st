@@ -25,7 +25,7 @@ WebsideAPI >> addChange [
 			"change
 				owner: changes;
 				changes: changes."
-			result := change execute ].
+			result := change execute on: Error do: [:e | e halt]].
 	^ result asWebsideJson
 ]
 
