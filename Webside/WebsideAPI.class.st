@@ -172,34 +172,42 @@ WebsideAPI >> instanceVariables [
 WebsideAPI >> method [
 	| class selector method |
 	class := self requestedClass.
-	class ifNil: [^self notFound].
+	class ifNil: [ ^ self notFound ].
 	selector := request at: 'selector' ifAbsent: nil.
-	selector ifNil: [^self notFound].
+	selector ifNil: [ ^ self notFound ].
 	method := class >> selector asSymbol.
-	method ifNil: [^self notFound].
-	^method asWebsideJson
+	method ifNil: [ ^ self notFound ].
+	^ method asWebsideJson
 ]
 
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
 	| selector methods senders global references class |
 	selector := self queriedSelector.
-	selector notNil ifTrue: [methods := self implementorsOf: selector].
+	selector notNil
+		ifTrue: [ methods := self implementorsOf: selector ].
 	selector := self queriedSending.
-	selector notNil ifTrue: [
-		senders := self sendersOf: selector.
-		methods := methods ifNil: [senders] ifNotNil: [methods intersection: senders]].
+	selector notNil
+		ifTrue: [ senders := self sendersOf: selector.
+			methods := methods
+				ifNil: [ senders ]
+				ifNotNil: [ methods intersection: senders ] ].
 	global := self queriedReferencingClass.
-	global notNil ifTrue: [
-		references := self referencesTo: global.
-		methods := methods ifNil: [references] ifNotNil: [methods intersection: references]].
-	class := self requestedClass ifNil: [self queriedClass].
-	(class notNil and: [methods notNil])
-		ifTrue: [methods := methods select: [:m | m methodClass == class]].
-	methods ifNil: [methods := (class ifNil: [self defaultRootClass]) methodDictionary asArray].
+	global notNil
+		ifTrue: [ references := self referencesTo: global.
+			methods := methods
+				ifNil: [ references ]
+				ifNotNil: [ methods intersection: references ] ].
+	class := self requestedClass ifNil: [ self queriedClass ].
+	(class notNil and: [ methods notNil ])
+		ifTrue: [ methods := methods select: [ :m | m methodClass == class ] ].
+	methods
+		ifNil: [ methods := (class ifNil: [ self defaultRootClass ]) methodDictionary
+				asArray ].
+			self halt.
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
-	^methods collect: #asWebsideJson
+	^ methods collect: #asWebsideJson
 ]
 
 { #category : #private }
