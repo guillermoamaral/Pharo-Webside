@@ -3,17 +3,18 @@ Extension { #name : #RBRefactoryDefinitionChange }
 { #category : #'*Webside' }
 RBRefactoryDefinitionChange class >> acceptsWebsideJson: json [
 	| ast context |
-	(super acceptsWebsideJson: json) ifFalse: [ ^false ].
+	(super acceptsWebsideJson: json)
+		ifFalse: [ ^ false ].
 	ast := RBParser
 		parseExpression: (json at: 'definition' ifAbsent: '')
 		onError: nil.
-	ast ifNil: [ ^false ].
+	ast ifNil: [ ^ false ].
 	context := SmallDictionary new.
-	^self definitionPatterns
-				anySatisfy: [ :pattern | 
-					((RBParser parseRewriteExpression: pattern)
-						match: ast
-						inContext: context empty)]
+	^ self definitionPatterns
+		anySatisfy: [ :pattern | 
+			(RBParser parseRewriteExpression: pattern)
+				match: ast
+				inContext: context empty ]
 ]
 
 { #category : #'*Webside' }
