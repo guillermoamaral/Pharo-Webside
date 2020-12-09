@@ -15,9 +15,8 @@ Class {
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
 	| change author |
-	self halt.
 	change := self requestedChange.
-	change ifNil: [ ^ self badRequest: 'Change not supported' ].
+	change ifNil: [ ^ self halt badRequest: 'Change not supported' ].
 	author := (NeoJSONReader fromString: request entity) at: 'author'.
 	Author
 		useAuthor: author
