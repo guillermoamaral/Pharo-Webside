@@ -22,7 +22,7 @@ WebsideAPI >> addChange [
 		useAuthor: author
 		during: [ [ change execute ]
 				on: Error , SyntaxErrorNotification
-				do: [ :e | ^ self compilationError: e ] ].
+				do: [ :e | ^ self halt compilationError: e ] ].
 	^ change asWebsideJson
 ]
 
