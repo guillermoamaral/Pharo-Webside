@@ -15,6 +15,7 @@ Class {
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
 	| change author |
+	self halt.
 	change := self requestedChange.
 	change ifNil: [ ^ self halt badRequest: 'Change not supported' ].
 	author := (NeoJSONReader fromString: request entity) at: 'author'.
@@ -311,6 +312,14 @@ WebsideAPI >> sendersOf: aSymbol [
 	^ scope
 		ifNotNil: [ scope sendersOf: aSymbol ]
 		ifNil: [ SystemNavigation default allSendersOf: aSymbol ]
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> subclasses [
+| class |
+class := self requestedClass .
+class ifNil: [ ^ self notFound  ].
+^ class subclasses collect: #asWebsideJson 
 ]
 
 { #category : #'code endpoints' }

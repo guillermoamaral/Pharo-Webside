@@ -63,11 +63,14 @@ WebsideServer >> initialize [
 { #category : #initialization }
 WebsideServer >> initializeRoutes [
 	server
-		OPTIONS: self baseUri , '/*' -> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+		OPTIONS:
+			(self baseUri , '/*')
+				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
 	self
-		routeGET: '/dialect' to: #dialect; 
+		routeGET: '/dialect' to: #dialect;
 		routeGET: '/classes' to: #classes;
 		routeGET: '/classes/<name>' to: #classDefinition;
+		routeGET: '/classes/<name>/subclasses' to: #subclasses;
 		routeGET: '/classes/<name>/variables' to: #variables;
 		routeGET: '/classes/<name>/instance-variables'
 			to: #instanceVariables;
