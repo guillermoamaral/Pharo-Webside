@@ -2,8 +2,10 @@ Extension { #name : #RBAddMethodChange }
 
 { #category : #'*Webside' }
 RBAddMethodChange >> asWebsideJson [
-	^super asWebsideJson
+	^ super asWebsideJson
 		at: 'sourceCode' put: self source;
+		at: 'selector' put: self selector;
+		at: 'category' put: self protocol ;
 		yourself
 ]
 
