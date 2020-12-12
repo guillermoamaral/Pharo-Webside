@@ -2,9 +2,8 @@ Extension { #name : #RBMethodRefactoring }
 
 { #category : #'*Webside' }
 RBMethodRefactoring >> asWebsideJson [
-	^ super asWebsideJson
-		at: 'class' put: class asString;
-		yourself
+	^super asWebsideJson
+	at: 'class' put: class; yourself
 ]
 
 { #category : #'*Webside' }
