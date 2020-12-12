@@ -10,5 +10,5 @@ RBMethodRefactoring >> asWebsideJson [
 RBMethodRefactoring >> fromWebsideJson: json [
 	super fromWebsideJson: json.
 	class := json at: 'class' ifAbsent: nil.
-	class ifNotNil: [ class := self classObjectFor: class asSymbol ]
+	class ifNotNil: [class := self classObjectFor: class asSymbol].
 ]
