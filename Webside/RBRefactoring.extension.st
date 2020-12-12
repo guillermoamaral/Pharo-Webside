@@ -3,8 +3,8 @@ Extension { #name : #RBRefactoring }
 { #category : #'*Webside' }
 RBRefactoring class >> acceptsWebsideJson: json [
 	| type |
-	type := json valueAt: 'type'.
-	^self webSTType = type
+	type := json at: 'type' ifAbsent: nil.
+	^ self webSTType = type
 ]
 
 { #category : #'*Webside' }
@@ -29,7 +29,7 @@ RBRefactoring class >> classForWebsideJson: json [
 RBRefactoring class >> fromWebsideJson: json [
 	| class |
 	class := self classForWebsideJson: json.
-	^ class new fromWebsideJson: json
+	^ class ifNotNil: [class new fromWebsideJson: json]
 ]
 
 { #category : #'*Webside' }
