@@ -11,7 +11,7 @@ RBRefactoring class >> acceptsWebsideJson: json [
 RBRefactoring >> asWebsideJson [
 	^ NeoJSONObject new
 		at: 'type' put: self class webSTType asString;
-		at: 'label' put: self changeString;
+		at: 'label' put: self printString;
 		at: 'project' put: 'self projectName';
 		at: 'timestamp' put: DateAndTime now asString;
 		at: 'author' put: Author uniqueInstance fullName;
