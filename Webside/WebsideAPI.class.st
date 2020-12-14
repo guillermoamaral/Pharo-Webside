@@ -326,6 +326,6 @@ class ifNil: [ ^ self notFound  ].
 WebsideAPI >> variables [
 	| class |
 	class := self requestedClass.
-	class isNil ifTrue: [^self notFound].
-	^self instanceVariables , self classVariables
+	class ifNil: [ ^ self notFound ].
+	^ self instanceVariables , self classVariables
 ]
