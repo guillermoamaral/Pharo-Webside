@@ -1,25 +1,46 @@
 "
 Handy class to make WebsideAPI accessible on a Teapot server.
 
-WebsideServer new start
+WebsideServer new
+	baseUri: '/pharo/v1';
+	port: 9002;
+	start
 "
 Class {
 	#name : #WebsideServer,
 	#superclass : #Object,
 	#instVars : [
-		'server'
+		'server',
+		'baseUri',
+		'port'
 	],
 	#category : #'Webside-Base'
 }
 
 { #category : #accessing }
 WebsideServer >> baseUri [
-	^'/pharo'
+	^baseUri
+]
+
+{ #category : #accessing }
+WebsideServer >> baseUri: aString [
+	baseUri := aString
+]
+
+{ #category : #initialization }
+WebsideServer >> defaultBaseUri [
+	^ '/pharo'
+]
+
+{ #category : #initialization }
+WebsideServer >> defaultPort [ 
+	^9001
 ]
 
 { #category : #actions }
 WebsideServer >> handlePreflightRequest: request [
 	| response origin method headers |
+	self halt.
 	(self isPreflight: request)
 		ifFalse: [ ^ ZnResponse serverError: 'Cannot process this request' ].
 	response := ZnResponse new.
@@ -55,16 +76,16 @@ WebsideServer >> handleRequest: request with: selector [
 { #category : #initialization }
 WebsideServer >> initialize [
 	super initialize.
-	self
-		initializeServer;
-		initializeRoutes
+	port := self defaultPort.
+	baseUri := self defaultBaseUri.
+
 ]
 
 { #category : #initialization }
 WebsideServer >> initializeRoutes [
 	server
 		OPTIONS:
-			(self baseUri , '/*')
+			(baseUri , '/*')
 				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
 	self
 		routeGET: '/dialect' to: #dialect;
@@ -88,7 +109,7 @@ WebsideServer >> initializeServer [
 	server := Teapot
 		configure:
 			{(#defaultOutput -> #json).
-			(#port -> self port).
+			(#port -> port).
 			(#debugMode -> true).
 			(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}
 ]
@@ -100,14 +121,19 @@ WebsideServer >> isPreflight: request [
 
 { #category : #accessing }
 WebsideServer >> port [
-	^9001
+	^ port
+]
+
+{ #category : #accessing }
+WebsideServer >> port: anInteger [
+	^ port := anInteger
 ]
 
 { #category : #initialization }
 WebsideServer >> routeGET: uri to: selector [
 	server
 		GET:
-			(self baseUri , uri)
+			(baseUri , uri)
 				-> [ :request | self handleRequest: request with: selector ]
 ]
 
@@ -115,12 +141,15 @@ WebsideServer >> routeGET: uri to: selector [
 WebsideServer >> routePOST: uri to: selector [
 	server
 		POST:
-			(self baseUri , uri)
+			(baseUri , uri)
 				-> [ :request | self handleRequest: request with: selector ]
 ]
 
 { #category : #actions }
 WebsideServer >> start [
+	self
+		initializeServer;
+		initializeRoutes.
 	server start
 ]
 
