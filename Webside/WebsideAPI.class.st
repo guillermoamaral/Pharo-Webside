@@ -147,14 +147,17 @@ WebsideAPI >> filterByCategory: aCollection [
 { #category : #private }
 WebsideAPI >> filterByVariable: aCollection [
 	| variable class slot classVar |
-	variable := self queriedReferencingVariable.
-	variable ifNil: [^aCollection].
-	^aCollection select: [:m | 
-		class := m methodClass.
-		(class hasSlotNamed: variable) ifTrue: [slot := class slotNamed: variable].
-		(class hasClassVarNamed: variable) ifTrue: [classVar := class classVarNamed: variable].
-		(slot notNil and: [slot isReferencedIn: m])
-			or: [classVar notNil and: [classVar isReferencedIn: m]]]
+	variable := self queriedReferencing.
+	variable ifNil: [ ^ aCollection ].
+	^ aCollection
+		select: [ :m | 
+			class := m methodClass.
+			(class hasSlotNamed: variable)
+				ifTrue: [ slot := class slotNamed: variable ].
+			(class hasClassVarNamed: variable)
+				ifTrue: [ classVar := class classVarNamed: variable ].
+			(slot notNil and: [ slot isReferencedIn: m ])
+				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
 ]
 
 { #category : #private }
@@ -241,15 +244,15 @@ WebsideAPI >> queriedClass [
 ]
 
 { #category : #private }
-WebsideAPI >> queriedReferencingClass [
-	| name |
-	name := request at: 'referencingClass' ifAbsent: nil.
-	^name ifNotNil: [self classNamed: name]
+WebsideAPI >> queriedReferencing [
+	^ self queryAt: 'referencing' 
 ]
 
 { #category : #private }
-WebsideAPI >> queriedReferencingVariable [
-	^request at: 'referencingClass' ifAbsent: nil
+WebsideAPI >> queriedReferencingClass [
+	| name |
+	name := self queryAt: 'referencing'.
+	^ name ifNotNil: [ self classNamed: name ]
 ]
 
 { #category : #private }
