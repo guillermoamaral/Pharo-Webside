@@ -2,8 +2,8 @@
 Handy class to make WebsideAPI accessible on a Teapot server.
 
 WebsideServer new
-	baseUri: '/pharo/v1';
-	port: 9002;
+	baseUri: '/pharo';
+	port: 9001;
 	start
 "
 Class {

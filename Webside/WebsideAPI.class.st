@@ -1,7 +1,10 @@
 "
 Implements the API required by Webside.
 
-WebsideServer new start
+WebsideServer new
+	baseUri: '/pharo';
+	port: 9001;
+	start
 "
 Class {
 	#name : #WebsideAPI,
