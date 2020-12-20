@@ -188,7 +188,7 @@ WebsideAPI >> method [
 	| class selector method |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
-	selector := request at: 'selector' ifAbsent: nil.
+	selector := self urlAt: 'selector'.
 	selector ifNil: [ ^ self notFound ].
 	method := class >> selector asSymbol.
 	method ifNil: [ ^ self notFound ].
@@ -306,8 +306,8 @@ WebsideAPI >> requestedChange [
 { #category : #private }
 WebsideAPI >> requestedClass [
 	| name |
-	name := request at: 'name' ifAbsent: nil.
-	^name ifNotNil: [self classNamed: name]
+	name := self urlAt: 'name'.
+	^ name ifNotNil: [ self classNamed: name ]
 ]
 
 { #category : #private }
