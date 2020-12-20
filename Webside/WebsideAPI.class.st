@@ -327,6 +327,11 @@ class ifNil: [ ^ self notFound  ].
 ^ class subclasses collect: #asWebsideJson 
 ]
 
+{ #category : #private }
+WebsideAPI >> urlAt: aString [
+	^request at: aString ifAbsent: nil
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> variables [
 	| class |
