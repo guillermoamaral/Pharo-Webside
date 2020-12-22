@@ -40,11 +40,13 @@ WebsideServer >> defaultPort [
 { #category : #actions }
 WebsideServer >> handlePreflightRequest: request [
 	| response origin method headers |
-	self halt.
 	(self isPreflight: request)
 		ifFalse: [ ^ ZnResponse serverError: 'Cannot process this request' ].
 	response := ZnResponse new.
-	response statusLine: ZnStatusLine ok.
+	response
+		statusLine: ZnStatusLine ok;
+		headers: ZnHeaders defaultResponseHeaders;
+		entity: (ZnEntity text: '').
 	origin := request headers at: 'Origin'.
 	method := request headers at: 'Access-Control-Request-Method'.
 	headers := request headers at: 'Access-Control-Request-Headers'.
