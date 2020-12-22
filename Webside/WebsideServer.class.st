@@ -84,13 +84,20 @@ WebsideServer >> initialize [
 ]
 
 { #category : #initialization }
-WebsideServer >> initializeRoutes [
-	server
-		OPTIONS:
-			(baseUri , '/*')
-				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+WebsideServer >> initializeChangesRoutes [
+	self
+		routeGET: '/changes' to: #changes;
+		routePOST: '/changes' to: #addChange
+]
+
+{ #category : #initialization }
+WebsideServer >> initializeCodeRoutes [
 	self
 		routeGET: '/dialect' to: #dialect;
+		routeGET: '/projects' to: #projects;
+		routeGET: '/projects/<name>' to: #project;
+		routeGET: '/projects/<name>/classes' to: #projectClasses;
+		routeGET: '/projects/<name>/methods' to: #projectMethods;
 		routeGET: '/classes' to: #classes;
 		routeGET: '/classes/<name>' to: #classDefinition;
 		routeGET: '/classes/<name>/subclasses' to: #subclasses;
@@ -100,10 +107,16 @@ WebsideServer >> initializeRoutes [
 		routeGET: '/classes/<name>/class-variables' to: #classVariables;
 		routeGET: '/classes/<name>/categories' to: #categories;
 		routeGET: '/classes/<name>/methods' to: #methods;
-		routeGET: '/classes/<name>/methods/<selector>' to: #method;
-		routeGET: '/methods' to: #methods;
-		routeGET: '/changes' to: #changes;
-		routePOST: '/changes' to: #addChange
+		routeGET: '/classes/<name>/methods/<selector>' to: #method
+]
+
+{ #category : #initialization }
+WebsideServer >> initializeRoutes [
+	server
+		OPTIONS:
+			(baseUri , '/*')
+				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+	self initializeCodeRoutes ; initializeChangesRoutes 
 ]
 
 { #category : #initialization }

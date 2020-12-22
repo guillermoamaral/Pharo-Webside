@@ -232,11 +232,13 @@ WebsideAPI >> notFound [
 { #category : #'code endpoints' }
 WebsideAPI >> projects [
 	| organizer root packages names |
-	organizer := RPackageOrganizer default.
+	organizer := RPackageOrganizer default .
 	root := self queryAt: 'root'.
 	root := root notNil
 		ifTrue: [ organizer packageNamed: root ifAbsent: nil ].
-	packages := root notNil ifTrue: [{root}] ifFalse: [organizer packages].
+	packages := root notNil
+		ifTrue: [ {root} ]
+		ifFalse: [ organizer packages ].
 	names := self queryAt: 'names'.
 	names = 'true'
 		ifTrue: [ ^ (packages collect: #name) sort ].
