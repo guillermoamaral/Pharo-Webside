@@ -39,17 +39,22 @@ WebsideServer >> defaultPort [
 
 { #category : #actions }
 WebsideServer >> handlePreflightRequest: request [
-	| response origin method headers |
+	| response |
 	(self isPreflight: request)
 		ifFalse: [ ^ ZnResponse serverError: 'Cannot process this request' ].
 	response := ZnResponse ok: (ZnEntity text: '').
-	origin := request headers at: 'Origin'.
-	method := request headers at: 'Access-Control-Request-Method'.
-	headers := request headers at: 'Access-Control-Request-Headers'.
-	response headers
-		at: 'Access-Control-Allow-Origin' put: origin;
-		at: 'Access-Control-Allow-Methods' put: method;
-		at: 'Access-Control-Allow-Headers' put: headers.
+	request headers
+		at: 'Origin'
+		ifPresent:
+			[ :origin | response headers at: 'Access-Control-Allow-Origin' put: origin ].
+	request headers
+		at: 'Access-Control-Request-Method'
+		ifPresent:
+			[ :method | response headers at: 'Access-Control-Allow-Methods' put: method ].
+	request headers
+		at: 'Access-Control-Request-Headers'
+		ifPresent:
+			[ :headers | response headers at: 'Access-Control-Allow-Headers' put: headers ].
 	^ response
 ]
 
@@ -107,12 +112,27 @@ WebsideServer >> initializeCodeRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializeEvaluationRoutes [
+	self
+		routePOST: '/evaluations' to: #evaluateExpression;
+		routeGET: '/evaluation/<id>' to: #evaluation
+]
+
+{ #category : #initialization }
+WebsideServer >> initializeObjectsRoutes [
+	self
+		routeGET: '/objects' to: #pinnedObjects;
+		routePOST: '/objects/<id>' to: #pinnedObject;
+		routeDELETE: '/objects/<id>' to: #unpinObject;
+		routeGET: '/objects/<id>/*' to: #pinnedObjectSlot
+		
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeRoutes [
-	server
-		OPTIONS:
-			(baseUri , '/*')
-				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
-	self initializeCodeRoutes ; initializeChangesRoutes 
+	self
+		initializeCodeRoutes;
+		initializeChangesRoutes; initializeEvaluationRoutes
 ]
 
 { #category : #initialization }
@@ -122,7 +142,13 @@ WebsideServer >> initializeServer [
 			{(#defaultOutput -> #json).
 			(#port -> port).
 			(#debugMode -> true).
-			(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}
+			(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
+			
+			server
+		OPTIONS:
+			(baseUri , '/*')
+				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+
 ]
 
 { #category : #testing }
@@ -138,6 +164,14 @@ WebsideServer >> port [
 { #category : #accessing }
 WebsideServer >> port: anInteger [
 	^ port := anInteger
+]
+
+{ #category : #initialization }
+WebsideServer >> routeDELETE: uri to: selector [
+	server
+		DELETE:
+			(baseUri , uri)
+				-> [ :request | self handleRequest: request with: selector ]
 ]
 
 { #category : #initialization }

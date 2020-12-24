@@ -12,6 +12,10 @@ Class {
 	#instVars : [
 		'request'
 	],
+	#classVars : [
+		'Evaluations',
+		'Objects'
+	],
 	#category : #'Webside-Base'
 }
 
@@ -32,6 +36,13 @@ WebsideAPI >> addChange [
 { #category : #private }
 WebsideAPI >> badRequest: aString [
 	^ZnResponse badRequest: aString
+]
+
+{ #category : #private }
+WebsideAPI >> bodyAt: aString [
+	| json |
+	json := NeoJSONReader fromString: request entity.
+	^json at: aString ifAbsent: nil 
 ]
 
 { #category : #'code endpoints' }
@@ -141,6 +152,20 @@ WebsideAPI >> dialect [
 	^'Pharo'
 ]
 
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> evaluateExpression [
+	| expression object id |
+	expression := self bodyAt: 'expression'.
+	object := Smalltalk compiler evaluate: expression.
+	(self bodyAt: 'pin') == true
+		ifTrue: [ id := UUID new.
+			self objects at: id put: object.
+			^ object asWebsideJson
+				at: 'id' put: id asString;
+				yourself ].
+	^ object asWebsideJson
+]
+
 { #category : #private }
 WebsideAPI >> filterByCategory: aCollection [
 	| category |
@@ -233,6 +258,21 @@ WebsideAPI >> methods [
 { #category : #private }
 WebsideAPI >> notFound [
 	^ZnResponse notFound: 'resource not found'
+]
+
+{ #category : #private }
+WebsideAPI >> objects [
+	Objects ifNil: [ Objects := Dictionary new ].
+	^ Objects
+]
+
+{ #category : #'objects endpoints' }
+WebsideAPI >> pinnedObjects [
+	^ self objects
+		associations collect: [ :id :object | 
+			object asWebsideJson
+				at: 'id' put: id;
+				yourself ]
 ]
 
 { #category : #'code endpoints' }
