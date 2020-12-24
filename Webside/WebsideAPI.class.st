@@ -19,6 +19,12 @@ Class {
 	#category : #'Webside-Base'
 }
 
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> activeEvaluations [
+	^ self evaluations associations
+		collect: [ :a | NeoJSONObject new at: 'id' put: a key asString ; yourself ]
+]
+
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
 	| change author |
@@ -154,16 +160,36 @@ WebsideAPI >> dialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
-	| expression object id |
-	expression := self bodyAt: 'expression'.
-	object := Smalltalk compiler evaluate: expression.
-	((self bodyAt: 'pin') == true or: [ (self bodyAt: 'sync') == false ])
-		ifTrue: [ id := UUID new.
-			self objects at: id put: object.
-			^ object asWebsideJson
-				at: 'id' put: id asString;
-				yourself ].
-	^ object asWebsideJson
+| expression sync pin id compiler block json process |
+expression := self bodyAt: 'expression'.
+	sync := (self bodyAt: 'sync') ifNil: true.
+	pin := (self bodyAt: 'pin') ifNil: false.
+	id := UUID new.
+	block := [ | object |
+	compiler := Smalltalk compiler.
+	compiler 
+		silentlyDo: [ object :=  compiler evaluate: expression ]
+		exceptionDo: [ :ex | object := ex ].
+	(sync not or: [ pin ])
+		ifTrue: [ self objects at: id put: object ].
+	self evaluations removeKey: id ifAbsent: nil.
+	object ].
+	sync
+		ifTrue: [ json := block value asWebsideJson.
+			pin
+				ifTrue: [ json at: 'id' put: id asString ].
+			^ json ].
+	process := self evaluations at: id put: block fork.
+	^ NeoJSONObject new
+		at: 'id' put: id asString;
+		at: 'expression' put: expression;
+		yourself
+]
+
+{ #category : #private }
+WebsideAPI >> evaluations [
+	Evaluations ifNil: [ Evaluations := Dictionary new ].
+	^ Evaluations
 ]
 
 { #category : #private }
