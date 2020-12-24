@@ -157,7 +157,7 @@ WebsideAPI >> evaluateExpression [
 	| expression object id |
 	expression := self bodyAt: 'expression'.
 	object := Smalltalk compiler evaluate: expression.
-	(self bodyAt: 'pin') == true
+	((self bodyAt: 'pin') == true or: [ (self bodyAt: 'sync') == false ])
 		ifTrue: [ id := UUID new.
 			self objects at: id put: object.
 			^ object asWebsideJson
@@ -271,18 +271,18 @@ WebsideAPI >> pinnedObject [
 	| id object |
 	id := self requestedId.
 	object := self objects at: id ifAbsent: nil.
-	object ifNil: [ ^ self notFound  ].
+	object ifNil: [ ^ self notFound ].
 	^ object asWebsideJson
-				at: 'id' put: id asString;
-				yourself 
+		at: 'id' put: id asString;
+		yourself
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjects [
 	^ self objects
-		associations collect: [ :id :object | 
-			object asWebsideJson
-				at: 'id' put: id;
+		associations collect: [ :a | 
+			a value asWebsideJson
+				at: 'id' put: a key asString;
 				yourself ]
 ]
 
@@ -405,6 +405,13 @@ WebsideAPI >> subclasses [
 class := self requestedClass .
 class ifNil: [ ^ self notFound  ].
 ^ class subclasses collect: #asWebsideJson 
+]
+
+{ #category : #'objects endpoints' }
+WebsideAPI >> unpinObject [
+
+	self objects removeKey: self requestedId ifAbsent: [ ^ self notFound ].
+	^ nil
 ]
 
 { #category : #private }
