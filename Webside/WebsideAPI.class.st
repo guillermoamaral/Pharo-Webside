@@ -10,7 +10,8 @@ Class {
 	#name : #WebsideAPI,
 	#superclass : #Object,
 	#instVars : [
-		'request'
+		'request',
+		'path'
 	],
 	#classVars : [
 		'Evaluations',
@@ -304,6 +305,21 @@ WebsideAPI >> pinnedObject [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPI >> pinnedObjectSlot [
+	| id object index |
+	id := self requestedId.
+	object := self objects at: id ifAbsent: [ ^ self notFound ].
+	path := request url segments.
+	index := path indexOf: 'objects'.
+	path
+		from: index + 2
+		to: path size
+		do:
+			[ :s | object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
+	^ object asWebsideJson
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjects [
 	^ self objects
 		associations collect: [ :a | 
@@ -423,6 +439,23 @@ WebsideAPI >> sendersOf: aSymbol [
 	^ scope
 		ifNotNil: [ scope sendersOf: aSymbol ]
 		ifNil: [ SystemNavigation default allSendersOf: aSymbol ]
+]
+
+{ #category : #private }
+WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
+	| index |
+	aString asNumber asString = aString ifTrue: [ 
+		index := aString asNumber.
+		anObject isCollection
+			ifTrue: [ 
+				index > anObject size ifTrue: [ ^aBlock value ].
+				^anObject at: index ] 
+			ifFalse: [
+				anObject class isVariable ifTrue: [^anObject at: index].
+				index > anObject class instSize ifTrue: [^aBlock value].
+				^anObject instVarAt: index]].
+		^(anObject class allInstVarNames includes: aString)
+			ifTrue:[anObject instVarNamed: aString] ifFalse: [ aBlock value ]
 ]
 
 { #category : #'code endpoints' }
