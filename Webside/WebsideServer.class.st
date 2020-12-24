@@ -132,7 +132,9 @@ WebsideServer >> initializeObjectsRoutes [
 WebsideServer >> initializeRoutes [
 	self
 		initializeCodeRoutes;
-		initializeChangesRoutes; initializeEvaluationRoutes
+		initializeChangesRoutes;
+		initializeEvaluationRoutes;
+		initializeObjectsRoutes 
 ]
 
 { #category : #initialization }

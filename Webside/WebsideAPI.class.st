@@ -267,6 +267,17 @@ WebsideAPI >> objects [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPI >> pinnedObject [
+	| id object |
+	id := self requestedId.
+	object := self objects at: id ifAbsent: nil.
+	object ifNil: [ ^ self notFound  ].
+	^ object asWebsideJson
+				at: 'id' put: id asString;
+				yourself 
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjects [
 	^ self objects
 		associations collect: [ :id :object | 
@@ -370,6 +381,13 @@ WebsideAPI >> requestedClass [
 	| name |
 	name := self urlAt: 'name'.
 	^ name ifNotNil: [ self classNamed: name ]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedId [
+	| id |
+	id := self urlAt: 'id'.
+	^ id ifNotNil: [ UUID fromString: id]
 ]
 
 { #category : #private }
