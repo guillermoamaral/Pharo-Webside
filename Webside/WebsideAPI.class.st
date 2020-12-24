@@ -444,8 +444,8 @@ WebsideAPI >> sendersOf: aSymbol [
 { #category : #private }
 WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 	| index |
-	aString asNumber asString = aString ifTrue: [ 
-		index := aString asNumber.
+	aString asInteger asString = aString ifTrue: [ 
+		index := aString asInteger.
 		anObject isCollection
 			ifTrue: [ 
 				index > anObject size ifTrue: [ ^aBlock value ].
