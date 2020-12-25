@@ -188,6 +188,18 @@ expression := self bodyAt: 'expression'.
 ]
 
 { #category : #private }
+WebsideAPI >> evaluationError: anError [
+	| entity |
+	entity := ZnStringEntity
+		with: (NeoJSONWriter toString: anError asWebsideJson)
+		type:
+			(ZnMimeType applicationJson
+				charSet: 'utf-8';
+				yourself).
+	^ ZnResponse serverErrorWithEntity: entity
+]
+
+{ #category : #private }
 WebsideAPI >> evaluations [
 	Evaluations ifNil: [ Evaluations := Dictionary new ].
 	^ Evaluations
@@ -299,6 +311,7 @@ WebsideAPI >> pinnedObject [
 	id := self requestedId.
 	object := self objects at: id ifAbsent: nil.
 	object ifNil: [ ^ self notFound ].
+	(object isKindOf: Exception) ifTrue: [ ^self evaluationError: object ].
 	^ object asWebsideJson
 		at: 'id' put: id asString;
 		yourself
