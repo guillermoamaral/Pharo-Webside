@@ -324,9 +324,9 @@ WebsideAPI >> objects [
 WebsideAPI >> pinnedObject [
 	| id object |
 	id := self requestedId.
-	object := self objects at: id ifAbsent: nil.
-	object ifNil: [ ^ self notFound ].
-	(object isKindOf: Exception) ifTrue: [ ^self evaluationError: object ].
+	object := self objects at: id ifAbsent: [ ^ self notFound ].
+	(object isKindOf: Exception)
+		ifTrue: [ ^ self evaluationError: object ].
 	^ object asWebsideJson
 		at: 'id' put: id asString;
 		yourself
