@@ -9,5 +9,7 @@ CompiledMethod >> asWebsideJson [
 		at: 'source' put: self sourceCode;
 		at: 'author' put: self author;
 		at: 'timestamp' put: self timeStamp;
+		at: 'overriding' put: self isOverriding;
+		at: 'overriden' put: self isOverridden;
 		yourself
 ]

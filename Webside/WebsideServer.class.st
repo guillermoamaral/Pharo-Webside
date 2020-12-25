@@ -108,7 +108,8 @@ WebsideServer >> initializeCodeRoutes [
 		routeGET: '/classes/<name>/class-variables' to: #classVariables;
 		routeGET: '/classes/<name>/categories' to: #categories;
 		routeGET: '/classes/<name>/methods' to: #methods;
-		routeGET: '/classes/<name>/methods/<selector>' to: #method
+		routeGET: '/classes/<name>/methods/<selector>' to: #method;
+		routeGET: '/methods' to: #methods
 ]
 
 { #category : #initialization }
