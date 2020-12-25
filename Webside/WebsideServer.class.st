@@ -134,7 +134,8 @@ WebsideServer >> initializeRoutes [
 		initializeCodeRoutes;
 		initializeChangesRoutes;
 		initializeEvaluationRoutes;
-		initializeObjectsRoutes 
+		initializeObjectsRoutes;
+		initializeWorkspacesRoutes
 ]
 
 { #category : #initialization }
@@ -151,6 +152,15 @@ WebsideServer >> initializeServer [
 			(baseUri , '/*')
 				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
 
+]
+
+{ #category : #initialization }
+WebsideServer >> initializeWorkspacesRoutes [
+	self
+		routePOST: '/workspaces' to: #createWorkspace;
+		routeGET: '/workspaces' to: #workspaces;
+		routeGET: '/workspaces/<id>' to: #workspaces;
+		routeDELETE: '/workspaces/<id>' to: #deleteWorkspace
 ]
 
 { #category : #testing }

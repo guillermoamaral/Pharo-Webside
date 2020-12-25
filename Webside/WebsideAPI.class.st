@@ -15,7 +15,8 @@ Class {
 	],
 	#classVars : [
 		'Evaluations',
-		'Objects'
+		'Objects',
+		'Workspaces'
 	],
 	#category : #'Webside-Base'
 }
@@ -149,9 +150,23 @@ WebsideAPI >> compilationError: aCompilationError [
 	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
+{ #category : #'workspaces endpoints' }
+WebsideAPI >> createWorkspace [
+	| id |
+	id := UUID new.
+	self workspaces at: id put: Dictionary new.
+	^ id asString
+]
+
 { #category : #private }
 WebsideAPI >> defaultRootClass [
 	^Object
+]
+
+{ #category : #'workspaces endpoints' }
+WebsideAPI >> deleteWorkspace [
+	self workspaces removeKey: self requestedId ifAbsent: [^self notFound].
+	^ nil
 ]
 
 { #category : #'code endpoints' }
@@ -497,4 +512,10 @@ WebsideAPI >> variables [
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
 	^ self instanceVariables , self classVariables
+]
+
+{ #category : #private }
+WebsideAPI >> workspaces [
+	Workspaces ifNil: [ Workspaces := Dictionary new ].
+	^ Workspaces
 ]
