@@ -180,10 +180,30 @@ WebsideAPI >> createWorkspace [
 ]
 
 { #category : #'debugging endpoints' }
+WebsideAPI >> debuggerFrame [
+	| debugger index frame |
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	index := self requestedIndex.
+	frame := debugger stack at: index ifAbsent: [ ^ self notFound ].
+	^ frame asWebsideJson
+				at: 'index' put: index;
+				yourself 
+]
+
+{ #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrames [
 	| debugger |
-	debugger := self debuggers at: self requestedId ifAbsent: [ ^self notFound ].
-		^debugger halt stack
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	^ debugger stack
+		withIndexCollect: [ :f :i | 
+			NeoJSONObject new
+				at: 'index' put: i;
+				at: 'label' put: f method printString;
+				yourself ]
 ]
 
 { #category : #private }
@@ -195,6 +215,18 @@ WebsideAPI >> debuggers [
 { #category : #private }
 WebsideAPI >> defaultRootClass [
 	^Object
+]
+
+{ #category : #'debugging endpoints' }
+WebsideAPI >> deleteDebugger [
+	| id debugger |
+	id := self requestedId .
+	debugger := self debuggers at: id ifAbsent: nil.
+	debugger notNil ifTrue: [ 
+		debugger terminate.
+		self debuggers removeKey: id ifAbsent: nil.
+		self evaluations removeKey: id ifAbsent: nil ].
+	^id
 ]
 
 { #category : #'workspaces endpoints' }
@@ -289,6 +321,21 @@ WebsideAPI >> filterByVariable: aCollection [
 				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> frameBindings [
+	| debugger  frame |
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	frame := debugger stack at: self requestedIndex ifAbsent: [ ^ self notFound ].
+	^ frame gtDebuggerRetrieveVariableValuePairs
+		collect: [ :b | 
+			NeoJSONObject new
+				at: 'name' put: b label;
+				at: 'value' put: b value printString;
+				yourself ]
+]
+
 { #category : #private }
 WebsideAPI >> implementorsOf: aSymbol [
 	| scope |
@@ -317,9 +364,9 @@ WebsideAPI >> method [
 	| class selector method |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
-	selector := self urlAt: 'selector'.
+	selector := self requestedSelector.
 	selector ifNil: [ ^ self notFound ].
-	method := class >> selector asSymbol.
+	method := class >> selector.
 	method ifNil: [ ^ self notFound ].
 	^ method asWebsideJson
 ]
@@ -510,6 +557,20 @@ WebsideAPI >> requestedId [
 	| id |
 	id := self urlAt: 'id'.
 	^ id ifNotNil: [ UUID fromString: id]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedIndex [
+	| index |
+	index := self urlAt: 'index'.
+	^ index ifNotNil: [ index asInteger ]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedSelector [
+	| selector |
+	selector := self urlAt: 'selector'.
+	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
 { #category : #private }
