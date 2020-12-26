@@ -150,10 +150,15 @@ WebsideAPI >> compilationError: aCompilationError [
 	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
+{ #category : #private }
+WebsideAPI >> compiler [
+	^ Smalltalk compiler
+]
+
 { #category : #'workspaces endpoints' }
 WebsideAPI >> createWorkspace [
 	| id |
-	id := UUID new.
+	id := self newID.
 	self workspaces at: id put: Dictionary new.
 	^ id asString
 ]
@@ -176,16 +181,19 @@ WebsideAPI >> dialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
-| expression sync pin id compiler block json process |
-expression := self bodyAt: 'expression'.
+	| expression sync pin id compiler block json process |
+	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
-	id := UUID new.
+	id := self newID.
+	process := nil.
 	block := [ | object |
-	compiler := Smalltalk compiler.
-	compiler 
-		silentlyDo: [ object :=  compiler evaluate: expression ]
-		exceptionDo: [ :ex | object := ex ].
+	compiler := self compiler.
+	compiler
+		silentlyDo: [ object := compiler evaluate: expression ]
+		exceptionDo: [ :exception | 
+			object := exception.
+			process suspend ].
 	(sync not or: [ pin ])
 		ifTrue: [ self objects at: id put: object ].
 	self evaluations removeKey: id ifAbsent: nil.
@@ -310,6 +318,11 @@ WebsideAPI >> methods [
 ]
 
 { #category : #private }
+WebsideAPI >> newID [
+	^UUID new
+]
+
+{ #category : #private }
 WebsideAPI >> notFound [
 	^ZnResponse notFound: 'resource not found'
 ]
@@ -322,11 +335,14 @@ WebsideAPI >> objects [
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObject [
-	| id object |
+	| id object evaluation |
 	id := self requestedId.
+	evaluation := self evaluations at: id ifPresent: [
+		evaluation isSuspended ifTrue: [ 
+			^self evaluationError: id
+			 ] ].
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
-	(object isKindOf: Exception)
-		ifTrue: [ ^ self evaluationError: object ].
+
 	^ object asWebsideJson
 		at: 'id' put: id asString;
 		yourself
