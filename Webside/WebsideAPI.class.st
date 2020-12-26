@@ -169,16 +169,16 @@ WebsideAPI >> compiler [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
-	| id process context debugger |
+	| id process exception debugger |
 	id := self bodyAt: 'evaluation'.
 	id ifNil: [ ^ self notFound ].
 	id := UUID fromString: id.
 	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
-	context := process suspendedContext.
-	process 	suspendedContext: context exception signalerContext.
+	exception := process suspendedContext exception.
+	process suspendedContext: exception signalerContext. 
 	debugger := process
-		newDebugSessionNamed: context exception description
-		startedAt: context.
+		newDebugSessionNamed: exception description
+		startedAt: process suspendedContext.
 	self debuggers at: id put: debugger.
 	^ id asString
 ]
