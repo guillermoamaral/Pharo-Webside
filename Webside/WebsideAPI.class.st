@@ -594,16 +594,18 @@ WebsideAPI >> restartDebugger [
 	context := debugger stack
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
-	^ debugger restart: context
+	debugger restart: context.
+	^ nil
 ]
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> resumeDebugger [
-	| id debugger  |
+	| id debugger |
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
 	self debuggers removeKey: id.
-	^ debugger resume
+	debugger resume.
+		^ nil
 ]
 
 { #category : #private }
@@ -641,7 +643,8 @@ WebsideAPI >> stepIntoDebugger [
 	context := debugger stack
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
-	^ debugger stepInto: context
+	debugger stepInto: context.
+		^ nil
 ]
 
 { #category : #'debugging endpoints' }
@@ -653,7 +656,8 @@ WebsideAPI >> stepOverDebugger [
 	context := debugger stack
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
-	^ debugger stepOver: context
+	debugger stepOver: context.
+		^ nil
 ]
 
 { #category : #'code endpoints' }
