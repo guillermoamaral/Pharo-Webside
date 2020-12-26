@@ -14,6 +14,7 @@ Class {
 		'path'
 	],
 	#classVars : [
+		'Debuggers',
 		'Evaluations',
 		'Objects',
 		'Workspaces'
@@ -155,12 +156,33 @@ WebsideAPI >> compiler [
 	^ Smalltalk compiler
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> createDebugger [
+	| id evaluation context debugger |
+	id := self bodyAt: 'evaluation'.
+	id ifNil: [ ^ self notFound ].
+	id := UUID fromString: id.
+	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	context := evaluation suspendedContext.
+	debugger := evaluation
+		newDebugSessionNamed: context exception description
+		startedAt: context.
+	self debuggers at: id put: debugger.
+	^ id asString
+]
+
 { #category : #'workspaces endpoints' }
 WebsideAPI >> createWorkspace [
 	| id |
 	id := self newID.
 	self workspaces at: id put: Dictionary new.
 	^ id asString
+]
+
+{ #category : #private }
+WebsideAPI >> debuggers [
+	Debuggers ifNil: [ Debuggers := Dictionary new ].
+	^ Debuggers
 ]
 
 { #category : #private }
@@ -192,8 +214,9 @@ WebsideAPI >> evaluateExpression [
 	compiler
 		silentlyDo: [ object := compiler evaluate: expression ]
 		exceptionDo: [ :exception | 
-			object := exception.
-			process suspend ].
+			process
+				suspendedContext: exception signalerContext;
+				suspend ].
 	(sync not or: [ pin ])
 		ifTrue: [ self objects at: id put: object ].
 	self evaluations removeKey: id ifAbsent: nil.
@@ -202,7 +225,7 @@ WebsideAPI >> evaluateExpression [
 		ifTrue: [ json := block value asWebsideJson.
 			pin
 				ifTrue: [ json at: 'id' put: id asString ].
-			^ json ].
+			^ json ]. 
 	process := self evaluations at: id put: block fork.
 	^ NeoJSONObject new
 		at: 'id' put: id asString;
@@ -211,10 +234,16 @@ WebsideAPI >> evaluateExpression [
 ]
 
 { #category : #private }
-WebsideAPI >> evaluationError: anError [
-	| entity |
+WebsideAPI >> evaluationError: id [
+	| process json entity |
+	process := self evaluations at: id.
+	json := NeoJSONObject new
+		at: 'description'
+			put: process suspendedContext exception description;
+		at: 'evaluation' put: id asString;
+		yourself.
 	entity := ZnStringEntity
-		with: (NeoJSONWriter toString: anError asWebsideJson)
+		with: (NeoJSONWriter toString: json)
 		type:
 			(ZnMimeType applicationJson
 				charSet: 'utf-8';
@@ -335,14 +364,14 @@ WebsideAPI >> objects [
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObject [
-	| id object evaluation |
+	| id object  |
 	id := self requestedId.
-	evaluation := self evaluations at: id ifPresent: [
-		evaluation isSuspended ifTrue: [ 
-			^self evaluationError: id
-			 ] ].
+	self evaluations
+		at: id
+		ifPresent: [ :process | 
+			process isSuspended
+				ifTrue: [ ^ self evaluationError: id ] ].
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
-
 	^ object asWebsideJson
 		at: 'id' put: id asString;
 		yourself
