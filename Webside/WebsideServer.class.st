@@ -120,9 +120,9 @@ WebsideServer >> initializeDebuggingRoutes [
 		routeGET: '/debuggers/<id>/frames/<index>' to: #debuggerFrame;
 		routeGET: '/debuggers/<id>/frames/<index>/bindings'
 			to: #frameBindings;
-		routePOST: '/debuggres/<id>/stepover' to: #stepOverDebugger;
-		routePOST: '/debuggres/<id>/stepinto' to: #stepIntoDebugger;
-		routePOST: '/debuggres/<id>/restart' to: #restartDebugger;
+		routePOST: '/debuggres/<id>/frames/<index>/stepover' to: #stepOverDebugger;
+		routePOST: '/debuggres/<id>/frames/<index>/stepinto' to: #stepIntoDebugger;
+		routePOST: '/debuggres/<id>/frames/<index>/restart' to: #restartDebugger;
 		routePOST: '/debuggres/<id>/resume' to: #resumeDebugger;
 		routePOST: '/debuggres/<id>/terminate' to: #terminateDebugger;
 		routeDELETE: '/debuggers/<id>' to: #deleteDebugger
