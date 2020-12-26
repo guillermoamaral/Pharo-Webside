@@ -639,7 +639,6 @@ WebsideAPI >> stepIntoDebugger [
 { #category : #'debugging endpoints' }
 WebsideAPI >> stepOverDebugger [
 	| debugger context |
-	self halt.
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
