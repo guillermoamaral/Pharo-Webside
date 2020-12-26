@@ -674,7 +674,8 @@ WebsideAPI >> terminateDebugger [
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
 	self debuggers removeKey: id.
-	^ debugger terminate
+	debugger terminate.
+		^nil
 ]
 
 { #category : #'objects endpoints' }
