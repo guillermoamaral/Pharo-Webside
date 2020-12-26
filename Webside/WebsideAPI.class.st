@@ -25,6 +25,14 @@ Class {
 	#category : #'Webside-Base'
 }
 
+{ #category : #initialization }
+WebsideAPI class >> reset [
+	"
+	self reset 
+	"
+	Debuggers := Evaluations := Objects := Workspaces := nil
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
 	^ self evaluations associations
