@@ -179,6 +179,13 @@ WebsideAPI >> createWorkspace [
 	^ id asString
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> debuggerFrames [
+	| debugger |
+	debugger := self debuggers at: self requestedId ifAbsent: [ ^self notFound ].
+		^debugger halt stack
+]
+
 { #category : #private }
 WebsideAPI >> debuggers [
 	Debuggers ifNil: [ Debuggers := Dictionary new ].
