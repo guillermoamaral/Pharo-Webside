@@ -4,7 +4,10 @@ Implements the API required by Webside.
 WebsideServer new
 	baseUri: '/pharo';
 	port: 9001;
-	start
+	start.
+	
+
+WebsideServer allInstances
 "
 Class {
 	#name : #WebsideAPI,
@@ -158,13 +161,14 @@ WebsideAPI >> compiler [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
-	| id evaluation context debugger |
+	| id process context debugger |
 	id := self bodyAt: 'evaluation'.
 	id ifNil: [ ^ self notFound ].
 	id := UUID fromString: id.
-	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
-	context := evaluation suspendedContext.
-	debugger := evaluation
+	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	context := process suspendedContext.
+	process 	suspendedContext: context exception signalerContext.
+	debugger := process
 		newDebugSessionNamed: context exception description
 		startedAt: context.
 	self debuggers at: id put: debugger.
@@ -247,12 +251,10 @@ WebsideAPI >> evaluateExpression [
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
-	process := nil.
 	block := [ | object |
 	compiler := self compiler.
-	compiler
-		silentlyDo: [ object := compiler evaluate: expression ]
-		exceptionDo: [ :exception | 
+	[ object := compiler evaluate: expression ] on: Exception
+		do: [ :exception | 
 			process
 				suspendedContext: exception signalerContext;
 				suspend ].
@@ -264,7 +266,7 @@ WebsideAPI >> evaluateExpression [
 		ifTrue: [ json := block value asWebsideJson.
 			pin
 				ifTrue: [ json at: 'id' put: id asString ].
-			^ json ]. 
+			^ json ].
 	process := self evaluations at: id put: block fork.
 	^ NeoJSONObject new
 		at: 'id' put: id asString;
@@ -323,15 +325,17 @@ WebsideAPI >> filterByVariable: aCollection [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> frameBindings [
-	| debugger  frame |
+	| debugger frame |
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
-	frame := debugger stack at: self requestedIndex ifAbsent: [ ^ self notFound ].
+	frame := debugger stack
+		at: self requestedIndex
+		ifAbsent: [ ^ self notFound ].
 	^ frame gtDebuggerRetrieveVariableValuePairs
 		collect: [ :b | 
 			NeoJSONObject new
-				at: 'name' put: b label;
+				at: 'name' put: b key asString;
 				at: 'value' put: b value printString;
 				yourself ]
 ]
@@ -573,6 +577,27 @@ WebsideAPI >> requestedSelector [
 	^ selector ifNotNil: [ selector asSymbol ]
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> restartDebugger [
+	| debugger context |
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	context := debugger stack
+		at: self requestedIndex
+		ifAbsent: [ ^ self notFound ].
+	^ debugger restart: context
+]
+
+{ #category : #'debugging endpoints' }
+WebsideAPI >> resumeDebugger [
+	| id debugger  |
+	id := self requestedId.
+	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
+	self debuggers removeKey: id.
+	^ debugger resume
+]
+
 { #category : #private }
 WebsideAPI >> sendersOf: aSymbol [
 	| scope |
@@ -599,12 +624,45 @@ WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 			ifTrue:[anObject instVarNamed: aString] ifFalse: [ aBlock value ]
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> stepIntoDebugger [
+	| debugger context |
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	context := debugger stack
+		at: self requestedIndex
+		ifAbsent: [ ^ self notFound ].
+	^ debugger stepInto: context
+]
+
+{ #category : #'debugging endpoints' }
+WebsideAPI >> stepOverDebugger [
+	| debugger context |
+	debugger := self debuggers
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	context := debugger stack
+		at: self requestedIndex
+		ifAbsent: [ ^ self notFound ].
+	^ debugger stepOver: context
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> subclasses [
 | class |
 class := self requestedClass .
 class ifNil: [ ^ self notFound  ].
 ^ class subclasses collect: #asWebsideJson 
+]
+
+{ #category : #'debugging endpoints' }
+WebsideAPI >> terminateDebugger [
+	| id debugger |
+	id := self requestedId.
+	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
+	self debuggers removeKey: id.
+	^ debugger terminate
 ]
 
 { #category : #'objects endpoints' }
