@@ -650,6 +650,7 @@ WebsideAPI >> stepIntoDebugger [
 { #category : #'debugging endpoints' }
 WebsideAPI >> stepOverDebugger [
 	| debugger context |
+	self halt.
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
@@ -657,7 +658,7 @@ WebsideAPI >> stepOverDebugger [
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
 	debugger stepOver: context.
-		^ nil
+	^ nil
 ]
 
 { #category : #'code endpoints' }
