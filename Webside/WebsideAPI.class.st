@@ -13,8 +13,7 @@ Class {
 	#name : #WebsideAPI,
 	#superclass : #Object,
 	#instVars : [
-		'request',
-		'path'
+		'request'
 	],
 	#classVars : [
 		'Debuggers',
@@ -169,13 +168,16 @@ WebsideAPI >> compiler [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
-	| id process exception debugger |
+	| id process exception context debugger |
 	id := self bodyAt: 'evaluation'.
 	id ifNil: [ ^ self notFound ].
 	id := UUID fromString: id.
 	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
 	exception := process suspendedContext exception.
-	process suspendedContext: exception signalerContext. 
+	context := exception signalerContext.
+	process
+		suspendedContext: context;
+		restart: context.
 	debugger := process
 		newDebugSessionNamed: exception description
 		startedAt: process suspendedContext.
@@ -445,7 +447,8 @@ WebsideAPI >> pinnedObject [
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjectSlot [
-	| id object index |
+	
+	| id object path index |
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
@@ -650,7 +653,7 @@ WebsideAPI >> stepIntoDebugger [
 { #category : #'debugging endpoints' }
 WebsideAPI >> stepOverDebugger [
 	| debugger context |
-	self halt.
+
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
