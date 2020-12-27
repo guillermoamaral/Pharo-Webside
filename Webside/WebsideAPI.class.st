@@ -6,8 +6,9 @@ WebsideServer new
 	port: 9001;
 	start.
 	
+WebsideServer allInstances.
 
-WebsideServer allInstances
+WebsideAPI reset.
 "
 Class {
 	#name : #WebsideAPI,
