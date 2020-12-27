@@ -262,14 +262,14 @@ WebsideAPI >> dialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
-	| expression sync pin id compiler block json process |
+	| expression sync pin id block json process |
 	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
 	block := [ | object |
-	compiler := self compiler.
-	[ object := compiler evaluate: expression ] on: Exception
+	[ object := self compiler evaluate: expression ]
+		on: Exception
 		do: [ :exception | 
 			process
 				suspendedContext: exception signalerContext;
