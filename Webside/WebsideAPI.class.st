@@ -195,15 +195,21 @@ WebsideAPI >> createWorkspace [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrame [
-	| debugger index frame |
+	| debugger index frame interval |
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
 	index := self requestedIndex.
 	frame := debugger stack at: index ifAbsent: [ ^ self notFound ].
+	interval := debugger pcRangeForContext: frame.
+	interval := NeoJSONObject new
+		at: 'start' put: interval first;
+		at: 'end' put: interval last;
+		yourself.
 	^ frame asWebsideJson
-				at: 'index' put: index;
-				yourself 
+		at: 'index' put: index;
+		at: 'interval' put: interval;
+		yourself
 ]
 
 { #category : #'debugging endpoints' }
