@@ -176,12 +176,11 @@ WebsideAPI >> createDebugger [
 	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
 	exception := process suspendedContext exception.
 	context := exception signalerContext.
-	process
-		suspendedContext: context;
-		restart: context.
+	"process suspendedContext: context."
 	debugger := process
 		newDebugSessionNamed: exception description
-		startedAt: process suspendedContext.
+		startedAt: context.
+	debugger restart: context.
 	self debuggers at: id put: debugger.
 	^ id asString
 ]
