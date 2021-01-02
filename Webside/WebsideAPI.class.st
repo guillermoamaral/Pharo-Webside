@@ -605,8 +605,8 @@ WebsideAPI >> restartDebugger [
 		ifAbsent: [ ^ self notFound ].
 	update := self queryAt: 'update'.
 	method := context method.
-	(update = 'true' and: [method notNil]) ifTrue: [ context privRefreshWith: (method classBinding >>method selector)].
-	
+	(update = 'true' and: [ method notNil ])
+		ifTrue: [ context privRefreshWith: method classBinding value >> method selector ].
 	debugger restart: context.
 	^ nil
 ]
