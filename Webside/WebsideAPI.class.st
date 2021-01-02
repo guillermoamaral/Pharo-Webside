@@ -596,13 +596,17 @@ WebsideAPI >> requestedSelector [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> restartDebugger [
-	| debugger context |
+	| debugger context update method |
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
 	context := debugger stack
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
+	update := self queryAt: 'update'.
+	method := context method.
+	(update = 'true' and: [method notNil]) ifTrue: [ context privRefreshWith: (method classBinding >>method selector)].
+	
 	debugger restart: context.
 	^ nil
 ]
