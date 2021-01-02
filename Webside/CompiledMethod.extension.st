@@ -11,5 +11,5 @@ CompiledMethod >> asWebsideJson [
 		at: 'timestamp' put: self timeStamp;
 		at: 'overriding' put: self isOverriding;
 		at: 'overriden' put: self isOverridden;
-		yourself
+			yourself
 ]
