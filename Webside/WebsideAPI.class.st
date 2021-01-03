@@ -335,7 +335,7 @@ WebsideAPI >> filterByVariable: aCollection [
 				ifTrue: [ slot := class slotNamed: variable ].
 			(class classVarNames includes: variable)
 				ifTrue: [ classVar := class classVarNamed: variable ].
-			(slot notNil and: [ slot isReferencedIn: m ])
+			(slot notNil and: [ (slot isReadIn: m) or: [ slot isWrittenIn: m ]  ])
 				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
 ]
 
