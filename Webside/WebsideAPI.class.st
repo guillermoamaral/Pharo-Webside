@@ -44,7 +44,7 @@ WebsideAPI >> addChange [
 	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
-	author := (NeoJSONReader fromString: request entity) at: 'author'.
+	author := (NeoJSONReader fromString: request entity) at: 'author' ifAbsent: 'Unknown'.
 	Author
 		useAuthor: author
 		during: [ [ change execute ]
@@ -55,7 +55,9 @@ WebsideAPI >> addChange [
 
 { #category : #private }
 WebsideAPI >> badRequest: aString [
-	^ZnResponse badRequest: aString
+	^ZnResponse 
+	badRequest: request 
+		entity: (ZnEntity textCRLF: aString)
 ]
 
 { #category : #private }
@@ -381,14 +383,13 @@ WebsideAPI >> instanceVariables [
 
 { #category : #'code endpoints' }
 WebsideAPI >> method [
-	| class selector method |
+	| class selector |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
 	selector := self requestedSelector.
 	selector ifNil: [ ^ self notFound ].
-	method := class >> selector.
-	method ifNil: [ ^ self notFound ].
-	^ method asWebsideJson
+	(class includesSelector: selector) ifFalse: [ ^ self notFound ].
+	^ (class >> selector) asWebsideJson
 ]
 
 { #category : #'code endpoints' }
