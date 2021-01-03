@@ -333,7 +333,7 @@ WebsideAPI >> filterByVariable: aCollection [
 			class := m methodClass.
 			(class hasSlotNamed: variable)
 				ifTrue: [ slot := class slotNamed: variable ].
-			(class hasClassVarNamed: variable)
+			(class classVarNames includes: variable)
 				ifTrue: [ classVar := class classVarNamed: variable ].
 			(slot notNil and: [ slot isReferencedIn: m ])
 				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
@@ -508,7 +508,8 @@ WebsideAPI >> queriedClass [
 
 { #category : #private }
 WebsideAPI >> queriedReferencing [
-	^ self queryAt: 'referencing' 
+	^ self queriedReferencingClass isNil
+		ifTrue: [ self queryAt: 'referencing' ]
 ]
 
 { #category : #private }
@@ -545,11 +546,10 @@ WebsideAPI >> queryAt: aString [
 ]
 
 { #category : #private }
-WebsideAPI >> referencesTo: anAssociation [
-	| scope |
-	scope := self queriedClass ifNil: [SystemNavigation default].
-	^(scope allCallsOn: anAssociation)
-		& (scope allCallsOn: anAssociation key)
+WebsideAPI >> referencesTo: aClass [
+	| binding |
+	binding := Smalltalk bindingOf: aClass name asSymbol.
+	^SystemNavigation default allReferencesTo: binding
 ]
 
 { #category : #accessing }
