@@ -62,7 +62,9 @@ WebsideServer >> handlePreflightRequest: request [
 WebsideServer >> handleRequest: request with: selector [
 	| api result entity response |
 	api := WebsideAPI new request: request.
-	result := api perform: selector.
+	result := [ api perform: selector ]
+		on: Error
+		do: [ :e | ^ ZnResponse serverError: e description ].
 	response := (result isKindOf: ZnResponse)
 		ifTrue: [ result ]
 		ifFalse: [ entity := ZnStringEntity

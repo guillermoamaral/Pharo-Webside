@@ -639,7 +639,7 @@ WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 		anObject isCollection
 			ifTrue: [ 
 				index > anObject size ifTrue: [ ^aBlock value ].
-				^anObject at: index ] 
+				^[anObject at: index] on: Error do: [ anObject basicAt: index ] ] 
 			ifFalse: [
 				anObject class isVariable ifTrue: [^anObject at: index].
 				index > anObject class instSize ifTrue: [^aBlock value].
