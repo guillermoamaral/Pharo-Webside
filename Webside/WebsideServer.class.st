@@ -196,7 +196,7 @@ WebsideServer >> port [
 
 { #category : #accessing }
 WebsideServer >> port: anInteger [
-	^ port := anInteger
+	port := anInteger
 ]
 
 { #category : #initialization }
