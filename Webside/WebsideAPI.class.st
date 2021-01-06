@@ -1,12 +1,12 @@
 "
 Implements the API required by Webside.
 
+WebsideServer allInstances.
+
 WebsideServer new
 	baseUri: '/pharo';
 	port: 9001;
 	start.
-	
-WebsideServer allInstances.
 
 WebsideAPI reset.
 "

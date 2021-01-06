@@ -1,6 +1,8 @@
 "
 Handy class to make WebsideAPI accessible on a Teapot server.
 
+WebsideServer allInstances.
+
 WebsideServer new
 	baseUri: '/pharo';
 	port: 9001;
