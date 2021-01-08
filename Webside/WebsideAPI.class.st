@@ -478,6 +478,14 @@ WebsideAPI >> pinnedObjects [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPI >> project [
+	| package |
+	package := self requestedProject.
+	package ifNil: [ ^ self notFound ].
+	^package asWebsideJson 
+]
+
+{ #category : #'code endpoints' }
 WebsideAPI >> projects [
 	| organizer root packages names |
 	organizer := RPackageOrganizer default .
@@ -586,6 +594,13 @@ WebsideAPI >> requestedIndex [
 	| index |
 	index := self urlAt: 'index'.
 	^ index ifNotNil: [ index asInteger ]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedProject [
+	| name |
+	name := self urlAt: 'name'.
+	^ name ifNotNil: [ RPackageOrganizer default packageNamed: name ifAbsent: nil  ]
 ]
 
 { #category : #private }
