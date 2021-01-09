@@ -182,6 +182,7 @@ WebsideAPI >> createDebugger [
 	debugger := process
 		newDebugSessionNamed: exception description
 		startedAt: context.
+	context isBottomContext ifFalse: [ context := context sender ].
 	debugger restart: context.
 	self debuggers at: id put: debugger.
 	^ id asString
