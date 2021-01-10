@@ -7,14 +7,13 @@ WebsideServer new
 	baseUri: '/pharo';
 	port: 9001;
 	start.
-
-WebsideAPI reset.
 "
 Class {
 	#name : #WebsideAPI,
 	#superclass : #Object,
 	#instVars : [
-		'request'
+		'request',
+		'server'
 	],
 	#classVars : [
 		'Debuggers',
@@ -24,14 +23,6 @@ Class {
 	],
 	#category : #'Webside-Base'
 }
-
-{ #category : #initialization }
-WebsideAPI class >> reset [
-	"
-	self reset 
-	"
-	Debuggers := Evaluations := Objects := Workspaces := nil
-]
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
@@ -246,8 +237,7 @@ WebsideAPI >> debuggerFrames [
 
 { #category : #private }
 WebsideAPI >> debuggers [
-	Debuggers ifNil: [ Debuggers := Dictionary new ].
-	^ Debuggers
+	^server debuggers
 ]
 
 { #category : #private }
@@ -332,8 +322,7 @@ WebsideAPI >> evaluationError: id [
 
 { #category : #private }
 WebsideAPI >> evaluations [
-	Evaluations ifNil: [ Evaluations := Dictionary new ].
-	^ Evaluations
+	^server evaluations
 ]
 
 { #category : #private }
@@ -453,8 +442,7 @@ WebsideAPI >> notFound [
 
 { #category : #private }
 WebsideAPI >> objects [
-	Objects ifNil: [ Objects := Dictionary new ].
-	^ Objects
+	^server objects
 ]
 
 { #category : #'objects endpoints' }
@@ -666,6 +654,11 @@ WebsideAPI >> sendersOf: aSymbol [
 		ifNil: [ SystemNavigation default allSendersOf: aSymbol ]
 ]
 
+{ #category : #accessing }
+WebsideAPI >> server: aWebsideServer [
+	server := aWebsideServer
+]
+
 { #category : #private }
 WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 	| index |
@@ -750,6 +743,5 @@ WebsideAPI >> variables [
 
 { #category : #private }
 WebsideAPI >> workspaces [
-	Workspaces ifNil: [ Workspaces := Dictionary new ].
-	^ Workspaces
+	^server workspaces
 ]

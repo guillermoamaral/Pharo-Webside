@@ -14,7 +14,11 @@ Class {
 	#instVars : [
 		'server',
 		'baseUri',
-		'port'
+		'port',
+		'debuggers',
+		'evaluations',
+		'objects',
+		'workspaces'
 	],
 	#category : #'Webside-Base'
 }
@@ -29,6 +33,11 @@ WebsideServer >> baseUri: aString [
 	baseUri := aString
 ]
 
+{ #category : #accessing }
+WebsideServer >> debuggers [
+	^ debuggers
+]
+
 { #category : #initialization }
 WebsideServer >> defaultBaseUri [
 	^ '/pharo'
@@ -37,6 +46,11 @@ WebsideServer >> defaultBaseUri [
 { #category : #initialization }
 WebsideServer >> defaultPort [ 
 	^9001
+]
+
+{ #category : #accessing }
+WebsideServer >> evaluations [
+	^ evaluations
 ]
 
 { #category : #actions }
@@ -63,7 +77,7 @@ WebsideServer >> handlePreflightRequest: request [
 { #category : #actions }
 WebsideServer >> handleRequest: request with: selector [
 	| api result entity response |
-	api := WebsideAPI new request: request.
+	api := WebsideAPI new server: self; request: request.
 	result := [ api perform: selector ]
 		on: Error
 		do: [ :e | ^ ZnResponse serverError: e description ].
@@ -85,6 +99,10 @@ WebsideServer >> initialize [
 	super initialize.
 	port := self defaultPort.
 	baseUri := self defaultBaseUri.
+	evaluations := Dictionary new.
+	objects := Dictionary new.
+	workspaces := Dictionary new.
+	debuggers := Dictionary new.
 
 ]
 
@@ -194,6 +212,11 @@ WebsideServer >> isPreflight: request [
 ]
 
 { #category : #accessing }
+WebsideServer >> objects [
+	^objects
+]
+
+{ #category : #accessing }
 WebsideServer >> port [
 	^ port
 ]
@@ -201,6 +224,14 @@ WebsideServer >> port [
 { #category : #accessing }
 WebsideServer >> port: anInteger [
 	port := anInteger
+]
+
+{ #category : #accessing }
+WebsideServer >> reset [
+	debuggers removeAll.
+	evaluations removeAll.
+	objects removeAll.
+	workspaces removeAll
 ]
 
 { #category : #initialization }
@@ -231,11 +262,16 @@ WebsideServer >> routePOST: uri to: selector [
 WebsideServer >> start [
 	self
 		initializeServer;
-		initializeRoutes.
+		initializeRoutes; reset.
 	server start
 ]
 
 { #category : #actions }
 WebsideServer >> stop [
 	server stop
+]
+
+{ #category : #accessing }
+WebsideServer >> workspaces [
+	^ workspaces
 ]
