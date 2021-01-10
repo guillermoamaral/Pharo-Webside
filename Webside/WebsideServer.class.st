@@ -139,7 +139,9 @@ WebsideServer >> initializeDebuggingRoutes [
 WebsideServer >> initializeEvaluationRoutes [
 	self
 		routePOST: '/evaluations' to: #evaluateExpression;
-		routeGET: '/evaluation/<id>' to: #evaluation
+		routeGET: '/evaluations' to: #activeEvaluations;
+		routeGET: '/evaluations/<id>' to: #activeEvaluation;
+		routeDELETE: '/evaluations/<id>' to: #cancelEvaluation
 ]
 
 { #category : #initialization }

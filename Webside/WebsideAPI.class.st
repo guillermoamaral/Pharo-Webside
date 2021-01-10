@@ -67,6 +67,16 @@ WebsideAPI >> bodyAt: aString [
 	^json at: aString ifAbsent: nil 
 ]
 
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> cancelEvaluation [
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	evaluation terminate.
+	self evaluations removeKey: id.
+	^ nil
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> categories [
 	| class |
