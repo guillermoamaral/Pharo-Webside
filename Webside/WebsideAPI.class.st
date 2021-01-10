@@ -280,28 +280,32 @@ WebsideAPI >> dialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
-	| expression sync pin id block json process |
+	| expression sync pin id semaphore block object json process |
 	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
-	block := [ | object |
-	[ object := self compiler evaluate: expression ]
+	semaphore := Semaphore new.
+	block := [ [ object := self compiler evaluate: expression ]
 		on: Exception
 		do: [ :exception | 
+			semaphore signal.
 			process
 				suspendedContext: exception signalerContext;
 				suspend ].
+	self evaluations removeKey: id ifAbsent: nil.
 	(sync not or: [ pin ])
 		ifTrue: [ self objects at: id put: object ].
-	self evaluations removeKey: id ifAbsent: nil.
+	semaphore signal.
 	object ].
+	process := self evaluations at: id put: block fork.
 	sync
-		ifTrue: [ json := block value asWebsideJson.
+		ifTrue: [ semaphore wait.
+			object ifNil: [ ^ self evaluationError: id ].
+			json := object asWebsideJson.
 			pin
 				ifTrue: [ json at: 'id' put: id asString ].
 			^ json ].
-	process := self evaluations at: id put: block fork.
 	^ NeoJSONObject new
 		at: 'id' put: id asString;
 		at: 'expression' put: expression;
