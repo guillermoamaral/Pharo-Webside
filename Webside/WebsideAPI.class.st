@@ -42,7 +42,7 @@ WebsideAPI >> addChange [
 		useAuthor: author
 		during: [ [ change execute ]
 				on: Error , SyntaxErrorNotification
-				do: [ :e | ^ self  compilationError: e ] ].
+				do: [ :e | ^ self halt compilationError: e ] ].
 	^ change asWebsideJson
 ]
 
@@ -76,6 +76,19 @@ WebsideAPI >> categories [
 	class := self requestedClass.
 	class ifNil: [^self notFound].
 	^class protocols
+]
+
+{ #category : #'changes endpoints' }
+WebsideAPI >> changes [
+	| author changes |
+	author := self queryAt: 'author'.
+	changes := EpMonitor current log entries select: [:e | e content isCodeChange].
+	changes := #().
+	author
+		ifNotNil: [ changes := changes select: [ :ch | ch author = author ] ].
+	^ changes collect: #asWebsideJson
+	
+
 ]
 
 { #category : #'code endpoints' }
