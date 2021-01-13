@@ -16,6 +16,6 @@ RBAddMethodRefactoring class >> acceptsWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBAddMethodRefactoring class >> webSTType [
-	^'MethodDefinition'
+RBAddMethodRefactoring class >> websideType [
+	^ 'MethodDefinition'
 ]

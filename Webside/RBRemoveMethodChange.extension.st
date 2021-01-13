@@ -13,6 +13,6 @@ RBRemoveMethodChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRemoveMethodChange class >> webSTType [
-	^'MethodRemove'
+RBRemoveMethodChange class >> websideType [
+	^ 'MethodRemove'
 ]

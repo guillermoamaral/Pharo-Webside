@@ -1,6 +1,6 @@
 Extension { #name : #RBRemoveClassChange }
 
 { #category : #'*Webside' }
-RBRemoveClassChange class >> webSTType [
+RBRemoveClassChange class >> websideType [
 	^ 'ClassRemove'
 ]

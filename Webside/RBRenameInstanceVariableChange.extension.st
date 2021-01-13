@@ -1,6 +1,6 @@
 Extension { #name : #RBRenameInstanceVariableChange }
 
 { #category : #'*Webside' }
-RBRenameInstanceVariableChange class >> webSTType [
+RBRenameInstanceVariableChange class >> websideType [
 	^ 'InstanceVariableRename'
 ]

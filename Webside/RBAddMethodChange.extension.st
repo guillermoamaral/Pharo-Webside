@@ -22,6 +22,6 @@ RBAddMethodChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBAddMethodChange class >> webSTType [
-	^'MethodDefinition'
+RBAddMethodChange class >> websideType [
+	^ 'MethodDefinition'
 ]

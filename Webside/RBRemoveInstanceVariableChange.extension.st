@@ -1,6 +1,6 @@
 Extension { #name : #RBRemoveInstanceVariableChange }
 
 { #category : #'*Webside' }
-RBRemoveInstanceVariableChange class >> webSTType [
+RBRemoveInstanceVariableChange class >> websideType [
 	^ 'InstanceVariableRemove'
 ]

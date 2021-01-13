@@ -4,13 +4,13 @@ Extension { #name : #RBRefactoryChange }
 RBRefactoryChange class >> acceptsWebsideJson: json [
 	| type |
 	type := json at: 'type' ifAbsent: nil.
-	^ self webSTType = type
+	^ self websideType = type
 ]
 
 { #category : #'*Webside' }
 RBRefactoryChange >> asWebsideJson [
 	^ NeoJSONObject new
-		at: 'type' put: self class webSTType asString;
+		at: 'type' put: self class websideType asString;
 		at: 'label' put: self changeString;
 		at: 'project' put: 'self projectName';
 		at: 'timestamp' put: DateAndTime now asString;
@@ -37,6 +37,6 @@ RBRefactoryChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRefactoryChange class >> webSTType [
-	^nil
+RBRefactoryChange class >> websideType [
+	^ nil
 ]

@@ -1,6 +1,6 @@
 Extension { #name : #RBAddInstanceVariableChange }
 
 { #category : #'*Webside' }
-RBAddInstanceVariableChange class >> webSTType [
+RBAddInstanceVariableChange class >> websideType [
 	^ 'InstanceVariableAddition'
 ]

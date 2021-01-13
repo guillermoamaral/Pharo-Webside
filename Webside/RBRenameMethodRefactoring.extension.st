@@ -19,6 +19,6 @@ RBRenameMethodRefactoring >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRenameMethodRefactoring class >> webSTType [
+RBRenameMethodRefactoring class >> websideType [
 	^ 'SelectorRename'
 ]

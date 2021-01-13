@@ -4,13 +4,13 @@ Extension { #name : #RBRefactoring }
 RBRefactoring class >> acceptsWebsideJson: json [
 	| type |
 	type := json at: 'type' ifAbsent: nil.
-	^ self webSTType = type
+	^ self websideType = type
 ]
 
 { #category : #'*Webside' }
 RBRefactoring >> asWebsideJson [
 	^ NeoJSONObject new
-		at: 'type' put: self class webSTType asString;
+		at: 'type' put: self class websideType asString;
 		at: 'label' put: self printString;
 		at: 'project' put: 'self projectName';
 		at: 'timestamp' put: DateAndTime now asString;
@@ -37,6 +37,6 @@ RBRefactoring >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRefactoring class >> webSTType [
-	^nil
+RBRefactoring class >> websideType [
+	^ nil
 ]
