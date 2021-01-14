@@ -182,7 +182,7 @@ WebsideAPI >> compilationError: aCompilationError [
 
 { #category : #private }
 WebsideAPI >> compiler [
-	^ Smalltalk compiler
+	^ OpalCompiler new compilationContext: self requestedContext
 ]
 
 { #category : #'debugging endpoints' }
@@ -603,6 +603,19 @@ WebsideAPI >> requestedClass [
 	| name |
 	name := self urlAt: 'name'.
 	^ name ifNotNil: [ self classNamed: name ]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedContext [
+	| context id workspace |
+	context := self bodyAt: 'context'.
+	context ifNil: [ ^ nil ].
+	id := context at: 'workspace' ifAbsent: nil.
+	id notNil
+		ifTrue: [ id := UUID fromString: id.
+			workspace := self workspaces at: id ifAbsent: nil.
+			^ CompilationContext new requestor: workspace ].
+	^ nil
 ]
 
 { #category : #private }
