@@ -213,7 +213,7 @@ WebsideAPI >> createDebugger [
 WebsideAPI >> createWorkspace [
 	| id |
 	id := self newID.
-	self workspaces at: id put: Dictionary new.
+	self workspaces at: id put: Workspace new.
 	^ id asString
 ]
 
