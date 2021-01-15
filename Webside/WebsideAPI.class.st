@@ -182,7 +182,26 @@ WebsideAPI >> compilationError: aCompilationError [
 
 { #category : #private }
 WebsideAPI >> compiler [
-	^ OpalCompiler new compilationContext: self requestedContext
+	| compiler context class object workspace index debugger frame |
+	compiler := OpalCompiler new.
+	context := self bodyAt: 'context'.
+	context ifNil: [ ^ compiler ].
+	context at: 'claat' ifPresent: [:name |
+		class := self classNamed: name.
+		^ compiler receiver: class ].
+	context at: 'object' ifPresent: [:id |
+			object := self objects at: (UUID fromString: id) ifAbsent: nil.
+			^compiler receiver: object ].
+	context at: 'workspace' ifPresent: [:id |
+			workspace := self workspaces at: (UUID fromString: id) ifAbsent: [ ^compiler ].
+			^compiler requestor: workspace  ].
+	context at: 'debugger' ifPresent: [:id | 
+			index := context at: 'frame' ifAbsent: [ ^ compiler ].
+			debugger := self debuggers at: (UUID fromString: id) ifAbsent: [ ^ compiler ].
+			
+			frame := debugger stack at: index asInteger ifAbsent: [ ^ compiler ].
+			^compiler receiver: frame ].
+	^ nil
 ]
 
 { #category : #'debugging endpoints' }
@@ -607,14 +626,25 @@ WebsideAPI >> requestedClass [
 
 { #category : #private }
 WebsideAPI >> requestedContext [
-	| context id workspace |
+	| context name id debugger index |
 	context := self bodyAt: 'context'.
 	context ifNil: [ ^ nil ].
+	name := context at: 'class' ifAbsent: nil.
+	name ifNotNil: [ ^ self classNamed: name ].
+	id := context at: 'object' ifAbsent: nil.
+	id
+		ifNotNil: [ id := UUID fromString: id.
+			^ self objects at: id ifAbsent: nil ].
 	id := context at: 'workspace' ifAbsent: nil.
-	id notNil
-		ifTrue: [ id := UUID fromString: id.
-			workspace := self workspaces at: id ifAbsent: nil.
-			^ CompilationContext new requestor: workspace ].
+	id
+		ifNotNil: [ id := UUID fromString: id.
+			^ self workspaces at: id ifAbsent: nil ].
+	id := context at: 'debugger' ifAbsent: nil.
+	id
+		ifNotNil: [ id := UUID fromString: id.
+			debugger := self debuggers at: id ifAbsent: [ ^ nil ].
+			index := context at: 'frame' ifAbsent: [ ^ nil ].
+			^debugger stack at: index asInteger ifAbsent: [ ^ nil ].].
 	^ nil
 ]
 
