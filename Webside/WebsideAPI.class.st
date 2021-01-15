@@ -186,21 +186,35 @@ WebsideAPI >> compiler [
 	compiler := OpalCompiler new.
 	context := self bodyAt: 'context'.
 	context ifNil: [ ^ compiler ].
-	context at: 'claat' ifPresent: [:name |
-		class := self classNamed: name.
-		^ compiler receiver: class ].
-	context at: 'object' ifPresent: [:id |
+	context
+		at: 'claat'
+		ifPresent: [ :name | 
+			class := self classNamed: name.
+			^ compiler receiver: class ].
+	context
+		at: 'object'
+		ifPresent: [ :id | 
 			object := self objects at: (UUID fromString: id) ifAbsent: nil.
-			^compiler receiver: object ].
-	context at: 'workspace' ifPresent: [:id |
-			workspace := self workspaces at: (UUID fromString: id) ifAbsent: [ ^compiler ].
-			^compiler requestor: workspace  ].
-	context at: 'debugger' ifPresent: [:id | 
+
+			^ compiler receiver: object ].
+	context
+		at: 'workspace'
+		ifPresent: [ :id | 
+			workspace := self workspaces
+				at: (UUID fromString: id)
+				ifAbsent: [ ^ compiler ].
+			^ compiler requestor: workspace ].
+	context
+		at: 'debugger'
+		ifPresent: [ :id | 
 			index := context at: 'frame' ifAbsent: [ ^ compiler ].
-			debugger := self debuggers at: (UUID fromString: id) ifAbsent: [ ^ compiler ].
-			
-			frame := debugger stack at: index asInteger ifAbsent: [ ^ compiler ].
-			^compiler receiver: frame ].
+			debugger := self debuggers
+				at: (UUID fromString: id)
+				ifAbsent: [ ^ compiler ].
+			frame := debugger stack
+				at: index asInteger
+				ifAbsent: [ ^ compiler ].
+			^ compiler receiver: frame ].
 	^ nil
 ]
 
