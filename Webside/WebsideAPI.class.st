@@ -195,7 +195,6 @@ WebsideAPI >> compiler [
 		at: 'object'
 		ifPresent: [ :id | 
 			object := self objects at: (UUID fromString: id) ifAbsent: nil.
-
 			^ compiler receiver: object ].
 	context
 		at: 'workspace'
@@ -214,7 +213,7 @@ WebsideAPI >> compiler [
 			frame := debugger stack
 				at: index asInteger
 				ifAbsent: [ ^ compiler ].
-			^ compiler receiver: frame ].
+			^ compiler receiver: frame receiver].
 	^ nil
 ]
 
