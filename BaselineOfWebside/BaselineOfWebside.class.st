@@ -9,9 +9,11 @@ BaselineOfWebside >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ self setUpDependencies: spec. spec
-				package: 'Webside'
-				with: [ spec requires: #('Teapot' 'NeoJSON') ] ]
+		do: [ self setUpDependencies: spec.
+			spec
+				package: 'Webside' with: [ spec requires: #('Teapot' 'NeoJSON') ];
+		
+				package: 'Webside-Tests' with: [ spec requires: #('Webside') ] ]
 ]
 
 { #category : #baselines }

@@ -34,6 +34,11 @@ WebsideServer >> baseUri: aString [
 ]
 
 { #category : #accessing }
+WebsideServer >> baseUrl [
+	^ server server localUrl / baseUri
+]
+
+{ #category : #accessing }
 WebsideServer >> debuggers [
 	^ debuggers
 ]
@@ -256,6 +261,11 @@ WebsideServer >> routePOST: uri to: selector [
 		POST:
 			(baseUri , uri)
 				-> [ :request | self handleRequest: request with: selector ]
+]
+
+{ #category : #accessing }
+WebsideServer >> server [
+	^ server
 ]
 
 { #category : #actions }
