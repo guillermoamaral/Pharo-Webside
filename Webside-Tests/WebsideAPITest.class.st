@@ -464,14 +464,15 @@ WebsideAPITest >> testCreateDebugger [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testDebuggerContext [
-	| evaluation id debugger |
+	| evaluation id debugger error |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | id := e data at: 'evaluation' ].
+	self post: '/evaluations' with: evaluation.
+	self deny: client isSuccess .
+	error := NeoJSONObject fromString: client response entity string.
+	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target context receiver |
 	target := NeoJSONObject new
@@ -528,26 +529,19 @@ WebsideAPITest >> testDialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testEvaluationError [
-	| evaluation failed |
+	| evaluation error description |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '3 + ';
 		at: 'sync' put: true;
 		yourself.
-	failed := false.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | 
-			| description |
-			failed := true.
-			self
-				assert: (e isKindOf: Error);
-				assert: e hasData.
-			description := (e data at: 'description') asLowercase.
-			self
-				assert:
-					(description includesSubstring: 'primary missing')
-						| (description includesSubstring: 'variable or expression expected') ].
-	self assert: failed
+	self post: '/evaluations' with: evaluation.
+	self deny: client isSuccess.
+	error := NeoJSONObject fromString: client response entity string.
+	description := (error at: 'description') asLowercase.
+	self
+		assert:
+			(description includesSubstring: 'primary missing')
+				| (description includesSubstring: 'variable or expression expected')
 ]
 
 { #category : #'debugging endpoints' }
