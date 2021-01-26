@@ -17,9 +17,13 @@ WebsideAPITest >> delete: uri [
 
 { #category : #private }
 WebsideAPITest >> get: uri [
-	| data |
-	data := client get: server baseUrl / uri.
-	client isNotFound ifTrue: [ ^nil ].
+	| url data |
+	url := server baseUrl asString.
+	(uri beginsWith: '/') ifFalse: [ url := url , '/' ].
+	url := url , uri.
+	data := client get: url.
+	client isNotFound
+		ifTrue: [ ^ nil ].
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
@@ -1010,7 +1014,7 @@ WebsideAPITest >> testReferences [
 ]
 
 { #category : #'changes endpoints' }
-WebsideAPITest >> testSelectorRename [
+WebsideAPITest >> testSelectorRename2 [
 	| definition renaming |
 	definition := NeoJSONObject new
 		at: 'type' put: 'MethodDefinition';
@@ -1025,7 +1029,7 @@ WebsideAPITest >> testSelectorRename [
 	renaming := NeoJSONObject new
 		at: 'type' put: 'SelectorRename';
 		at: 'class' put: 'Point';
-		at: 'selector' put: 'testSelectorRename';
+		at: 'selector' put: #testSelectorRename2;
 		at: 'newSelector' put: 'testSelectorRename2';
 		at: 'author' put: self class name;
 		yourself.
