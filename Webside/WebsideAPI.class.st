@@ -282,7 +282,7 @@ WebsideAPI >> debuggerFrames [
 				yourself ]
 ]
 
-{ #category : #private }
+{ #category : #'debugging endpoints' }
 WebsideAPI >> debuggers [
 	^server debuggers
 ]
@@ -812,7 +812,7 @@ WebsideAPI >> variables [
 	^ self instanceVariables , self classVariables
 ]
 
-{ #category : #private }
+{ #category : #'workspaces endpoints' }
 WebsideAPI >> workspaces [
 	^server workspaces
 ]

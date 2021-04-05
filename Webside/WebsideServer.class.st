@@ -142,6 +142,7 @@ WebsideServer >> initializeCodeRoutes [
 { #category : #initialization }
 WebsideServer >> initializeDebuggingRoutes [
 	self
+		routeGET: '/debuggers' to: #debuggers;
 		routePOST: '/debuggers' to: #createDebugger;
 		routeGET: '/debuggers/<id>/frames' to: #debuggerFrames;
 		routeGET: '/debuggers/<id>/frames/<index>' to: #debuggerFrame;
