@@ -30,6 +30,7 @@ WebsideAPI >> activeDebuggers [
 		collect: [ :a | 
 			a value asWebsideJson
 				at: 'id' put: a key asString;
+				at: 'description' put: a value name;
 				yourself ]
 ]
 
