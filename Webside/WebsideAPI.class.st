@@ -26,7 +26,8 @@ Class {
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> activeDebuggers [
-	^ self debuggers 		collect: [ :a | 
+	^ self debuggers associations
+		collect: [ :a | 
 			a value asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
@@ -40,7 +41,8 @@ WebsideAPI >> activeEvaluations [
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> activeWorkspaces [
-	^ self  workspaces collect: [ :a | 
+	^ self workspaces associations
+		collect: [ :a | 
 			a value asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
