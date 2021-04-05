@@ -26,7 +26,10 @@ Class {
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> activeDebuggers [
-	^ self debuggers asArray
+	^ self debuggers 		collect: [ :a | 
+			a value asWebsideJson
+				at: 'id' put: a key asString;
+				yourself ]
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -37,7 +40,10 @@ WebsideAPI >> activeEvaluations [
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> activeWorkspaces [
-	^ server workspaces asArray
+	^ self  workspaces collect: [ :a | 
+			a value asWebsideJson
+				at: 'id' put: a key asString;
+				yourself ]
 ]
 
 { #category : #'changes endpoints' }
