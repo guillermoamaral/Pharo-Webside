@@ -1160,3 +1160,13 @@ WebsideAPITest >> testWorkspace [
 		assert: (result at: 'printString') equals: '1' ]
 		ensure: [ self delete: '/workspaces/' , id ]
 ]
+
+{ #category : #'workspaces endpoints' }
+WebsideAPITest >> testWorkspaces [
+	| id result |
+	id := self post: '/workspaces'.
+	[result := self get: '/workspaces'.
+	self
+		assert: (result anySatisfy: [:w | (w at: 'id') = id])]
+		ensure: [ self delete: '/workspaces/' , id ]
+]

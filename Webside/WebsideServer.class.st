@@ -142,7 +142,7 @@ WebsideServer >> initializeCodeRoutes [
 { #category : #initialization }
 WebsideServer >> initializeDebuggingRoutes [
 	self
-		routeGET: '/debuggers' to: #debuggers;
+		routeGET: '/debuggers' to: #activeDebuggers;
 		routePOST: '/debuggers' to: #createDebugger;
 		routeGET: '/debuggers/<id>/frames' to: #debuggerFrames;
 		routeGET: '/debuggers/<id>/frames/<index>' to: #debuggerFrame;
@@ -207,8 +207,8 @@ WebsideServer >> initializeServer [
 WebsideServer >> initializeWorkspacesRoutes [
 	self
 		routePOST: '/workspaces' to: #createWorkspace;
-		routeGET: '/workspaces' to: #workspaces;
-		routeGET: '/workspaces/<id>' to: #workspaces;
+		routeGET: '/workspaces' to: #activeWorkspaces;
+		routeGET: '/workspaces/<id>' to: #workspace;
 		routeDELETE: '/workspaces/<id>' to: #deleteWorkspace
 ]
 

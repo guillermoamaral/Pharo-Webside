@@ -24,10 +24,20 @@ Class {
 	#category : #'Webside-Base'
 }
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> activeDebuggers [
+	^ self debuggers asArray
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
 	^ self evaluations associations
 		collect: [ :a | NeoJSONObject new at: 'id' put: a key asString ; yourself ]
+]
+
+{ #category : #'workspaces endpoints' }
+WebsideAPI >> activeWorkspaces [
+	^ server workspaces asArray
 ]
 
 { #category : #'changes endpoints' }
@@ -213,7 +223,7 @@ WebsideAPI >> compiler [
 			frame := debugger stack
 				at: index asInteger
 				ifAbsent: [ ^ compiler ].
-			^ compiler receiver: frame receiver].
+			^ compiler receiver: frame receiver ].
 	^ nil
 ]
 
@@ -282,9 +292,9 @@ WebsideAPI >> debuggerFrames [
 				yourself ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : #private }
 WebsideAPI >> debuggers [
-	^server debuggers
+	^ server debuggers
 ]
 
 { #category : #private }
@@ -295,18 +305,20 @@ WebsideAPI >> defaultRootClass [
 { #category : #'debugging endpoints' }
 WebsideAPI >> deleteDebugger [
 	| id debugger |
-	id := self requestedId .
+	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: nil.
-	debugger notNil ifTrue: [ 
-		debugger terminate.
-		self debuggers removeKey: id ifAbsent: nil.
-		self evaluations removeKey: id ifAbsent: nil ].
-	^id
+	debugger notNil
+		ifTrue: [ debugger terminate.
+			self debuggers removeKey: id ifAbsent: nil.
+			self evaluations removeKey: id ifAbsent: nil ].
+	^ id
 ]
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> deleteWorkspace [
-	self workspaces removeKey: self requestedId ifAbsent: [^self notFound].
+	self workspaces
+		removeKey: self requestedId
+		ifAbsent: [ ^ self notFound ].
 	^ nil
 ]
 
@@ -657,7 +669,7 @@ WebsideAPI >> requestedContext [
 		ifNotNil: [ id := UUID fromString: id.
 			debugger := self debuggers at: id ifAbsent: [ ^ nil ].
 			index := context at: 'frame' ifAbsent: [ ^ nil ].
-			^debugger stack at: index asInteger ifAbsent: [ ^ nil ].].
+			^ debugger stack at: index asInteger ifAbsent: [ ^ nil ] ].
 	^ nil
 ]
 
@@ -701,7 +713,8 @@ WebsideAPI >> restartDebugger [
 	update := self queryAt: 'update'.
 	method := context method.
 	(update = 'true' and: [ method notNil ])
-		ifTrue: [ context privRefreshWith: method classBinding value >> method selector ].
+		ifTrue: [ context
+				privRefreshWith: method classBinding value >> method selector ].
 	debugger restart: context.
 	^ nil
 ]
@@ -713,7 +726,7 @@ WebsideAPI >> resumeDebugger [
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
 	self debuggers removeKey: id.
 	debugger resume.
-		^ nil
+	^ nil
 ]
 
 { #category : #private }
@@ -757,13 +770,12 @@ WebsideAPI >> stepIntoDebugger [
 		at: self requestedIndex
 		ifAbsent: [ ^ self notFound ].
 	debugger stepInto: context.
-		^ nil
+	^ nil
 ]
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> stepOverDebugger [
 	| debugger context |
-
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
@@ -789,7 +801,7 @@ WebsideAPI >> terminateDebugger [
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
 	self debuggers removeKey: id.
 	debugger terminate.
-		^nil
+	^ nil
 ]
 
 { #category : #'objects endpoints' }
@@ -813,6 +825,13 @@ WebsideAPI >> variables [
 ]
 
 { #category : #'workspaces endpoints' }
+WebsideAPI >> workspace [
+	^ self workspaces
+		at: self requestedId
+		ifAbsent: [ self notFound ]
+]
+
+{ #category : #private }
 WebsideAPI >> workspaces [
-	^server workspaces
+	^ server workspaces
 ]
