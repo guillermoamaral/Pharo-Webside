@@ -174,7 +174,8 @@ WebsideServer >> initializeObjectsRoutes [
 		routeGET: '/objects' to: #pinnedObjects;
 		routeGET: '/objects/<id>' to: #pinnedObject;
 		routeDELETE: '/objects/<id>' to: #unpinObject;
-		routeGET: '/objects/<id>/*' to: #pinnedObjectSlot
+		routeGET: '/objects/<id>/*' to: #pinnedObjectSlot;
+		routeGET: '/objects/<id>/*/instance-variables' to: #pinnedObjectInstanceVariables
 ]
 
 { #category : #initialization }
