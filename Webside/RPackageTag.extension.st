@@ -4,6 +4,6 @@ Extension { #name : #RPackageTag }
 RPackageTag >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'name' put: name;
-		at: 'classNames' put: classNames;
+		at: 'classes' put: classNames;
 		yourself
 ]

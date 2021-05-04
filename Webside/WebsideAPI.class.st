@@ -153,6 +153,22 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 	^ json
 ]
 
+{ #category : #private }
+WebsideAPI >> classTreeFromClasses: aCollection [
+	| roots json subclasses |
+	roots := Dictionary new.
+	aCollection do: [ :c |
+		json := NeoJSONObject new at: 'name' put: c name; yourself.
+		roots at: c name put: json];
+	select: [ :c | c superclass notNil ] thenDo: [ :c |
+		roots at: c superclass ifPresent: [ :sc |
+			subclasses := sc at: 'subclasses' ifAbsentPut: [ SortedCollection new sortBlock: [:a :b | a name <= b name] ].
+			subclasses add: (roots at: c name)						 ]
+		 ];
+	select: [ :c | c superclass notNil ] thenDo: [ :c | (roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]].
+	^roots asArray sort: [ :a :b | a name <= b name ]
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> classVariables [
 	| class |
@@ -574,6 +590,22 @@ WebsideAPI >> project [
 	package := self requestedProject.
 	package ifNil: [ ^ self notFound ].
 	^package asWebsideJson 
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> projectClasses [
+	| project classes tree names |
+	project := self requestedProject.
+	project ifNil: [ ^ self notFound ].
+	classes := project classes asOrderedCollection.
+	tree := self queryAt: 'tree'.
+	tree = 'true'
+		ifTrue: [ ^ self classTreeFromClasses: classes ].
+	names := self queryAt: 'names'.
+	names = 'true'
+		ifTrue: [ ^ (classes collect: #name) sort ].
+	^ classes collect: #sWebsideJson
+	
 ]
 
 { #category : #'code endpoints' }
