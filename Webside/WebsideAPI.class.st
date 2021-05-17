@@ -273,7 +273,10 @@ WebsideAPI >> createDebugger [
 				stepOver;
 				stepOver ].
 	self debuggers at: id put: debugger.
-	^ id asString
+	^ debugger asWebsideJson
+				at: 'id' put: id asString;
+				at: 'description' put: debugger name;
+				yourself 
 ]
 
 { #category : #'workspaces endpoints' }
