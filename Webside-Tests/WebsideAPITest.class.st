@@ -443,14 +443,17 @@ WebsideAPITest >> testCodeSuggestion [
 	^t + 1';
 		at: 'author' put: self class name;
 		yourself.
-	[ 
-	[self post: '/changes' with: change] on: Error do:  [:e | error := e].
-	self assert: error notNil; assert: error class = Error; assert: error hasData.
+	[ [ self post: '/changes' with: change ]
+		on: Error
+		do: [ :e | error := e ].
+	self
+		assert: error notNil;
+		assert: error class = Error.
 	data := error data.
 	self assert: data notNil.
 	changes := data at: 'changes'.
-	self post: '/changes' with: changes anyone.
- 	method := self get: '/classes/Point/methods/testMethodDefinition'.
+	self post: '/changes' with: changes first.
+	method := self get: '/classes/Point/methods/testMethodDefinition'.
 	self
 		assert: method notNil;
 		assert: method selector equals: 'testMethodDefinition';
