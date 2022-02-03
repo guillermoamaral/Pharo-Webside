@@ -26,14 +26,14 @@ RBRefactoryChange class >> classForWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
+RBRefactoryChange >> fromWebsideJson: json [
+]
+
+{ #category : #'*Webside' }
 RBRefactoryChange class >> fromWebsideJson: json [
 	| class |
 	class := self classForWebsideJson: json.
 	^ class ifNotNil: [ class new fromWebsideJson: json ] 
-]
-
-{ #category : #'*Webside' }
-RBRefactoryChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }

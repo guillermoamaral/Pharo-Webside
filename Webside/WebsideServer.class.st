@@ -13,6 +13,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'server',
+		'apiClass',
 		'baseUri',
 		'port',
 		'debuggers',
@@ -22,6 +23,11 @@ Class {
 	],
 	#category : #'Webside-Base'
 }
+
+{ #category : #accessing }
+WebsideServer >> apiClass: aClass [
+	apiClass := aClass
+]
 
 { #category : #accessing }
 WebsideServer >> baseUri [
@@ -82,7 +88,7 @@ WebsideServer >> handlePreflightRequest: request [
 { #category : #actions }
 WebsideServer >> handleRequest: request with: selector [
 	| api result entity response |
-	api := WebsideAPI new server: self; request: request.
+	api := apiClass new server: self; request: request.
 	result := [ api perform: selector ]
 		on: Error
 		do: [ :e | ^ ZnResponse serverError: e description ].
@@ -102,6 +108,7 @@ WebsideServer >> handleRequest: request with: selector [
 { #category : #initialization }
 WebsideServer >> initialize [
 	super initialize.
+	apiClass := WebsideAPI.
 	port := self defaultPort.
 	baseUri := self defaultBaseUri.
 	evaluations := Dictionary new.
