@@ -643,8 +643,7 @@ WebsideAPI >> queriedClass [
 
 { #category : #private }
 WebsideAPI >> queriedReferencing [
-	^ self queriedReferencingClass isNil
-		ifTrue: [ self queryAt: 'referencing' ]
+	^ self queriedReferencingClass ifNil: [ self queryAt: 'referencing' ]
 ]
 
 { #category : #private }
