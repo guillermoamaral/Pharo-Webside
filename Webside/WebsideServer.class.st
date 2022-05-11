@@ -16,10 +16,7 @@ Class {
 		'apiClass',
 		'baseUri',
 		'port',
-		'debuggers',
-		'evaluations',
-		'objects',
-		'workspaces'
+		'resources'
 	],
 	#category : #'Webside-Base'
 }
@@ -46,7 +43,7 @@ WebsideServer >> baseUrl [
 
 { #category : #accessing }
 WebsideServer >> debuggers [
-	^ debuggers
+	^ self resourcesAt: #debuggers
 ]
 
 { #category : #initialization }
@@ -61,7 +58,7 @@ WebsideServer >> defaultPort [
 
 { #category : #accessing }
 WebsideServer >> evaluations [
-	^ evaluations
+	^ self resourcesAt: #evaluations
 ]
 
 { #category : #actions }
@@ -111,11 +108,7 @@ WebsideServer >> initialize [
 	apiClass := WebsideAPI.
 	port := self defaultPort.
 	baseUri := self defaultBaseUri.
-	evaluations := Dictionary new.
-	objects := Dictionary new.
-	workspaces := Dictionary new.
-	debuggers := Dictionary new.
-
+	self initializeResources
 ]
 
 { #category : #initialization }
@@ -191,6 +184,16 @@ WebsideServer >> initializeObjectsRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializeResources [
+	resources := Dictionary new.
+	
+	resources at: #evaluations put: Dictionary new;
+	at: #objects put: Dictionary new;
+	at: #workspaces put: Dictionary new;
+	at: #debuggers put: Dictionary new
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeRoutes [
 	self
 		initializeCodeRoutes;
@@ -232,7 +235,7 @@ WebsideServer >> isPreflight: request [
 
 { #category : #accessing }
 WebsideServer >> objects [
-	^objects
+	^ self resourcesAt: #objects
 ]
 
 { #category : #accessing }
@@ -247,10 +250,20 @@ WebsideServer >> port: anInteger [
 
 { #category : #accessing }
 WebsideServer >> reset [
-	debuggers removeAll.
-	evaluations removeAll.
-	objects removeAll.
-	workspaces removeAll
+	self debuggers removeAll.
+	self evaluations removeAll.
+	self objects removeAll.
+	self workspaces removeAll
+]
+
+{ #category : #accessing }
+WebsideServer >> resourcesAt: aSymbol [
+	^ resources at: aSymbol ifAbsent: nil
+]
+
+{ #category : #accessing }
+WebsideServer >> resourcesAt: aSymbol put: anObject [
+	resources at: aSymbol put: anObject
 ]
 
 { #category : #initialization }
@@ -297,5 +310,5 @@ WebsideServer >> stop [
 
 { #category : #accessing }
 WebsideServer >> workspaces [
-	^ workspaces
+	^ self resourcesAt: #workspaces
 ]
