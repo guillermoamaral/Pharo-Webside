@@ -355,6 +355,17 @@ WebsideAPI >> dialect [
 	^'Pharo'
 ]
 
+{ #category : #private }
+WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol [
+	aSymbol == #referencing
+		ifTrue: [ ^ (variable isReadIn: aCompiledMethod) or: [  (variable isWrittenIn: aCompiledMethod)] ].
+	aSymbol == #using
+		ifTrue: [ ^ variable isReadIn: aCompiledMethod ].
+	aSymbol == #assigning
+		ifTrue: [ ^ variable isWrittenIn: aCompiledMethod ].
+	self error: 'not valid access type: ' , aSymbol
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
 	| expression sync pin id semaphore block object json process |
@@ -423,18 +434,42 @@ WebsideAPI >> filterByCategory: aCollection [
 
 { #category : #private }
 WebsideAPI >> filterByVariable: aCollection [
-	| variable class slot classVar |
-	variable := self queriedReferencing.
-	variable ifNil: [ ^ aCollection ].
-	^ aCollection
-		select: [ :m | 
-			class := m methodClass.
-			(class hasSlotNamed: variable)
-				ifTrue: [ slot := class slotNamed: variable ].
-			(class classVarNames includes: variable)
-				ifTrue: [ classVar := class classVarNamed: variable ].
-			(slot notNil and: [ (slot isReadIn: m) or: [ slot isWrittenIn: m ]  ])
-				or: [ classVar notNil and: [ classVar isReferencedIn: m ] ] ]
+	
+	| referencing using assigning filtered |
+	referencing := self queriedReferencing.
+	using := self queriedUsing.
+	assigning := self queriedAssigning.
+	(referencing isNil and: [using isNil] and: [assigning isNil]) ifTrue: [ ^aCollection ].
+	filtered := Set new.
+	referencing notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: referencing type: #referencing) ].	
+		using notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: using type: #using) ].
+	assigning notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: assigning type: #assigning) ].
+	^filtered
+]
+
+{ #category : #private }
+WebsideAPI >> filterMethods: aCollection byAccessTo: aString type: aSymbol [
+	| groupped filtered slot variable |
+	groupped := Dictionary new.
+	aCollection
+		do: [ :m | 
+			(groupped at: m methodClass ifAbsentPut: [ OrderedCollection new ])
+				add: m ].
+	filtered := OrderedCollection new.
+	groupped
+		keysAndValuesDo: [ :class :methods | 
+			(class hasSlotNamed: aString)
+				ifTrue: [ slot := class slotNamed: aString.
+					filtered
+						addAll:
+							(methods
+								select: [ :m | self doesMethod: m accessVariable: slot for: aSymbol ]) ].
+			(class classVarNames includes: aString)
+				ifTrue: [ variable := class classVariableNamed: aString.
+					filtered addAll: (methods
+						select: [ :m | self doesMethod: m accessVariable: slot for: aSymbol ]
+						 )] ].
+	^ filtered
 ]
 
 { #category : #'debugging endpoints' }
@@ -628,6 +663,11 @@ WebsideAPI >> projects [
 ]
 
 { #category : #private }
+WebsideAPI >> queriedAssigning [
+	^ self queryAt: 'assigning'
+]
+
+{ #category : #private }
 WebsideAPI >> queriedCategory [
 	| category |
 	category := request at: 'category' ifAbsent: nil.
@@ -643,7 +683,8 @@ WebsideAPI >> queriedClass [
 
 { #category : #private }
 WebsideAPI >> queriedReferencing [
-	^ self queriedReferencingClass ifNil: [ self queryAt: 'referencing' ]
+self queriedReferencingClass ifNotNil: [ ^nil ].
+	^ self queryAt: 'referencing' 
 ]
 
 { #category : #private }
@@ -672,6 +713,11 @@ WebsideAPI >> queriedSending [
 	| selector |
 	selector := request at: 'sending' ifAbsent: nil.
 	^selector ifNotNil: [selector asSymbol]
+]
+
+{ #category : #private }
+WebsideAPI >> queriedUsing [
+	^ self queryAt: 'using'
 ]
 
 { #category : #private }
