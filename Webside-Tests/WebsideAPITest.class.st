@@ -476,38 +476,31 @@ WebsideAPITest >> testCodeSuggestion [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger [
-	| evaluation halt id debugger |
+	| evaluation id debugger error |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	halt := false.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | 
-			| error |
-			halt := true.
-			self
-				assert: (e isKindOf: Error);
-				assert: e hasData.
-			error := e data.
-			self
-				assert: ((error at: 'description') asLowercase includesSubstring: 'halt');
-				assert: (error includesKey: 'evaluation').
-			id := error at: 'evaluation' ].
 	self
-		assert: halt;
-		assert: id notNil.
+		post: '/evaluations' with: evaluation;
+		deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
+	self
+		assert: ((error at: 'description') asLowercase includesSubstring: 'halt');
+		assert: (error includesKey: 'evaluation').
+	id := error at: 'evaluation'.
+	self assert: id notNil.
 	[ | target frames |
 	target := NeoJSONObject new
 		at: 'evaluation' put: id;
 		yourself.
 	debugger := self post: '/debuggers' with: target.
 	self assert: debugger notNil.
-	frames := self get: '/debuggers/' , debugger , '/frames'.
+	id := debugger at: 'id'.
+	frames := self get: '/debuggers/' , id , '/frames'.
 	self assert: frames notEmpty ]
 		ensure: [ debugger notNil
-				ifTrue: [ self delete: '/debuggers/' , debugger asString ] ]
+				ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -517,9 +510,8 @@ WebsideAPITest >> testDebuggerContext [
 		at: 'expression' put: '3 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	self post: '/evaluations' with: evaluation.
-	self deny: client isSuccess .
-	error := NeoJSONObject fromString: client response entity string.
+	self post: '/evaluations' with: evaluation; deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
 	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target context receiver |
@@ -527,9 +519,10 @@ WebsideAPITest >> testDebuggerContext [
 		at: 'evaluation' put: id;
 		yourself.
 	debugger := self post: '/debuggers' with: target.
-	self post: '/debuggers/' , debugger , '/frames/1/stepinto'.
+	id := debugger at: 'id'.
+	self post: '/debuggers/' , id , '/frames/1/stepinto'.
 	context := NeoJSONObject new
-		at: 'debugger' put: debugger asString;
+		at: 'debugger' put: id;
 		at: 'frame' put: 1;
 		yourself.
 	evaluation := NeoJSONObject new
@@ -542,30 +535,33 @@ WebsideAPITest >> testDebuggerContext [
 	self
 		assert: (receiver at: 'class') equals: 'SmallInteger';
 		assert: (receiver at: 'printString') equals: '3' ]
-		ensure: [ self delete: '/debuggers/' , debugger asString ]
+		ensure: [ self delete: '/debuggers/' , id asString ]
 ]
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testDebuggerFrames [
-	| evaluation id debugger |
+	| evaluation error id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | id := e data at: 'evaluation' ].
+	self
+		post: '/evaluations' with: evaluation;
+		deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
+	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target frames |
 	target := NeoJSONObject new
 		at: 'evaluation' put: id;
 		yourself.
 	debugger := self post: '/debuggers' with: target.
-	frames := self get: '/debuggers/' , debugger , '/frames'.
+	id := debugger at: 'id'.
+	frames := self get: '/debuggers/' , id , '/frames'.
 	self
 		assert: frames notEmpty;
 		assert: (frames anySatisfy: [ :f | (f at: 'label') notEmpty ]) ]
-		ensure: [ self delete: '/debuggers/' , debugger asString ]
+		ensure: [ self delete: '/debuggers/' , id ]
 ]
 
 { #category : #'code endpoints' }
@@ -594,27 +590,30 @@ WebsideAPITest >> testEvaluationError [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testFrameBindings [
-	| evaluation id debugger |
+	| evaluation error id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | id := e data at: 'evaluation' ].
+	self
+		post: '/evaluations' with: evaluation;
+		deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
+	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target frames bindings |
 	target := NeoJSONObject new
 		at: 'evaluation' put: id;
 		yourself.
 	debugger := self post: '/debuggers' with: target.
-	frames := self get: '/debuggers/' , debugger , '/frames'.
+	id := debugger at: 'id'.
+	frames := self get: '/debuggers/' , id , '/frames'.
 	self assert: frames notEmpty.
-	bindings := self get: '/debuggers/' , debugger , '/frames/1/bindings'.
+	bindings := self get: '/debuggers/' , id , '/frames/1/bindings'.
 	self
 		assert: bindings notEmpty;
 		assert: (bindings anySatisfy: [ :b | (b at: 'name') = 'self' ]) ]
-		ensure: [ self delete: '/debuggers/' , debugger asString ]
+		ensure: [ self delete: '/debuggers/' , id ]
 ]
 
 { #category : #'code endpoints' }
@@ -1137,24 +1136,29 @@ WebsideAPITest >> testSenders [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testStepInto [
-	| evaluation id debugger |
+	| evaluation error id debugger |
 	evaluation := NeoJSONObject new
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | id := e data at: 'evaluation' ].
+	self
+		post: '/evaluations' with: evaluation;
+		deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
+	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target frame |
 	target := NeoJSONObject new
 		at: 'evaluation' put: id;
 		yourself.
 	debugger := self post: '/debuggers' with: target.
-	self post: '/debuggers/' , debugger , '/frames/1/stepinto'.
-	frame := self get: '/debuggers/' , debugger , '/frames/1'.
-	self assert: ((frame at: 'method') at: 'selector') equals: 'factorial' ]
-		ensure: [ self delete: '/debuggers/' , debugger asString ]
+	id := debugger at: 'id'.
+	self post: '/debuggers/' , id , '/frames/1/stepinto'.
+	frame := self get: '/debuggers/' , id , '/frames/1'.
+	self
+		assert: ((frame at: 'method') at: 'selector')
+		equals: 'factorial' ]
+		ensure: [ self delete: '/debuggers/' , id asString ]
 ]
 
 { #category : #'code endpoints' }
