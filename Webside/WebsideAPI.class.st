@@ -514,18 +514,23 @@ WebsideAPI >> instanceVariables [
 
 { #category : #'code endpoints' }
 WebsideAPI >> method [
-	| class selector |
+	| class selector method json |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
 	selector := self requestedSelector.
 	selector ifNil: [ ^ self notFound ].
-	(class includesSelector: selector) ifFalse: [ ^ self notFound ].
-	^ (class >> selector) asWebsideJson
+	(class includesSelector: selector)
+		ifFalse: [ ^ self notFound ].
+	method := class >> selector.
+	json := method asWebsideJson.
+	(self queryAt: 'ast') = 'true'
+		ifTrue: [ json at: 'ast' put: method ast asWebsideJson ].
+	^ json
 ]
 
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
-	| selector methods senders global references class |
+	| selector methods senders global references class ast json |
 	selector := self queriedSelector.
 	selector notNil
 		ifTrue: [ methods := self implementorsOf: selector ].
@@ -549,7 +554,10 @@ WebsideAPI >> methods [
 				asArray ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
-	^ methods collect: #asWebsideJson
+	ast := 	(self queryAt: 'ast') = 'true'.
+	^ methods collect: [:m | json := m asWebsideJson.
+		ast
+		ifTrue: [ json at: 'ast' put: m ast asWebsideJson ]].
 ]
 
 { #category : #private }
