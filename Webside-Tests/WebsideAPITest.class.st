@@ -103,7 +103,8 @@ WebsideAPITest >> testAst [
 	block value: node.
 	(node includesKey: 'children')
 		ifTrue: [ (node at: 'children')
-				do: [ :child | traverse value: child value: block ] ] ]. traverse
+				do: [ :child | traverse value: child value: block ] ] ].
+	traverse
 		value: ast
 		value: [ :n | 
 			(n at: 'type') = 'Return'
@@ -112,7 +113,7 @@ WebsideAPITest >> testAst [
 	traverse
 		value: return
 		value: [ :n | 
-			((n at: 'type') = 'Identifier' and: [ (n at: 'name') = 'x' ])
+			((n at: 'type') = 'Identifier' and: [ (n at: 'value') = 'x' ])
 				ifTrue: [ x := n ] ].
 	self assert: x notNil
 ]
