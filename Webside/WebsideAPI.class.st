@@ -439,7 +439,7 @@ WebsideAPI >> filterByVariable: aCollection [
 	referencing := self queriedReferencing.
 	using := self queriedUsing.
 	assigning := self queriedAssigning.
-	(referencing isNil and: [using isNil] and: [assigning isNil]) ifTrue: [ ^aCollection ].
+	(referencing isNil and: [using isNil and: [assigning isNil]]) ifTrue: [ ^aCollection ].
 	filtered := Set new.
 	referencing notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: referencing type: #referencing) ].	
 		using notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: using type: #using) ].
