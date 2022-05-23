@@ -93,6 +93,30 @@ WebsideAPITest >> testActiveEvaluations [
 		ensure: [ self delete: '/evaluations/' , id asString ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPITest >> testAst [
+	| method ast traverse return x |
+	method := self get: 'classes/Point/methods/x?ast=true'.
+	ast := method ast.
+	self assert: ast notNil.
+	traverse := [ :node :block | 
+	block value: node.
+	(node includesKey: 'children')
+		ifTrue: [ (node at: 'children')
+				do: [ :child | traverse value: child value: block ] ] ]. traverse
+		value: ast
+		value: [ :n | 
+			(n at: 'type') = 'Return'
+				ifTrue: [ return := n ] ].
+	self assert: return notNil.
+	traverse
+		value: return
+		value: [ :n | 
+			((n at: 'type') = 'Identifier' and: [ (n at: 'name') = 'x' ])
+				ifTrue: [ x := n ] ].
+	self assert: x notNil
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testAsynchronousEvaluation [
 	| evaluation result id |

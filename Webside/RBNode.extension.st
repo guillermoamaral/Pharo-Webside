@@ -2,11 +2,20 @@ Extension { #name : #RBNode }
 
 { #category : #'*Webside' }
 RBNode >> asWebsideJson [
-	| type |
-	type := (self class name withoutPrefix: 'RB') withoutSuffix: 'Node'.
+
 	^ NeoJSONObject new
-		at: 'type' put: type;
+		at: 'type' put: self websideType;
 		at: 'start' put: self start;
-		at: 'end' put: self end;
+		at: 'end' put: self stop;
 		yourself
+]
+
+{ #category : #'*Webside' }
+RBNode >> websideType [
+	^self class websideType
+]
+
+{ #category : #'*Webside' }
+RBNode class >> websideType [ 
+	^(self name withoutPrefix: 'RB') withoutSuffix: 'Node'.
 ]
