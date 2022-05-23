@@ -554,10 +554,12 @@ WebsideAPI >> methods [
 				asArray ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
-	ast := 	(self queryAt: 'ast') = 'true'.
-	^ methods collect: [:m | json := m asWebsideJson.
-		ast
-		ifTrue: [ json at: 'ast' put: m ast asWebsideJson ]].
+	ast := (self queryAt: 'ast') = 'true'.
+	^ methods
+		collect: [ :m | 
+			json := m asWebsideJson.
+			ast
+				ifTrue: [ json at: 'ast' put: m ast asWebsideJson ]. json]
 ]
 
 { #category : #private }
