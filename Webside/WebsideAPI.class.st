@@ -24,6 +24,27 @@ Class {
 	#category : #'Webside-Base'
 }
 
+{ #category : #services }
+WebsideAPI class >> startServer [
+	"
+	self startServer
+	"
+
+^WebsideServer new
+	baseUri: '/pharo';
+	port: 9001;
+	start.
+]
+
+{ #category : #services }
+WebsideAPI class >> stopServer [
+	"
+	self stopServer
+	"
+
+	WebsideServer allInstances do: #stop
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPI >> activeDebuggers [
 	^ self debuggers associations
