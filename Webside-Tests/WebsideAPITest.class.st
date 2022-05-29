@@ -422,11 +422,46 @@ WebsideAPITest >> testClassRename [
 			self post: '/changes' with: remotion ]
 ]
 
+{ #category : #'changes endpoints' }
+WebsideAPITest >> testClassVariableAddition [
+	| definition addition |
+	definition := NeoJSONObject new
+		at: 'type' put: 'ClassDefinition';
+		at: 'class' put: 'TestClassVariableAddition';
+		definition:
+			'Object
+	subclass: #TestClassVariableAddition
+	instanceVariableNames: ''''
+	classVariableNames: ''''
+	poolDictionaries: ''''';
+		at: 'author' put: self class name;
+		yourself.
+	addition := NeoJSONObject new
+		at: 'type' put: 'ClassVariableAddition';
+		at: 'class' put: 'TestClassVariableAddition';
+		at: 'variable' put: 'X';
+		yourself.
+	[ | variables |
+	self
+		post: '/changes' with: definition;
+		post: '/changes' with: addition.
+	variables := self
+		get: '/classes/TestClassVariableAddition/class-variables'.
+	self
+		assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ])]
+		ensure: [ | remotion |
+			remotion := NeoJSONObject new
+				at: 'type' put: 'ClassRemove';
+				at: 'class' put: 'TestClassVariableAddition';
+				yourself.
+			self post: '/changes' with: remotion ]
+]
+
 { #category : #'code endpoints' }
 WebsideAPITest >> testClassVariables [
 	| variables |
 	variables := self get: 'classes/Float/class-variables'.
-	self assert: (variables anySatisfy: [ :v | v name = 'Infinity' ])
+	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'Infinity' and: [(v at: 'type') = 'class']])
 ]
 
 { #category : #'code endpoints' }
@@ -1227,11 +1262,11 @@ WebsideAPITest >> testUnpinObject [
 WebsideAPITest >> testVariables [
 	| variables |
 	variables := self get: 'classes/Float/variables'.
-	self assert: (variables anySatisfy: [ :v | v name = 'Infinity' ]).
+	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'Infinity' and: [(v at: 'type') = 'class']]).
 	variables := self get: 'classes/Fraction/variables'.
 	self
-		assert: (variables anySatisfy: [ :v | v name = 'numerator' ]);
-		assert: (variables anySatisfy: [ :v | v name = 'denominator' ])
+		assert: (variables anySatisfy: [ :v | (v at:'name') = 'numerator' and: [(v at: 'type') = 'instance']]);
+		assert: (variables anySatisfy: [ :v | (v at:'name') = 'denominator' and: [(v at: 'type') = 'instance']])
 ]
 
 { #category : #'workspaces endpoints' }

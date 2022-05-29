@@ -194,14 +194,16 @@ WebsideAPI >> classTreeFromClasses: aCollection [
 WebsideAPI >> classVariables [
 	| class |
 	class := self requestedClass.
-	class ifNil: [^self notFound].
-	^class withAllSuperclasses
-		gather: [:c | 
-			c classVarNames asArray sort collect: [:v | 
-				NeoJSONObject new
-					at: 'name' put: v;
-					at: 'class' put: c name , ' class';
-					yourself]]
+	class ifNil: [ ^ self notFound ].
+	^ class withAllSuperclasses
+		gather: [ :c | 
+			c classVarNames asArray sort
+				collect: [ :v | 
+					NeoJSONObject new
+						at: 'name' put: v;
+						at: 'class' put: c name , ' class';
+						at: 'type' put: 'class';
+						yourself ] ]
 ]
 
 { #category : #'code endpoints' }
@@ -523,14 +525,16 @@ WebsideAPI >> implementorsOf: aSymbol [
 WebsideAPI >> instanceVariables [
 	| class |
 	class := self requestedClass.
-	class ifNil: [^self notFound].
-	^class withAllSuperclasses
-		gather: [:c | 
-			c instVarNames collect: [:v | 
-				NeoJSONObject new
-					at: 'name' put: v;
-					at: 'class' put: c name;
-					yourself]]
+	class ifNil: [ ^ self notFound ].
+	^ class withAllSuperclasses
+		gather: [ :c | 
+			c instVarNames
+				collect: [ :v | 
+					NeoJSONObject new
+						at: 'name' put: v;
+						at: 'class' put: c name;
+						at: 'type' put: 'instance';
+						yourself ] ]
 ]
 
 { #category : #'code endpoints' }
