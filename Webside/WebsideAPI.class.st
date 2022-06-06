@@ -452,17 +452,31 @@ WebsideAPI >> filterByCategory: aCollection [
 
 { #category : #private }
 WebsideAPI >> filterByVariable: aCollection [
-	
-	| referencing using assigning filtered |
-	referencing := self queriedReferencing.
+	| accessing using assigning filtered |
+	accessing := self queriedAccessing .
 	using := self queriedUsing.
 	assigning := self queriedAssigning.
-	(referencing isNil and: [using isNil and: [assigning isNil]]) ifTrue: [ ^aCollection ].
+	(accessing isNil and: [ using isNil and: [ assigning isNil ] ])
+		ifTrue: [ ^ aCollection ].
 	filtered := Set new.
-	referencing notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: referencing type: #referencing) ].	
-		using notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: using type: #using) ].
-	assigning notNil ifTrue: [ filtered addAll: (self filterMethods: aCollection byAccessTo: assigning type: #assigning) ].
-	^filtered
+	accessing notNil
+		ifTrue: [ filtered
+				addAll:
+					(self
+						filterMethods: aCollection
+						byAccessTo: accessing
+						type: #referencing) ].
+	using notNil
+		ifTrue: [ filtered
+				addAll: (self filterMethods: aCollection byAccessTo: using type: #using) ].
+	assigning notNil
+		ifTrue: [ filtered
+				addAll:
+					(self
+						filterMethods: aCollection
+						byAccessTo: assigning
+						type: #assigning) ].
+	^ filtered
 ]
 
 { #category : #private }
@@ -693,6 +707,11 @@ WebsideAPI >> projects [
 ]
 
 { #category : #private }
+WebsideAPI >> queriedAccessing [
+	^ self queryAt: 'accessing'
+]
+
+{ #category : #private }
 WebsideAPI >> queriedAssigning [
 	^ self queryAt: 'assigning'
 ]
@@ -709,12 +728,6 @@ WebsideAPI >> queriedClass [
 	| name |
 	name := request at: 'class' ifAbsent: nil.
 	^name ifNotNil: [self classNamed: name]
-]
-
-{ #category : #private }
-WebsideAPI >> queriedReferencing [
-self queriedReferencingClass ifNotNil: [ ^nil ].
-	^ self queryAt: 'referencing' 
 ]
 
 { #category : #private }

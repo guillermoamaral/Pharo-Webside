@@ -62,7 +62,7 @@ WebsideAPITest >> tearDown [
 { #category : #'code endpoints' }
 WebsideAPITest >> testAccessors [
 	| accessors |
-	accessors := self get: 'methods?class=Fraction&referencing=numerator'.
+	accessors := self get: 'methods?class=Fraction&accessing=numerator'.
 	self
 		assert: accessors notEmpty;
 		assert:
@@ -1158,7 +1158,7 @@ WebsideAPITest >> testSelectorRename2 [
 	renaming := NeoJSONObject new
 		at: 'type' put: 'SelectorRename';
 		at: 'class' put: 'Point';
-		at: 'selector' put: #testSelectorRename2;
+		at: 'selector' put: 'testSelectorRename';
 		at: 'newSelector' put: 'testSelectorRename2';
 		at: 'author' put: self class name;
 		yourself.
