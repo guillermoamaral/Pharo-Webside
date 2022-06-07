@@ -801,7 +801,7 @@ WebsideAPI >> referencesToString: aString [
 	| scope |
 	scope := self queriedScope ifNil: [ self queriedClass ].
 	^ SystemNavigation default
-		allMethodsSelect: [ :m | 
+		allMethodsSelect: [ :m |
 			m
 				hasLiteralSuchThat: [ :l | 
 					l isString
