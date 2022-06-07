@@ -565,24 +565,25 @@ WebsideAPI >> method [
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
 	| string methods selector global class ast json |
+
 	string := self queriedReferencingString.
-	string notNil ifTrue: [ methods := self referencesToString: string ].
+	string notNil
+		ifTrue: [ methods := self referencesToString: string ].
 	selector := self queriedSelector.
 	selector notNil
-		ifTrue: [ 
-			methods := methods ifNil: [self implementorsOf: selector] ifNotNil: [ methods select: [ :m | m selector = selector ] ] ].
+		ifTrue: [ methods := methods
+				ifNil: [ self implementorsOf: selector ]
+				ifNotNil: [ methods select: [ :m | m selector = selector ] ] ].
 	selector := self queriedSending.
 	selector notNil
-		ifTrue: [ 
-			methods := methods
-				ifNil: [ self sendersOf: selector. ]
+		ifTrue: [ methods := methods
+				ifNil: [ self sendersOf: selector ]
 				ifNotNil: [ self sendersOf: selector among: methods ] ].
 	global := self queriedReferencingClass.
 	global notNil
-		ifTrue: [ 
-			methods := methods
+		ifTrue: [ methods := methods
 				ifNil: [ self referencesToClass: global ]
-				ifNotNil: [ self referencesToClass: global among: methods  ] ].
+				ifNotNil: [ self referencesToClass: global among: methods ] ].
 	class := self requestedClass ifNil: [ self queriedClass ].
 	(class notNil and: [ methods notNil ])
 		ifTrue: [ methods := methods select: [ :m | m methodClass == class ] ].
@@ -924,7 +925,7 @@ WebsideAPI >> sendersOf: aSymbol among: aCollection [
 	
 	| index |
 	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
-	^ self methods
+	^ aCollection
 		select:
 			[ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
 ]
