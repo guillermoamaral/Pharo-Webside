@@ -277,7 +277,7 @@ WebsideAPITest >> testCategoryRename [
 	categories := self get: '/classes/TestCategoryRename/categories'.
 	self
 		assert: categories size equals: 1;
-		assert: categories first name equals: 'y' ]
+		assert: categories first equals: 'y' ]
 		ensure: [ | remotion |
 			remotion := NeoJSONObject new
 				at: 'type' put: 'ClassRemove';
@@ -505,15 +505,10 @@ WebsideAPITest >> testCodeSuggestion [
 	^t + 1';
 		at: 'author' put: self class name;
 		yourself.
-	[ [ self post: '/changes' with: change ]
-		on: Error
-		do: [ :e | error := e ].
-	self
-		assert: error notNil;
-		assert: error class = Error.
-	data := error data.
-	self assert: data notNil.
-	changes := data at: 'changes'.
+	[self post: '/changes' with: change; deny: client isSuccess.
+	error := NeoJSONObject fromString: client contents.
+	self assert: error notNil.
+	changes := error at: 'changes'.
 	self post: '/changes' with: changes first.
 	method := self get: '/classes/Point/methods/testMethodDefinition'.
 	self
@@ -1132,14 +1127,35 @@ WebsideAPITest >> testPinnedObjects [
 ]
 
 { #category : #'code endpoints' }
-WebsideAPITest >> testReferences [
+WebsideAPITest >> testReferencesToClass [
 	| references |
-	references := self get: 'methods?referencing=Fraction'.
+	references := self get: 'methods?referencingClass=Fraction'.
 	self
 		assert: references notEmpty;
 		assert:
 			(references
 				allSatisfy: [ :m | m source includesSubstring: 'Fraction' ])
+]
+
+{ #category : #'code endpoints' }
+WebsideAPITest >> testReferencesToString [
+	| references |
+	references := self get: 'methods?referencingString=referencingString'.
+	self
+		assert: references notEmpty;
+		assert:
+			(references
+				allSatisfy: [ :m | m source includesSubstring: 'referencingString' ])
+]
+
+{ #category : #'code endpoints' }
+WebsideAPITest >> testScope [
+	| methods hierarchy retrieved |
+	methods := self get: 'methods?scope=Collection&sending=notEmpty'.
+	self assert: methods notEmpty.
+	hierarchy := Collection withAllSuperAndSubclasses collect: [ :c | c name ].
+	retrieved := (methods collect: [ :m | m at: 'class' ]) asSet.
+	self assert: retrieved size > 1; assert: (retrieved allSatisfy: [:n |  hierarchy includes: n]) 
 ]
 
 { #category : #'changes endpoints' }

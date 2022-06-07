@@ -564,22 +564,25 @@ WebsideAPI >> method [
 
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
-	| selector methods senders global references class ast json |
+	| string methods selector global class ast json |
+	string := self queriedReferencingString.
+	string notNil ifTrue: [ methods := self referencesToString: string ].
 	selector := self queriedSelector.
 	selector notNil
-		ifTrue: [ methods := self implementorsOf: selector ].
+		ifTrue: [ 
+			methods := methods ifNil: [self implementorsOf: selector] ifNotNil: [ methods select: [ :m | m selector = selector ] ] ].
 	selector := self queriedSending.
 	selector notNil
-		ifTrue: [ senders := self sendersOf: selector.
+		ifTrue: [ 
 			methods := methods
-				ifNil: [ senders ]
-				ifNotNil: [ methods intersection: senders ] ].
+				ifNil: [ self sendersOf: selector. ]
+				ifNotNil: [ self sendersOf: selector among: methods ] ].
 	global := self queriedReferencingClass.
 	global notNil
-		ifTrue: [ references := self referencesTo: global.
+		ifTrue: [ 
 			methods := methods
-				ifNil: [ references ]
-				ifNotNil: [ methods intersection: references ] ].
+				ifNil: [ self referencesToClass: global ]
+				ifNotNil: [ self referencesToClass: global among: methods  ] ].
 	class := self requestedClass ifNil: [ self queriedClass ].
 	(class notNil and: [ methods notNil ])
 		ifTrue: [ methods := methods select: [ :m | m methodClass == class ] ].
@@ -593,7 +596,8 @@ WebsideAPI >> methods [
 		collect: [ :m | 
 			json := m asWebsideJson.
 			ast
-				ifTrue: [ json at: 'ast' put: m ast asWebsideJson ]. json]
+				ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
+			json ]
 ]
 
 { #category : #private }
@@ -733,8 +737,13 @@ WebsideAPI >> queriedClass [
 { #category : #private }
 WebsideAPI >> queriedReferencingClass [
 	| name |
-	name := self queryAt: 'referencing'.
+	name := self queryAt: 'referencingClass'.
 	^ name ifNotNil: [ self classNamed: name ]
+]
+
+{ #category : #private }
+WebsideAPI >> queriedReferencingString [
+	^ self queryAt: 'referencingString'
 ]
 
 { #category : #private }
@@ -769,10 +778,34 @@ WebsideAPI >> queryAt: aString [
 ]
 
 { #category : #private }
-WebsideAPI >> referencesTo: aClass [
+WebsideAPI >> referencesToClass: aClass [
 	| binding |
 	binding := Smalltalk bindingOf: aClass name asSymbol.
-	^SystemNavigation default allReferencesTo: binding
+	^ SystemNavigation default allReferencesTo: binding
+]
+
+{ #category : #private }
+WebsideAPI >> referencesToClass: aClass among: aCollection [
+
+	| binding index |
+	binding := Smalltalk bindingOf: aClass name asSymbol.
+	index := Smalltalk specialSelectorIndexOrNil: binding.
+	^ aCollection
+		select:
+			[ :m  | m  hasSelector: binding specialSelectorIndex: index ]
+]
+
+{ #category : #private }
+WebsideAPI >> referencesToString: aString [
+	| scope |
+	scope := self queriedScope ifNil: [ self queriedClass ].
+	^ SystemNavigation default
+		allMethodsSelect: [ :m | 
+			m
+				hasLiteralSuchThat: [ :l | 
+					l isString
+						and: [ l isSymbol not
+								and: [ l includesSubstring: aString caseSensitive: false ] ] ] ]
 ]
 
 { #category : #accessing }
@@ -881,8 +914,19 @@ WebsideAPI >> sendersOf: aSymbol [
 	| scope |
 	scope := self queriedScope.
 	^ scope
-		ifNotNil: [ scope sendersOf: aSymbol ]
+		ifNotNil: [ self sendersOf: aSymbol among: scope methods ]
 		ifNil: [ SystemNavigation default allSendersOf: aSymbol ]
+]
+
+{ #category : #private }
+WebsideAPI >> sendersOf: aSymbol among: aCollection [
+		
+	
+	| index |
+	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
+	^ self methods
+		select:
+			[ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
 ]
 
 { #category : #accessing }
