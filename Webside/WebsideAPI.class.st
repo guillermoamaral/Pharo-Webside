@@ -236,39 +236,50 @@ WebsideAPI >> compilationError: aCompilationError [
 
 { #category : #private }
 WebsideAPI >> compiler [
-	| compiler context class object workspace index debugger frame |
-	compiler := OpalCompiler new.
+	^ OpalCompiler new
+		noPattern: true;
+		receiver: self compilerReceiver;
+		requestor: self compilerRequestor
+]
+
+{ #category : #private }
+WebsideAPI >> compilerReceiver [
+	| context index debugger |
 	context := self bodyAt: 'context'.
-	context ifNil: [ ^ compiler ].
+	context ifNil: [ ^ nil ].
 	context
-		at: 'claat'
+		at: 'class'
 		ifPresent: [ :name | 
-			class := self classNamed: name.
-			^ compiler receiver: class ].
+			^self classNamed: name.
+			].
 	context
 		at: 'object'
 		ifPresent: [ :id | 
-			object := self objects at: (UUID fromString: id) ifAbsent: nil.
-			^ compiler receiver: object ].
-	context
-		at: 'workspace'
-		ifPresent: [ :id | 
-			workspace := self workspaces
-				at: (UUID fromString: id)
-				ifAbsent: [ ^ compiler ].
-			^ compiler requestor: workspace ].
+			^self objects at: (UUID fromString: id) ifAbsent: nil.
+			 ].
 	context
 		at: 'debugger'
 		ifPresent: [ :id | 
-			index := context at: 'frame' ifAbsent: [ ^ compiler ].
+			index := context at: 'frame' ifAbsent: [ ^ nil ].
 			debugger := self debuggers
 				at: (UUID fromString: id)
-				ifAbsent: [ ^ compiler ].
-			frame := debugger stack
+				ifAbsent: [ ^ nil ].
+			^debugger stack
 				at: index asInteger
-				ifAbsent: [ ^ compiler ].
-			^ compiler receiver: frame receiver ].
+				ifPresent: [ :frame | frame receiver ]
+				ifAbsent: [ nil ]. ].
 	^ nil
+]
+
+{ #category : #private }
+WebsideAPI >> compilerRequestor [
+	| context |
+	context := self bodyAt: 'context'.
+	context ifNil: [ ^ nil ].
+	^ context
+		at: 'workspace'
+		ifPresent: [ :id | self workspaces at: (UUID fromString: id) ifAbsent: [ nil ] ]
+		ifAbsent: [ nil ]
 ]
 
 { #category : #'debugging endpoints' }
@@ -303,6 +314,25 @@ WebsideAPI >> createWorkspace [
 	| id |
 	id := self newID.
 	self workspaces at: id put: Workspace new.
+	^ id asString
+]
+
+{ #category : #private }
+WebsideAPI >> debugExpression [
+	| expression method receiver process context debugger id |
+	expression := self bodyAt: 'expression'.
+	method := self compiler compile: expression.
+	receiver := self compilerReceiver.
+	process := [ method valueWithReceiver: receiver arguments: #() ]
+		newProcess.
+	context := process suspendedContext.
+	debugger := process
+		newDebugSessionNamed: 'debug it'
+		startedAt: context.
+	debugger stepIntoUntil: [ :c | c method == method ].
+	id := self newID.
+	self evaluations at: id put: process.
+	self debuggers at: id put: debugger.
 	^ id asString
 ]
 
@@ -387,7 +417,9 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
-	| expression sync pin id semaphore block object json process |
+	| debug expression sync pin id semaphore object process block json |
+	debug := self bodyAt: 'debug'.
+	debug == true ifTrue: [ ^self debugExpression  ].
 	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
