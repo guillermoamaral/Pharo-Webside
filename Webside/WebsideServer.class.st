@@ -85,7 +85,9 @@ WebsideServer >> handlePreflightRequest: request [
 { #category : #actions }
 WebsideServer >> handleRequest: request with: selector [
 	| api result entity response |
-	api := apiClass new server: self; request: request.
+	api := apiClass new
+		server: self;
+		request: request.
 	result := [ api perform: selector ]
 		on: Error
 		do: [ :e | ^ ZnResponse serverError: e description ].

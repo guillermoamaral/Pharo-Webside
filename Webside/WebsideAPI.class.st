@@ -671,7 +671,11 @@ WebsideAPI >> pinnedObjectInstanceVariables [
 		to: path size - 1
 		do:
 			[ :s | object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
-	^ object class allInstVarNames collect: [ :n | NeoJSONObject new at: 'name' put: n; yourself ]
+	^ object class allInstVarNames
+		collect: [ :n | 
+			NeoJSONObject new
+				at: 'name' put: n;
+				yourself ]
 ]
 
 { #category : #'objects endpoints' }
