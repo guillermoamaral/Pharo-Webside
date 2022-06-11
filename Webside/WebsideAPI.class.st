@@ -244,19 +244,14 @@ WebsideAPI >> compiler [
 
 { #category : #private }
 WebsideAPI >> compilerReceiver [
-	| context index debugger |
+	| context index debugger frame |
 	context := self bodyAt: 'context'.
 	context ifNil: [ ^ nil ].
-	context
-		at: 'class'
-		ifPresent: [ :name | 
-			^self classNamed: name.
-			].
+	context at: 'class' ifPresent: [ :name | ^ self classNamed: name ].
 	context
 		at: 'object'
-		ifPresent: [ :id | 
-			^self objects at: (UUID fromString: id) ifAbsent: nil.
-			 ].
+		ifPresent:
+			[ :id | ^ self objects at: (UUID fromString: id) ifAbsent: nil ].
 	context
 		at: 'debugger'
 		ifPresent: [ :id | 
@@ -264,10 +259,10 @@ WebsideAPI >> compilerReceiver [
 			debugger := self debuggers
 				at: (UUID fromString: id)
 				ifAbsent: [ ^ nil ].
-			^debugger stack
+			frame := debugger stack
 				at: index asInteger
-				ifPresent: [ :frame | frame receiver ]
-				ifAbsent: [ nil ]. ].
+				ifAbsent:  nil .
+				^frame ifNotNil: [ frame receiver ] ].
 	^ nil
 ]
 
