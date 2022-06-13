@@ -2,10 +2,12 @@ Extension { #name : #RBAddMethodChange }
 
 { #category : #'*Webside' }
 RBAddMethodChange >> asWebsideJson [
-	^ super asWebsideJson
-		at: 'sourceCode' put: self source;
+	| json |
+	json := super asWebsideJson.
+	self source ifNotNil: [ :s | json at: 'sourceCode' put: s ].
+	^ json
 		at: 'selector' put: self selector;
-		at: 'category' put: self protocol ;
+		at: 'category' put: self protocol;
 		yourself
 ]
 
@@ -15,7 +17,7 @@ RBAddMethodChange >> fromWebsideJson: json [
 	super fromWebsideJson: json.
 	selector := json at: 'selector' ifAbsent: nil.
 	selector ifNotNil: [ selector := selector asSymbol ].
-	source := json at: 'sourceCode'.
+	source := json at: 'sourceCode' ifAbsent: nil.
 	category := json at: 'category' ifAbsent: nil.
 	category ifNil: [ category := Protocol unclassified ].
 	self protocols: {category asSymbol}
