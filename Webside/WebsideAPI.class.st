@@ -647,7 +647,7 @@ WebsideAPI >> objects [
 { #category : #'code endpoints' }
 WebsideAPI >> package [
 	| package |
-	package := self requestedProject.
+	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
 	^ package asWebsideJson
 ]
