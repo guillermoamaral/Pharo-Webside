@@ -12,7 +12,7 @@ RBRefactoring >> asWebsideJson [
 	^ NeoJSONObject new
 		at: 'type' put: self class websideType asString;
 		at: 'label' put: self printString;
-		at: 'project' put: 'self projectName';
+		at: 'package' put: nil;
 		at: 'timestamp' put: DateAndTime now asString;
 		at: 'author' put: Author uniqueInstance fullName;
 		yourself

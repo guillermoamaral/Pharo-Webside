@@ -6,10 +6,11 @@ CompiledMethod >> asWebsideJson [
 		at: 'selector' put: self selector;
 		at: 'class' put: self methodClass name;
 		at: 'category' put: self category;
+		at: 'package' put: self package name;
 		at: 'source' put: self sourceCode;
 		at: 'author' put: self author;
 		at: 'timestamp' put: self timeStamp;
 		at: 'overriding' put: self isOverriding;
 		at: 'overriden' put: self isOverridden;
-			yourself
+		yourself
 ]

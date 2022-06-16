@@ -12,7 +12,7 @@ RBRefactoryChange >> asWebsideJson [
 	^ NeoJSONObject new
 		at: 'type' put: self class websideType asString;
 		at: 'label' put: self changeString;
-		at: 'project' put: 'self projectName';
+		at: 'package' put: nil;
 		at: 'timestamp' put: DateAndTime now asString;
 		at: 'author' put: Author uniqueInstance fullName;
 		yourself
@@ -26,14 +26,14 @@ RBRefactoryChange class >> classForWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRefactoryChange >> fromWebsideJson: json [
-]
-
-{ #category : #'*Webside' }
 RBRefactoryChange class >> fromWebsideJson: json [
 	| class |
 	class := self classForWebsideJson: json.
 	^ class ifNotNil: [ class new fromWebsideJson: json ] 
+]
+
+{ #category : #'*Webside' }
+RBRefactoryChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
