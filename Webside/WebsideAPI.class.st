@@ -657,14 +657,23 @@ WebsideAPI >> packageClasses [
 	| package classes tree names |
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
-	classes := package classes asOrderedCollection.
+	classes := package definedClasses asOrderedCollection.
 	tree := self queryAt: 'tree'.
 	tree = 'true'
 		ifTrue: [ ^ self classTreeFromClasses: classes ].
 	names := self queryAt: 'names'.
 	names = 'true'
 		ifTrue: [ ^ (classes collect: #name) sort ].
-	^ classes collect: #sWebsideJson
+	^ classes collect: #asWebsideJson
+	
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> packageMethods [
+	| package |
+	package := self requestedPackage.
+	package ifNil: [ ^ self notFound ].
+	^ package extensionMethods collect: #asWebsideJson
 ]
 
 { #category : #'code endpoints' }

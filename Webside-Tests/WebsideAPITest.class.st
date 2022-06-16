@@ -1065,6 +1065,23 @@ WebsideAPITest >> testObjectContext [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testPackageClasses [
+	| classes |
+	classes := self get: 'packages/Webside/classes'.
+	self
+		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'WebsideAPI'])
+]
+
+{ #category : #'code endpoints' }
+WebsideAPITest >> testPackageMethods [
+	| methods |
+	methods := self get: 'packages/Webside/methods'.
+	self
+		assert: methods notEmpty;
+		assert: (methods anySatisfy: [ :m | (m at: 'class') = 'Object' and: [ (m at: 'selector') = 'asWebsideJson' ]]) 
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testPackages [
 	| packages package |
 	packages := self get: 'packages'.
