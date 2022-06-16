@@ -2,13 +2,15 @@ Extension { #name : #RPackage }
 
 { #category : #'*Webside' }
 RPackage >> asWebsideJson [
-	| tags selectors |
-	tags := classTags collect: #asWebsideJson.
-	selectors := OrderedCollection new.
-	self classNamesAndExtensionSelectorsDo: [ :c :s | selectors add: (NeoJSONObject new at: 'class' put: c asString; at: 'selector' put: s asString; yourself) ].
+	| methods |
+	methods := NeoJSONObject new.
+	classExtensionSelectors
+		keysAndValuesDo: [ :c :m | methods at: c asString put: m ].
+	metaclassExtensionSelectors
+		keysAndValuesDo: [ :c :m | methods at: c asString put: m ].
 	^ super asWebsideJson
 		at: 'name' put: name;
 		at: 'classes' put: self definedClassNames;
-		at: 'methods' put: selectors;
+		at: 'methods' put: methods;
 		yourself
 ]

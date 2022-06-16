@@ -1064,6 +1064,16 @@ WebsideAPITest >> testObjectContext [
 		ensure: [ self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPITest >> testPackages [
+	| packages package |
+	packages := self get: 'packages'.
+	package := packages
+		detect: [ :p | p name = 'Webside' ]
+		ifNone: [ self assert: false ].
+	self assert: ((package at: 'classes') includes: 'WebsideAPI'); assert: ((package at: 'methods') includesKey: 'Object'); assert: (((package at: 'methods') at: 'Object') includes: 'asWebsideJson')
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testPinEvaluationResult [
 	| evaluation result |
