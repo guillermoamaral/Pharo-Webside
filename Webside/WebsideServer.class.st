@@ -124,10 +124,10 @@ WebsideServer >> initializeChangesRoutes [
 WebsideServer >> initializeCodeRoutes [
 	self
 		routeGET: '/dialect' to: #dialect;
-		routeGET: '/projects' to: #projects;
-		routeGET: '/projects/<name>' to: #project;
-		routeGET: '/projects/<name>/classes' to: #projectClasses;
-		routeGET: '/projects/<name>/methods' to: #projectMethods;
+		routeGET: '/packages' to: #packages;
+		routeGET: '/packages/<name>' to: #package;
+		routeGET: '/packages/<name>/classes' to: #packageClasses;
+		routeGET: '/packages/<name>/methods' to: #packageMethods;
 		routeGET: '/classes' to: #classes;
 		routeGET: '/classes/<name>' to: #classDefinition;
 		routeGET: '/classes/<name>/subclasses' to: #subclasses;

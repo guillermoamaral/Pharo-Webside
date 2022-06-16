@@ -644,6 +644,39 @@ WebsideAPI >> objects [
 	^server objects
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> package [
+	| package |
+	package := self requestedProject.
+	package ifNil: [ ^ self notFound ].
+	^ package asWebsideJson
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> packageClasses [
+	| package classes tree names |
+	package := self requestedPackage.
+	package ifNil: [ ^ self notFound ].
+	classes := package classes asOrderedCollection.
+	tree := self queryAt: 'tree'.
+	tree = 'true'
+		ifTrue: [ ^ self classTreeFromClasses: classes ].
+	names := self queryAt: 'names'.
+	names = 'true'
+		ifTrue: [ ^ (classes collect: #name) sort ].
+	^ classes collect: #sWebsideJson
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> packages [
+	|  packages names |
+	packages := RPackageOrganizer default packages.
+	names := self queryAt: 'names'.
+	names = 'true'
+		ifTrue: [ ^ (packages collect: #name) sort ].
+	^ packages collect: #asWebsideJson
+]
+
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObject [
 	| id object  |
@@ -701,46 +734,6 @@ WebsideAPI >> pinnedObjects [
 			a value asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
-]
-
-{ #category : #'code endpoints' }
-WebsideAPI >> project [
-	| package |
-	package := self requestedProject.
-	package ifNil: [ ^ self notFound ].
-	^package asWebsideJson 
-]
-
-{ #category : #'code endpoints' }
-WebsideAPI >> projectClasses [
-	| project classes tree names |
-	project := self requestedProject.
-	project ifNil: [ ^ self notFound ].
-	classes := project classes asOrderedCollection.
-	tree := self queryAt: 'tree'.
-	tree = 'true'
-		ifTrue: [ ^ self classTreeFromClasses: classes ].
-	names := self queryAt: 'names'.
-	names = 'true'
-		ifTrue: [ ^ (classes collect: #name) sort ].
-	^ classes collect: #sWebsideJson
-	
-]
-
-{ #category : #'code endpoints' }
-WebsideAPI >> projects [
-	| organizer root packages names |
-	organizer := RPackageOrganizer default .
-	root := self queryAt: 'root'.
-	root := root notNil
-		ifTrue: [ organizer packageNamed: root ifAbsent: nil ].
-	packages := root notNil
-		ifTrue: [ {root} ]
-		ifFalse: [ organizer packages ].
-	names := self queryAt: 'names'.
-	names = 'true'
-		ifTrue: [ ^ (packages collect: #name) sort ].
-	^ packages collect: #asWebsideJson
 ]
 
 { #category : #private }
@@ -901,10 +894,11 @@ WebsideAPI >> requestedIndex [
 ]
 
 { #category : #private }
-WebsideAPI >> requestedProject [
+WebsideAPI >> requestedPackage [
 	| name |
 	name := self urlAt: 'name'.
-	^ name ifNotNil: [ RPackageOrganizer default packageNamed: name ifAbsent: nil  ]
+	^ name
+		ifNotNil: [ RPackageOrganizer default packageNamed: name ifAbsent: nil ]
 ]
 
 { #category : #private }
