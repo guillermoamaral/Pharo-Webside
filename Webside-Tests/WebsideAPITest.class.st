@@ -1079,7 +1079,11 @@ WebsideAPITest >> testPackageClasses [
 	| classes |
 	classes := self get: 'packages/Webside/classes'.
 	self
-		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'WebsideAPI'])
+		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'WebsideAPI' ]);
+		deny: (classes anySatisfy: [ :c | (c at: 'name') = 'Object' ]).
+	classes := self get: 'packages/Webside/classes?extended=true'.
+	self
+		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'Object' ])
 ]
 
 { #category : #'code endpoints' }
