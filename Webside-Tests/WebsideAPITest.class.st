@@ -1065,6 +1065,16 @@ WebsideAPITest >> testObjectContext [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testPackage [
+	| package |
+	package := self get: 'packages/Webside'.
+	self
+		assert: package notNil;
+		assert: (package at: 'classes') notEmpty;
+		assert: (package at: 'methods') notEmpty
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testPackageClasses [
 	| classes |
 	classes := self get: 'packages/Webside/classes'.
