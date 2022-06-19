@@ -3,7 +3,7 @@
 
 ## Installation
 
-You can load **Teapot** evaluating:
+You can load **Webside** evaluating:
 ```smalltalk
 Metacello new
 	baseline: 'Webside';
