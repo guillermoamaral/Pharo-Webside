@@ -84,19 +84,18 @@ WebsideServer >> handlePreflightRequest: request [
 
 { #category : #actions }
 WebsideServer >> handleRequest: request with: selector [
-	| api result entity response |
+	| api result response |
 	api := apiClass new
 		server: self;
 		request: request.
 	response := [ result := api perform: selector.
 	(result isKindOf: ZnResponse)
 		ifTrue: [ result ]
-		ifFalse: [ self responseFrom: result ].
-	 ]
+		ifFalse: [ self responseFrom: result ] ]
 		on: Error
 		do: [ :e | ZnResponse serverError: e description ].
-		response headers at: 'Access-Control-Allow-Origin' put: '*'.
-	^response
+	response headers at: 'Access-Control-Allow-Origin' put: '*'.
+	^ response
 ]
 
 { #category : #initialization }
@@ -267,9 +266,9 @@ WebsideServer >> resourcesAt: aSymbol put: anObject [
 WebsideServer >> responseFrom: anObject [
 	| json type entity |
 	json := NeoJSONWriter toString: anObject.
-	type := ZnMimeType applicationJson
-		charSet: 'utf-8';
-		yourself.
+	type := ZnMimeType applicationJson.
+	type
+		charSet: 'utf-8'.
 	entity := ZnStringEntity with: json type: type.
 	^ ZnResponse ok: entity
 ]
