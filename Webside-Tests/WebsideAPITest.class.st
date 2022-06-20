@@ -494,7 +494,7 @@ WebsideAPITest >> testClasses [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCodeSuggestion [
-	| change method error data changes |
+	| change method error changes |
 	change := NeoJSONObject new
 		at: 'type' put: 'MethodDefinition';
 		at: 'class' put: 'Point';
@@ -505,7 +505,9 @@ WebsideAPITest >> testCodeSuggestion [
 	^t + 1';
 		at: 'author' put: self class name;
 		yourself.
-	[self post: '/changes' with: change; deny: client isSuccess.
+	[ self
+		post: '/changes' with: change;
+		deny: client isSuccess.
 	error := NeoJSONObject fromString: client contents.
 	self assert: error notNil.
 	changes := error at: 'changes'.
@@ -1141,6 +1143,40 @@ WebsideAPITest >> testPinnedObject [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPITest >> testPinnedObjectIndexedSlots [
+	| evaluation result id slots slot |
+	evaluation := NeoJSONObject new
+		at: 'expression' put: '#(true 2 nil)';
+		at: 'sync' put: true;
+		at: 'pin' put: true;
+		yourself.
+	result := self post: '/evaluations' with: evaluation.
+	id := result at: 'id'.
+	self
+		assert: (result at: 'class') equals: 'Array';
+		assert: (result at: 'indexable') equals: true.
+	slots := self get: '/objects/' , id asString , '/indexed-slots'.
+	self
+		assert: slots size equals: 3;
+		assert:
+			(slots
+				anySatisfy: [ :s | (s at: 'slot') = 1 and: [ (s at: 'printString') = 'true' ] ]);
+				assert:
+			(slots
+				anySatisfy: [ :s | (s at: 'slot') = 2 and: [ (s at: 'printString') = '2' ] ]);
+				assert:
+			(slots
+				anySatisfy: [ :s | (s at: 'slot') = 3 and: [ (s at: 'printString') = 'nil' ] ]).
+	slot := self get: '/objects/', id asString , '/3'.
+	self assert: (slot at: 'printString') equals: 'nil'.			
+slots := self get: '/objects/' , id asString , '/indexed-slots?from=2&to=2'.
+	self
+		assert: slots size equals: 1;
+		assert:
+			((slots anyone at: 'slot') = 2 and: [ (slots anyone at: 'printString') = '2' ])
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjectInstanceVariables [
 	| evaluation result id vars |
 	evaluation := NeoJSONObject new
@@ -1164,6 +1200,31 @@ WebsideAPITest >> testPinnedObjectInstanceVariables [
 		assert:
 			(Point allInstVarNames
 				allSatisfy: [ :n | vars anySatisfy: [ :v | (v at: 'name') = n ] ])
+]
+
+{ #category : #'objects endpoints' }
+WebsideAPITest >> testPinnedObjectNamedSlots [
+
+	| evaluation result id slots |
+	evaluation := NeoJSONObject new
+		at: 'expression' put: '3 @ 4';
+		at: 'sync' put: true;
+		at: 'pin' put: true;
+		yourself.
+	result := self post: '/evaluations' with: evaluation.
+	id := result at: 'id'.
+	self
+		assert: (result at: 'class') equals: 'Point';
+		assert: (result at: 'indexable') equals: false.
+	slots := self get: '/objects/' , id asString , '/named-slots'.
+	self
+		assert: slots size equals: 2;
+		assert:
+			(slots
+				anySatisfy: [ :s | (s at: 'slot') = 'x' and: [ (s at: 'printString') = '3' ] ]);
+		assert:
+			(slots
+				anySatisfy: [ :s | (s at: 'slot') = 'y' and: [ (s at: 'printString') = '4' ] ])
 ]
 
 { #category : #'objects endpoints' }

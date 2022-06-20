@@ -210,15 +210,13 @@ WebsideAPI >> classes [
 	root ifNil: [ ^ self notFound ].
 	tree := self queryAt: 'tree'.
 	tree = 'true'
-		ifTrue: [ depth := self queryAt: 'depth'.
-			depth notNil
-				ifTrue: [ depth := depth asInteger ].
+		ifTrue: [ depth := self queryAt: 'depth' ifPresent: [:d | d  asInteger ].
 			json := self classTreeFrom: root depth: depth.
 			^ Array with: json ].
 	classes := root withAllSubclasses.
 	names := self queryAt: 'names'.
 	names = 'true'
-		ifTrue: [ ^ (classes collect: #name)  ].
+		ifTrue: [ ^ classes collect: #name ].
 	^ classes collect: #asWebsideJson
 ]
 
@@ -558,6 +556,27 @@ WebsideAPI >> implementorsOf: aSymbol [
 		ifNil: [ SystemNavigation default allImplementorsOf: aSymbol ]
 ]
 
+{ #category : #private }
+WebsideAPI >> indexedSlotsOf: anObject [
+	| from to slot |
+	anObject class isVariable
+		ifFalse: [ ^ self notFound ].
+	from := self
+		queryAt: 'from'
+		ifPresent: [ :f | f asInteger ]
+		ifAbsent: [ 1 ].
+	to := self
+		queryAt: 'to'
+		ifPresent: [ :t | t asInteger ]
+		ifAbsent: [ anObject size ].
+	^ (from to: to)
+		collect: [ :i | 
+			slot := anObject basicAt: i.
+			slot asWebsideJson
+				at: 'slot' put: i;
+				yourself ]
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> instanceVariables [
 	| class |
@@ -572,6 +591,15 @@ WebsideAPI >> instanceVariables [
 						at: 'class' put: c name;
 						at: 'type' put: 'instance';
 						yourself ] ]
+]
+
+{ #category : #private }
+WebsideAPI >> instanceVariablesOf: anObject [
+^anObject class allInstVarNames
+		collect: [ :n | 
+			NeoJSONObject new
+				at: 'name' put: n;
+				yourself ]
 ]
 
 { #category : #'code endpoints' }
@@ -627,6 +655,15 @@ WebsideAPI >> methods [
 			ast
 				ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
 			json ]
+]
+
+{ #category : #private }
+WebsideAPI >> namedSlotsOf: anObject [
+	| slot |
+	anObject class isVariable ifTrue: [ ^self notFound ].
+	^anObject class allInstVarNames collect: [ :n |
+		slot := self slot: n of: anObject ifAbsent: nil.
+		slot asWebsideJson at: 'slot' put: n; yourself  ]
 ]
 
 { #category : #private }
@@ -704,8 +741,8 @@ WebsideAPI >> pinnedObject [
 ]
 
 { #category : #'objects endpoints' }
-WebsideAPI >> pinnedObjectInstanceVariables [
-	| id object path index |
+WebsideAPI >> pinnedObjectSlots [
+	| id object path index last |
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
@@ -715,26 +752,14 @@ WebsideAPI >> pinnedObjectInstanceVariables [
 		to: path size - 1
 		do:
 			[ :s | object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
-	^ object class allInstVarNames
-		collect: [ :n | 
-			NeoJSONObject new
-				at: 'name' put: n;
-				yourself ]
-]
-
-{ #category : #'objects endpoints' }
-WebsideAPI >> pinnedObjectSlot [
-	
-	| id object path index |
-	id := self requestedId.
-	object := self objects at: id ifAbsent: [ ^ self notFound ].
-	path := request url segments.
-	index := path indexOf: 'objects'.
-	path
-		from: index + 2
-		to: path size
-		do:
-			[ :s | object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
+	last := path last.
+	last = 'instance-variables'
+		ifTrue: [ ^ self instanceVariablesOf: object ].
+	last = 'named-slots'
+		ifTrue: [ ^ self namedSlotsOf: object ].
+	last = 'indexed-slots'
+		ifTrue: [ ^ self indexedSlotsOf: object ].
+	object := self slot: last of: object ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 ]
 
@@ -773,9 +798,7 @@ WebsideAPI >> queriedClass [
 
 { #category : #private }
 WebsideAPI >> queriedReferencingClass [
-	| name |
-	name := self queryAt: 'referencingClass'.
-	^ name ifNotNil: [ self classNamed: name ]
+	^self queryAt: 'referencingClass' ifPresent: [:n | self classNamed: n ]
 ]
 
 { #category : #private }
@@ -811,7 +834,27 @@ WebsideAPI >> queriedUsing [
 
 { #category : #private }
 WebsideAPI >> queryAt: aString [
-	^request at: aString ifAbsent: nil.
+	^ self queryAt: aString ifAbsent: nil
+]
+
+{ #category : #private }
+WebsideAPI >> queryAt: aString ifAbsent: aBlock [
+	^ self queryAt: aString ifPresent: nil ifAbsent: aBlock
+]
+
+{ #category : #private }
+WebsideAPI >> queryAt: aString ifPresent: aBlock [
+	^ self queryAt: aString ifPresent: aBlock ifAbsent: nil
+]
+
+{ #category : #private }
+WebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
+	| value |
+	value := request at: aString ifAbsent: nil.
+	value ifNil: [ ^ anotherBlock value ].
+	^ aBlock notNil
+		ifTrue: [ aBlock evaluateWith: value ]
+		ifFalse: [ value ]
 ]
 
 { #category : #private }
