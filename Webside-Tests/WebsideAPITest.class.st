@@ -1124,6 +1124,31 @@ WebsideAPITest >> testPinEvaluationResult [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPITest >> testPinObjectSlot [
+	| evaluation result id uri pinned x |
+	evaluation := NeoJSONObject new
+		at: 'expression' put: '3 @ 4';
+		at: 'sync' put: true;
+		at: 'pin' put: true;
+		yourself.
+	result := self post: '/evaluations' with: evaluation.
+	id := result at: 'id'.
+
+	uri := NeoJSONObject new
+		at: 'uri' put: '/objects/' , id , '/x';
+		yourself.
+	pinned := self post: '/objects' with: uri.
+	self
+		assert: pinned notNil;
+		assert: (pinned at: 'id') != id.
+	id := pinned at: 'id'.
+	x := self get: '/objects/' , id asString.
+	self
+		assert: (x at: 'class') equals: 'SmallInteger';
+		assert: (x at: 'printString') equals: '3'
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObject [
 	| evaluation result id |
 	evaluation := NeoJSONObject new

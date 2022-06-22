@@ -727,6 +727,18 @@ WebsideAPI >> packages [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPI >> pinObjectSlot [
+	| slot id |
+	slot := self requestedSlot.
+	slot ifNil: [ ^ self badRequest: 'Bad object slot URI' ].
+	id := self newID.
+	self objects at: id put: slot.
+	^ slot asWebsideJson
+		at: 'id' put: id asString;
+		yourself
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPI >> pinnedObject [
 	| id object  |
 	id := self requestedId.
@@ -961,6 +973,20 @@ WebsideAPI >> requestedSelector [
 	| selector |
 	selector := self urlAt: 'selector'.
 	^ selector ifNotNil: [ selector asSymbol ]
+]
+
+{ #category : #private }
+WebsideAPI >> requestedSlot [
+	| uri path index id slot |
+	uri := self bodyAt: 'uri'.
+	uri ifNil: [ ^nil ].
+	path := uri substrings: '/'.
+	index := path indexOf: 'objects' ifAbsent: [ ^nil ].
+	id := path at: index + 1 ifAbsent: [ ^nil ].
+	id := UUID fromString: id.
+	slot := self objects at: id ifAbsent: [ ^nil ].
+	path from: index + 2 to: path size do: [ :s | slot := self slot: s of: slot ifAbsent: [ ^nil ] ]  .
+	^slot
 ]
 
 { #category : #'debugging endpoints' }
