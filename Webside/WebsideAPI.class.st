@@ -332,7 +332,7 @@ WebsideAPI >> debugExpression [
 { #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrame [
 	| debugger index frame interval |
-	self halt.
+
 	debugger := self debuggers
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
