@@ -172,6 +172,7 @@ WebsideServer >> initializeObjectsRoutes [
 		routeDELETE: '/objects/<id>' to: #unpinObject;
 		routeGET: '/objects/<id>/*' to: #pinnedObjectSlots;
 		routePOST: '/objects' to: #pinObjectSlot
+
 ]
 
 { #category : #initialization }

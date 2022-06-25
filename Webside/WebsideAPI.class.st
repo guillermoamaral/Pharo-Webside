@@ -89,9 +89,14 @@ WebsideAPI >> badRequest: aString [
 
 { #category : #private }
 WebsideAPI >> bodyAt: aString [
+	^ self bodyAt: aString ifAbsent: nil
+]
+
+{ #category : #private }
+WebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 	| json |
 	json := NeoJSONReader fromString: request entity.
-	^json at: aString ifAbsent: nil 
+	^ json at: aString ifAbsent: aBlock
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -243,13 +248,11 @@ WebsideAPI >> compiler [
 { #category : #private }
 WebsideAPI >> compilerReceiver [
 	| context index debugger frame |
-	context := self bodyAt: 'context'.
-	context ifNil: [ ^ nil ].
+	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
 	context at: 'class' ifPresent: [ :name | ^ self classNamed: name ].
 	context
 		at: 'object'
-		ifPresent:
-			[ :id | ^ self objects at: (UUID fromString: id) ifAbsent: nil ].
+		ifPresent: [ :id | ^ self objects at: (UUID fromString: id) ifAbsent: nil ].
 	context
 		at: 'debugger'
 		ifPresent: [ :id | 
@@ -257,29 +260,25 @@ WebsideAPI >> compilerReceiver [
 			debugger := self debuggers
 				at: (UUID fromString: id)
 				ifAbsent: [ ^ nil ].
-			frame := debugger stack
-				at: index asInteger
-				ifAbsent:  nil .
-				^frame ifNotNil: [ frame receiver ] ].
+			frame := debugger stack at: index asInteger ifAbsent: nil.
+			^ frame ifNotNil: [ frame receiver ] ].
 	^ nil
 ]
 
 { #category : #private }
 WebsideAPI >> compilerRequestor [
 	| context |
-	context := self bodyAt: 'context'.
-	context ifNil: [ ^ nil ].
+	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
 	^ context
 		at: 'workspace'
 		ifPresent: [ :id | self workspaces at: (UUID fromString: id) ifAbsent: [ nil ] ]
 		ifAbsent: [ nil ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : #private }
 WebsideAPI >> createDebugger [
 	| id process exception context debugger |
-	id := self bodyAt: 'evaluation'.
-	id ifNil: [ ^ self notFound ].
+	id := self bodyAt: 'evaluation' ifAbsent: [ ^ self notFound ].
 	id := UUID fromString: id.
 	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
 	exception := process suspendedContext exception.
@@ -297,9 +296,9 @@ WebsideAPI >> createDebugger [
 				stepOver ].
 	self debuggers at: id put: debugger.
 	^ debugger asWebsideJson
-				at: 'id' put: id asString;
-				at: 'description' put: debugger name;
-				yourself 
+		at: 'id' put: id asString;
+		at: 'description' put: debugger name;
+		yourself
 ]
 
 { #category : #'workspaces endpoints' }
@@ -313,7 +312,7 @@ WebsideAPI >> createWorkspace [
 { #category : #private }
 WebsideAPI >> debugExpression [
 	| expression method receiver process context debugger id |
-	expression := self bodyAt: 'expression'.
+	expression := self bodyAt: 'expression' ifAbsent: [''].
 	method := self compiler compile: expression.
 	receiver := self compilerReceiver.
 	process := [ method valueWithReceiver: receiver arguments: #() ]
@@ -726,7 +725,7 @@ WebsideAPI >> packages [
 	^ packages collect: #asWebsideJson
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : #private }
 WebsideAPI >> pinObjectSlot [
 	| slot id |
 	slot := self requestedSlot.
@@ -925,8 +924,7 @@ WebsideAPI >> requestedClass [
 { #category : #private }
 WebsideAPI >> requestedContext [
 	| context name id debugger index |
-	context := self bodyAt: 'context'.
-	context ifNil: [ ^ nil ].
+	context := self bodyAt: 'context' ifAbsent: [ ^nil ].
 	name := context at: 'class' ifAbsent: nil.
 	name ifNotNil: [ ^ self classNamed: name ].
 	id := context at: 'object' ifAbsent: nil.
@@ -978,15 +976,17 @@ WebsideAPI >> requestedSelector [
 { #category : #private }
 WebsideAPI >> requestedSlot [
 	| uri path index id slot |
-	uri := self bodyAt: 'uri'.
-	uri ifNil: [ ^nil ].
+	uri := self bodyAt: 'uri' ifAbsent: [ ^ nil ].
 	path := uri substrings: '/'.
-	index := path indexOf: 'objects' ifAbsent: [ ^nil ].
-	id := path at: index + 1 ifAbsent: [ ^nil ].
+	index := path indexOf: 'objects' ifAbsent: [ ^ nil ].
+	id := path at: index + 1 ifAbsent: [ ^ nil ].
 	id := UUID fromString: id.
-	slot := self objects at: id ifAbsent: [ ^nil ].
-	path from: index + 2 to: path size do: [ :s | slot := self slot: s of: slot ifAbsent: [ ^nil ] ]  .
-	^slot
+	slot := self objects at: id ifAbsent: [ ^ nil ].
+	path
+		from: index + 2
+		to: path size
+		do: [ :s | slot := self slot: s of: slot ifAbsent: [ ^ nil ] ].
+	^ slot
 ]
 
 { #category : #'debugging endpoints' }
