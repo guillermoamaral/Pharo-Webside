@@ -172,7 +172,6 @@ WebsideServer >> initializeObjectsRoutes [
 		routeDELETE: '/objects/<id>' to: #unpinObject;
 		routeGET: '/objects/<id>/*' to: #pinnedObjectSlots;
 		routePOST: '/objects' to: #pinObjectSlot
-
 ]
 
 { #category : #initialization }
@@ -182,7 +181,7 @@ WebsideServer >> initializeResources [
 	resources at: #evaluations put: Dictionary new;
 	at: #objects put: Dictionary new;
 	at: #workspaces put: Dictionary new;
-	at: #debuggers put: Dictionary new
+	at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new
 ]
 
 { #category : #initialization }
@@ -192,7 +191,9 @@ WebsideServer >> initializeRoutes [
 		initializeChangesRoutes;
 		initializeEvaluationRoutes;
 		initializeObjectsRoutes;
-		initializeWorkspacesRoutes;initializeDebuggingRoutes
+		initializeWorkspacesRoutes;
+		initializeDebuggingRoutes;
+		initializeTestsRoutes 
 ]
 
 { #category : #initialization }
@@ -208,6 +209,22 @@ WebsideServer >> initializeServer [
 		OPTIONS:
 			(baseUri , '/*')
 				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+
+]
+
+{ #category : #initialization }
+WebsideServer >> initializeTestsRoutes [
+	self
+		routeGET: '/test-runs' to: #activeTestRuns;
+		routePOST: '/test-runs' to: #runTests;
+		routeGET: '/test-runs/<id>/status'
+		to: #testRunStatus;
+		routeGET: '/test-runs/<id>/results'
+		to: #testRunResults;
+		routePOST: '/test-runs/<id>/run' to: #runTestRun;
+		routePOST: '/test-runs/<id>/debug' to: #debugTest;
+		routePOST: '/test-runs/<id>/stop' to: #stopTestRun;
+		routeDELETE: '/test-runs/<id>' to: #deleteTestRun
 
 ]
 
@@ -309,6 +326,11 @@ WebsideServer >> start [
 { #category : #actions }
 WebsideServer >> stop [
 	server stop
+]
+
+{ #category : #accessing }
+WebsideServer >> testRuns [
+	^ self resourcesAt: #testRuns
 ]
 
 { #category : #accessing }

@@ -55,6 +55,15 @@ WebsideAPI >> activeEvaluations [
 		collect: [ :a | NeoJSONObject new at: 'id' put: a key asString ; yourself ]
 ]
 
+{ #category : #'testing endpoints' }
+WebsideAPI >> activeTestRuns [
+	^ self testRuns associations
+		collect: [ :a | 
+			a value asWebsideJson
+				at: 'id' put: a key asString;
+				yourself ]
+]
+
 { #category : #'workspaces endpoints' }
 WebsideAPI >> activeWorkspaces [
 	^ self workspaces associations
@@ -382,6 +391,14 @@ WebsideAPI >> deleteDebugger [
 			self debuggers removeKey: id ifAbsent: nil.
 			self evaluations removeKey: id ifAbsent: nil ].
 	^ id
+]
+
+{ #category : #'testing endpoints' }
+WebsideAPI >> deleteTestRun [
+	self testRuns
+		removeKey: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	^ nil
 ]
 
 { #category : #'workspaces endpoints' }
@@ -989,6 +1006,35 @@ WebsideAPI >> requestedSlot [
 	^ slot
 ]
 
+{ #category : #private }
+WebsideAPI >> requestedTestSuite [
+	| package classes methods class name suite |
+	package := self bodyAt: 'package'.
+	package notNil ifTrue: [
+		package := self packageNamed: package.
+		^package notNil ifTrue: [package buildTestSuite]].
+	classes := self bodyAt: 'classes' ifAbsent: [#()].
+	methods := self bodyAt: 'methods' ifAbsent: [#()].
+	(classes size = 1 and: [methods isEmpty]) ifTrue: [
+		class := self classNamed: classes anyone.
+		^(class notNil and: [class inheritsFrom: TestCase])
+			ifTrue: [class buildSuite]].
+	name := (classes isEmpty and: [methods size = 1])
+		ifTrue: [(methods anyone at: 'class') , '>>#' , (methods anyone at: 'selector')]
+		ifFalse: ['Custom Suite'].
+	suite := TestSuite named: name.
+	classes do: [:c | | class |
+		class := self classNamed: c asSymbol.
+		(class notNil and: [class inheritsFrom: TestCase])
+			ifTrue: [suite addTest: class buildSuiteFromSelectors]].
+	methods do: [:m | | class test |
+		class := self classNamed: (m at: 'class') asSymbol.
+		(class notNil and: [class inheritsFrom: TestCase]) ifTrue: [
+			test := class selector: (m at: 'selector') asSymbol.
+			test notNil ifTrue: [suite addTest: test]]].
+	^suite
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPI >> restartDebugger [
 	| debugger context update method |
@@ -1018,16 +1064,31 @@ WebsideAPI >> resumeDebugger [
 ]
 
 { #category : #'testing endpoints' }
+WebsideAPI >> runTestRun [
+	| id run |
+	id := self requestedId.
+	run := self testRuns at: id ifAbsent: [^self notFound].
+	run instVarNamed: 'running' put: true.
+	[run runSuite]
+		forkAt: Processor userBackgroundPriority
+		named: 'Test Run ' , id asString.
+	^run asWebsideJson
+]
+
+{ #category : #'testing endpoints' }
 WebsideAPI >> runTests [
 	| suite run id |
-	suite := self requestedTestSuit.
-	suite ifNil: [ ^self badRequest: 'Invalid test suite' ].
+	suite := self requestedTestSuite.
+	suite ifNil: [ ^ self badRequest: 'Invalid test suite' ].
 	run := TestRunner new.
-	run when: #resultChange: evaluate: [ suite currentTest ].
-	id := self newID .
-	[ run runSuite: suite ] forkAt: Processor  userBackgroundPriority named: 'Test Run ', id asString.
+	id := self newID.
+	[ run runSuite: suite ]
+		forkAt: Processor userBackgroundPriority
+		named: 'Test Run ' , id asString.
 	self testRuns at: id put: run.
-	^run asWebsideJson at: 'id' put: id asString; yourself  
+	^ run asWebsideJson
+		at: 'id' put: id asString;
+		yourself
 ]
 
 { #category : #private }
@@ -1114,6 +1175,53 @@ WebsideAPI >> terminateDebugger [
 	self debuggers removeKey: id.
 	debugger terminate.
 	^ nil
+]
+
+{ #category : #'testing endpoints' }
+WebsideAPI >> testRunResults [
+	| run tests result |
+	run := self testRuns
+		at: self requestedId
+		ifAbsent: [ ^ self notFound ].
+	tests := OrderedCollection new.
+	result := run result.
+	tests addAll: (result passed
+		collect: [ :t | 
+			t asWebsideJson
+				at: 'type' put: 'passed';
+				yourself ]);
+		addAll: (
+	result failures
+		collect: [ :t | 
+			t asWebsideJson
+				at: 'type' put: 'failed';
+				yourself ]);
+			addAll: (
+	result errors
+		collect: [ :t | 
+			t asWebsideJson
+				at: 'type' put: 'error';
+				yourself ]);
+addAll: (
+	result skipped
+		collect: [ :t | 
+			t asWebsideJson
+				at: 'type' put: 'skipped';
+				yourself ]).
+	^ tests
+]
+
+{ #category : #'testing endpoints' }
+WebsideAPI >> testRunStatus [
+	| id run |
+	id := self requestedId.
+	run := self testRuns at: id ifAbsent: [^self notFound].
+	^run asWebsideJson at: 'id' put: id asString; yourself
+]
+
+{ #category : #private }
+WebsideAPI >> testRuns [
+	^ server testRuns
 ]
 
 { #category : #'objects endpoints' }

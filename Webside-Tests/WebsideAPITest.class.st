@@ -38,6 +38,7 @@ WebsideAPITest >> post: uri [
 WebsideAPITest >> post: uri with: body [
 	| data |
 	data := client post: server baseUrl / uri contents: body asString.
+	client isSuccess ifFalse: [ self error: client contents ] .
 	^ NeoJSONObject fromString: data
 ]
 
@@ -1311,6 +1312,29 @@ WebsideAPITest >> testReferencesToString [
 		assert:
 			(references
 				allSatisfy: [ :m | m source includesSubstring: 'referencingString' ])
+]
+
+{ #category : #'testing endpoints' }
+WebsideAPITest >> testRunTests [
+	| test suite run id results |
+	test := NeoJSONObject new
+		at: 'class' put: 'DateTest';
+		at: 'selector' put: 'testAdd';
+		yourself.
+	suite := NeoJSONObject new
+		at: 'methods' put: {test};
+		yourself.
+	run := self post: '/test-runs' with: suite.
+	self assert: run notNil.
+	id := run at: 'id'.
+	[ results := self get: 'test-runs/' , id , '/results'.
+	self
+		assert: results size equals: 1;
+		assert:
+			((results anyone at: 'class') = 'DateTest'
+				and: [ (results anyone at: 'selector') = 'testAdd' ]
+				and: [ (results anyone at: 'type') = 'passed' ]) ]
+		ensure: [ self delete: '/test-runs/' , id asString ]
 ]
 
 { #category : #'code endpoints' }
