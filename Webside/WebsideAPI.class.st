@@ -1017,6 +1017,19 @@ WebsideAPI >> resumeDebugger [
 	^ nil
 ]
 
+{ #category : #'testing endpoints' }
+WebsideAPI >> runTests [
+	| suite run id |
+	suite := self requestedTestSuit.
+	suite ifNil: [ ^self badRequest: 'Invalid test suite' ].
+	run := TestRunner new.
+	run when: #resultChange: evaluate: [ suite currentTest ].
+	id := self newID .
+	[ run runSuite: suite ] forkAt: Processor  userBackgroundPriority named: 'Test Run ', id asString.
+	self testRuns at: id put: run.
+	^run asWebsideJson at: 'id' put: id asString; yourself  
+]
+
 { #category : #private }
 WebsideAPI >> sendersOf: aSymbol [
 	| scope |
