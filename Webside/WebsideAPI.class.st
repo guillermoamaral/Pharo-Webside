@@ -675,6 +675,22 @@ WebsideAPI >> methods [
 ]
 
 { #category : #private }
+WebsideAPI >> nameForTestSuite [
+	| packages classes methods m |
+	packages := self bodyAt: 'packages' ifAbsent: [#()].
+	classes := self bodyAt: 'classes' ifAbsent: [#()].
+	methods := self bodyAt: 'methods' ifAbsent: [#()].
+	(packages size = 1 and: [classes isEmpty] and: [methods isEmpty])
+		ifTrue: [^packages anyone].
+	(packages isEmpty and: [classes size = 1] and: [methods isEmpty])
+		ifTrue: [^classes anyone].
+	(packages isEmpty and: [classes isEmpty] and: [methods size = 1]) ifTrue: [
+		m := methods anyone.
+		^(m at: 'class' ifAbsent: '') , ' >> #' , (m at: 'selector' ifAbsent: '')].
+	^'Custom Suite'
+]
+
+{ #category : #private }
 WebsideAPI >> namedSlotsOf: anObject [
 	| slot |
 	anObject class isVariable ifTrue: [ ^self notFound ].
@@ -730,6 +746,13 @@ WebsideAPI >> packageMethods [
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
 	^ package extensionMethods collect: #asWebsideJson
+]
+
+{ #category : #private }
+WebsideAPI >> packageNamed: aString [
+^
+RPackageOrganizer default packageNamed: aString ifAbsent: nil
+
 ]
 
 { #category : #'code endpoints' }
@@ -980,7 +1003,7 @@ WebsideAPI >> requestedPackage [
 	| name |
 	name := self urlAt: 'name'.
 	^ name
-		ifNotNil: [ RPackageOrganizer default packageNamed: name ifAbsent: nil ]
+		ifNotNil: [ self packageNamed: name ]
 ]
 
 { #category : #private }
@@ -1008,31 +1031,32 @@ WebsideAPI >> requestedSlot [
 
 { #category : #private }
 WebsideAPI >> requestedTestSuite [
-	| package classes methods class name suite |
-	package := self bodyAt: 'package'.
-	package notNil ifTrue: [
-		package := self packageNamed: package.
-		^package notNil ifTrue: [package buildTestSuite]].
-	classes := self bodyAt: 'classes' ifAbsent: [#()].
-	methods := self bodyAt: 'methods' ifAbsent: [#()].
-	(classes size = 1 and: [methods isEmpty]) ifTrue: [
-		class := self classNamed: classes anyone.
-		^(class notNil and: [class inheritsFrom: TestCase])
-			ifTrue: [class buildSuite]].
-	name := (classes isEmpty and: [methods size = 1])
-		ifTrue: [(methods anyone at: 'class') , '>>#' , (methods anyone at: 'selector')]
-		ifFalse: ['Custom Suite'].
-	suite := TestSuite named: name.
-	classes do: [:c | | class |
-		class := self classNamed: c asSymbol.
-		(class notNil and: [class inheritsFrom: TestCase])
-			ifTrue: [suite addTest: class buildSuiteFromSelectors]].
-	methods do: [:m | | class test |
-		class := self classNamed: (m at: 'class') asSymbol.
-		(class notNil and: [class inheritsFrom: TestCase]) ifTrue: [
-			test := class selector: (m at: 'selector') asSymbol.
-			test notNil ifTrue: [suite addTest: test]]].
-	^suite
+	| packages classes methods suite |
+	packages := self bodyAt: 'packages' ifAbsent: [ #() ].
+	classes := self bodyAt: 'classes' ifAbsent: [ #() ].
+	methods := self bodyAt: 'methods' ifAbsent: [ #() ].
+	suite := TestSuite named: self nameForTestSuite.
+	packages
+		do: [ :n | 
+			| p |
+			p := self packageNamed: n.
+			p notNil
+				ifTrue: [ suite addTest: p buildTestSuite ] ].
+	classes
+		do: [ :n | 
+			| c |
+			c := self classNamed: n.
+			(c notNil and: [ c inheritsFrom: TestCase ])
+				ifTrue: [ suite addTest: c buildSuiteFromSelectors ] ].
+	methods
+		do: [ :s | 
+			| c m |
+			c := self classNamed: (s at: 'class' ifAbsent: '').
+			(c notNil and: [ c inheritsFrom: TestCase ])
+				ifTrue: [ m := c selector: (s at: 'selector') asSymbol.
+					m notNil
+						ifTrue: [ suite addTest: m ] ] ].
+	^ suite
 ]
 
 { #category : #'debugging endpoints' }

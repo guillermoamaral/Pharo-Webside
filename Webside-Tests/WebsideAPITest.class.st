@@ -1319,7 +1319,7 @@ WebsideAPITest >> testRunTests [
 	| test suite run id results |
 	test := NeoJSONObject new
 		at: 'class' put: 'DateTest';
-		at: 'selector' put: 'testAdd';
+		at: 'selector' put: 'testAddDays';
 		yourself.
 	suite := NeoJSONObject new
 		at: 'methods' put: {test};
