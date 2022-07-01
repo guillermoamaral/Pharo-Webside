@@ -59,7 +59,7 @@ WebsideAPI >> activeEvaluations [
 WebsideAPI >> activeTestRuns [
 	^ self testRuns associations
 		collect: [ :a | 
-			a value asWebsideJson
+			a value key asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
 ]
