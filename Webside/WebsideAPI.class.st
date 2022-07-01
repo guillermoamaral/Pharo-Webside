@@ -1187,6 +1187,16 @@ WebsideAPI >> stepOverDebugger [
 	^ nil
 ]
 
+{ #category : #'testing endpoints' }
+WebsideAPI >> stopTestRun [
+	| id run |
+	id := self requestedId.
+	run := self testRuns
+		at: id
+		ifAbsent: [ ^ self notFound ].
+	^ nil
+]
+
 { #category : #'code endpoints' }
 WebsideAPI >> subclasses [
 | class |
@@ -1212,28 +1222,11 @@ WebsideAPI >> testCountOf: test [
 
 { #category : #'testing endpoints' }
 WebsideAPI >> testRunResults [
-	| run tests result |
+	| run  |
 	run := self testRuns
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
-	result := run value.
-	tests := OrderedCollection new.
-	{(#passed -> 'passed').
-	(#failures -> 'failed').
-	(#errors -> 'error').
-	(#skipped -> 'skipped')}
-		do: [ :a | 
-			| filtered converted |
-			filtered := result perform: a key.
-			converted := (filtered
-						collect: [ :t | 
-							t asWebsideJson
-								at: 'type' put: a value;
-								yourself ]).
-			tests
-				addAll:
-					converted ].
-	^ tests
+	^ run value asWebsideJson
 ]
 
 { #category : #'testing endpoints' }
@@ -1248,14 +1241,16 @@ WebsideAPI >> testRunStatus [
 		at: 'run' put: result runCount;
 		at: 'passed' put: result passedCount;
 		at: 'failed' put: result failureCount;
-		at: 'error' put: result errorCount;
+		at: 'errors' put: result errorCount;
 		at: 'skipped' put: result skippedCount;
 		yourself.
-	^NeoJSONObject new
+	^ NeoJSONObject new
 		at: 'id' put: id asString;
 		at: 'name' put: suite name;
 		at: 'total' put: total;
-		at: 'running' put: total  result runCount
+		at: 'running' put: total > result runCount;
+		at: 'summary' put: summary;
+		yourself
 ]
 
 { #category : #private }
