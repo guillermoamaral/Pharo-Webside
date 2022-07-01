@@ -1089,28 +1089,32 @@ WebsideAPI >> resumeDebugger [
 
 { #category : #'testing endpoints' }
 WebsideAPI >> runTestRun [
-	| id run |
+	| id run suite result |
 	id := self requestedId.
-	run := self testRuns at: id ifAbsent: [^self notFound].
-	run instVarNamed: 'running' put: true.
-	[run runSuite]
+	run := self testRuns at: id ifAbsent: [ ^ self notFound ].
+	suite := run key.
+	result := suite resultClass new.
+	[ suite run: result ]
 		forkAt: Processor userBackgroundPriority
 		named: 'Test Run ' , id asString.
-	^run asWebsideJson
+	self testRuns at: id put: suite -> result.
+	^ suite asWebsideJson
+		at: 'id' put: id asString;
+		yourself
 ]
 
 { #category : #'testing endpoints' }
 WebsideAPI >> runTests [
-	| suite run id |
+	| suite id result |
 	suite := self requestedTestSuite.
 	suite ifNil: [ ^ self badRequest: 'Invalid test suite' ].
-	run := TestRunner new.
 	id := self newID.
-	[ run runSuite: suite ]
+	result := suite resultClass new.
+	[ suite run: result ]
 		forkAt: Processor userBackgroundPriority
 		named: 'Test Run ' , id asString.
-	self testRuns at: id put: run.
-	^ run asWebsideJson
+	self testRuns at: id put: suite -> result.
+	^ suite asWebsideJson
 		at: 'id' put: id asString;
 		yourself
 ]
@@ -1201,46 +1205,57 @@ WebsideAPI >> terminateDebugger [
 	^ nil
 ]
 
+{ #category : #private }
+WebsideAPI >> testCountOf: test [
+	^(test isKindOf: TestSuite) ifTrue: [ test tests sum: [ :t | self testCountOf: t ] ] ifFalse: [ 1 ]
+]
+
 { #category : #'testing endpoints' }
 WebsideAPI >> testRunResults [
 	| run tests result |
 	run := self testRuns
 		at: self requestedId
 		ifAbsent: [ ^ self notFound ].
+	result := run value.
 	tests := OrderedCollection new.
-	result := run result.
-	tests addAll: (result passed
-		collect: [ :t | 
-			t asWebsideJson
-				at: 'type' put: 'passed';
-				yourself ]);
-		addAll: (
-	result failures
-		collect: [ :t | 
-			t asWebsideJson
-				at: 'type' put: 'failed';
-				yourself ]);
-			addAll: (
-	result errors
-		collect: [ :t | 
-			t asWebsideJson
-				at: 'type' put: 'error';
-				yourself ]);
-addAll: (
-	result skipped
-		collect: [ :t | 
-			t asWebsideJson
-				at: 'type' put: 'skipped';
-				yourself ]).
+	{(#passed -> 'passed').
+	(#failures -> 'failed').
+	(#errors -> 'error').
+	(#skipped -> 'skipped')}
+		do: [ :a | 
+			| filtered converted |
+			filtered := result perform: a key.
+			converted := (filtered
+						collect: [ :t | 
+							t asWebsideJson
+								at: 'type' put: a value;
+								yourself ]).
+			tests
+				addAll:
+					converted ].
 	^ tests
 ]
 
 { #category : #'testing endpoints' }
 WebsideAPI >> testRunStatus [
-	| id run |
+	| id run suite result total summary |
 	id := self requestedId.
-	run := self testRuns at: id ifAbsent: [^self notFound].
-	^run asWebsideJson at: 'id' put: id asString; yourself
+	run := self testRuns at: id ifAbsent: [ ^ self notFound ].
+	suite := run key.
+	total := self testCountOf: suite.
+	result := run value.
+	summary := NeoJSONObject new
+		at: 'run' put: result runCount;
+		at: 'passed' put: result passedCount;
+		at: 'failed' put: result failureCount;
+		at: 'error' put: result errorCount;
+		at: 'skipped' put: result skippedCount;
+		yourself.
+	^NeoJSONObject new
+		at: 'id' put: id asString;
+		at: 'name' put: suite name;
+		at: 'total' put: total;
+		at: 'running' put: total  result runCount
 ]
 
 { #category : #private }
