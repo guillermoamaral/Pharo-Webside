@@ -108,6 +108,18 @@ WebsideAPI >> bodyAt: aString ifAbsent: aBlock [
 	^ json at: aString ifAbsent: aBlock
 ]
 
+{ #category : #private }
+WebsideAPI >> buildTestSuiteForPackage: package [
+	| suite |
+	suite := TestSuite named: package name.
+	package definedClasses
+		select: [ :c | c isTestCase ]
+		thenDo: [ :c | suite addTest: c buildTestSuite ].
+	package extensionMethods
+		select: [ :m | m isTestMethod  ] thenDo: [:m | suite addTest: m].
+	^ suite
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> cancelEvaluation [
 	| id evaluation |
@@ -1038,24 +1050,24 @@ WebsideAPI >> requestedTestSuite [
 	suite := TestSuite named: self nameForTestSuite.
 	packages
 		do: [ :n | 
-			| p |
+			| p s |
 			p := self packageNamed: n.
 			p notNil
-				ifTrue: [ suite addTest: p buildTestSuite ] ].
+				ifTrue: [ s := self buildTestSuiteForPackage: p.
+					suite addTest: s ] ].
 	classes
 		do: [ :n | 
 			| c |
 			c := self classNamed: n.
-			(c notNil and: [ c inheritsFrom: TestCase ])
+			(c notNil and: [ c isTestCase ])
 				ifTrue: [ suite addTest: c buildSuiteFromSelectors ] ].
 	methods
 		do: [ :s | 
 			| c m |
 			c := self classNamed: (s at: 'class' ifAbsent: '').
-			(c notNil and: [ c inheritsFrom: TestCase ])
-				ifTrue: [ m := c selector: (s at: 'selector') asSymbol.
-					m notNil
-						ifTrue: [ suite addTest: m ] ] ].
+			m := c selector: (s at: 'selector') asSymbol.
+			(m notNil and: [ m isTestMethod ])
+				ifTrue: [ suite addTest: m ] ].
 	^ suite
 ]
 
