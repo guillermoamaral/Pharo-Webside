@@ -114,9 +114,10 @@ WebsideAPI >> buildTestSuiteForPackage: package [
 	suite := TestSuite named: package name.
 	package definedClasses
 		select: [ :c | c isTestCase ]
-		thenDo: [ :c | suite addTest: c buildTestSuite ].
+		thenDo: [ :c | suite addTest: c buildSuiteFromSelectors ].
 	package extensionMethods
-		select: [ :m | m isTestMethod  ] thenDo: [:m | suite addTest: m].
+		select: [ :m | m isTestMethod ]
+		thenDo: [ :m | suite addTest: m ].
 	^ suite
 ]
 
