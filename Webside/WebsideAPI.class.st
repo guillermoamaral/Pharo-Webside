@@ -50,6 +50,16 @@ WebsideAPI >> activeDebuggers [
 ]
 
 { #category : #'evaluation  endpoints' }
+WebsideAPI >> activeEvaluation [
+	| id evaluation a |
+	id := self requestedId .
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	^NeoJSONObject new
+				at: 'id' put: a id asString;
+				yourself 
+]
+
+{ #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
 	^ self evaluations associations
 		collect: [ :a | NeoJSONObject new at: 'id' put: a key asString ; yourself ]
@@ -442,7 +452,8 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 WebsideAPI >> evaluateExpression [
 	| debug expression sync pin id semaphore object process block json |
 	debug := self bodyAt: 'debug'.
-	debug == true ifTrue: [ ^self debugExpression  ].
+	debug == true
+		ifTrue: [ ^ self debugExpression ].
 	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
