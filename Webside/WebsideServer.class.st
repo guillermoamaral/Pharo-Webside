@@ -175,6 +175,15 @@ WebsideServer >> initializeObjectsRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializePreflightRoutes [
+	server
+		OPTIONS:
+			(baseUri , '/*')
+				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
+	
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeResources [
 	resources := Dictionary new.
 	
@@ -187,6 +196,7 @@ WebsideServer >> initializeResources [
 { #category : #initialization }
 WebsideServer >> initializeRoutes [
 	self
+    	initializePreflightRoutes;
 		initializeCodeRoutes;
 		initializeChangesRoutes;
 		initializeEvaluationRoutes;
@@ -204,12 +214,6 @@ WebsideServer >> initializeServer [
 			(#port -> port).
 			(#debugMode -> true).
 			(#notFoundHandlerClass -> Tea405AwareNotFoundHandler)}.
-			
-			server
-		OPTIONS:
-			(baseUri , '/*')
-				-> [ :request | self handlePreflightRequest: request ].	"This is not that well"
-
 ]
 
 { #category : #initialization }
