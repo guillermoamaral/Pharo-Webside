@@ -704,12 +704,12 @@ WebsideAPI >> nameForTestSuite [
 	packages := self bodyAt: 'packages' ifAbsent: [#()].
 	classes := self bodyAt: 'classes' ifAbsent: [#()].
 	methods := self bodyAt: 'methods' ifAbsent: [#()].
-	(packages size = 1 and: [classes isEmpty] and: [methods isEmpty])
-		ifTrue: [^packages anyone].
-	(packages isEmpty and: [classes size = 1] and: [methods isEmpty])
-		ifTrue: [^classes anyone].
-	(packages isEmpty and: [classes isEmpty] and: [methods size = 1]) ifTrue: [
-		m := methods anyone.
+	(packages size = 1 and: [classes isEmpty and: [methods isEmpty]])
+		ifTrue: [^packages first].
+	(packages isEmpty and: [classes size = 1 and: [methods isEmpty]])
+		ifTrue: [^classes first].
+	(packages isEmpty and: [classes isEmpty and: [methods size = 1]]) ifTrue: [
+		m := methods first.
 		^(m at: 'class' ifAbsent: '') , ' >> #' , (m at: 'selector' ifAbsent: '')].
 	^'Custom Suite'
 ]
@@ -929,7 +929,7 @@ WebsideAPI >> queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock [
 	value := request at: aString ifAbsent: nil.
 	value ifNil: [ ^ anotherBlock value ].
 	^ aBlock notNil
-		ifTrue: [ aBlock evaluateWith: value ]
+		ifTrue: [ aBlock value: value ]
 		ifFalse: [ value ]
 ]
 

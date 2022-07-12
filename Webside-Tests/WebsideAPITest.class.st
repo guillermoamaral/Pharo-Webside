@@ -1199,7 +1199,7 @@ slots := self get: '/objects/' , id asString , '/indexed-slots?from=2&to=2'.
 	self
 		assert: slots size equals: 1;
 		assert:
-			((slots anyone at: 'slot') = 2 and: [ (slots anyone at: 'printString') = '2' ])
+			((slots first at: 'slot') = 2 and: [ (slots first at: 'printString') = '2' ])
 ]
 
 { #category : #'objects endpoints' }
@@ -1331,9 +1331,9 @@ WebsideAPITest >> testRunTests [
 	self
 		assert: results size equals: 1;
 		assert:
-			((results anyone at: 'class') = 'DateTest'
-				and: [ (results anyone at: 'selector') = 'testAdd' ]
-				and: [ (results anyone at: 'type') = 'passed' ]) ]
+			((results first at: 'class') = 'DateTest'
+				and: [ (results first at: 'selector') = 'testAdd' 
+				and: [ (results first at: 'type') = 'passed' ]]) ]
 		ensure: [ self delete: '/test-runs/' , id asString ]
 ]
 
