@@ -1141,7 +1141,7 @@ WebsideAPITest >> testPinObjectSlot [
 	pinned := self post: '/objects' with: uri.
 	self
 		assert: pinned notNil;
-		assert: (pinned at: 'id') != id.
+		deny: (pinned at: 'id') equals: id.
 	id := pinned at: 'id'.
 	x := self get: '/objects/' , id asString.
 	self
