@@ -2,7 +2,7 @@ Extension { #name : #Collection }
 
 { #category : #'*Webside' }
 Collection >> asWebsideJson [
-	| columns rows presentation |
+	| columns rows presentation json |
 	columns := OrderedCollection new.
 	columns
 		add:
@@ -17,7 +17,7 @@ Collection >> asWebsideJson [
 				at: 'label' put: 'Value';
 				at: 'align' put: 'left';
 				yourself).
-	rows := self asArray
+	[rows := self asArray
 		withIndexCollect: [ :e :i | 
 			NeoJSONObject new
 				at: 'index' put: i;
@@ -28,8 +28,8 @@ Collection >> asWebsideJson [
 		at: 'title' put: 'Items';
 		at: 'columns' put: columns;
 		at: 'rows' put: rows;
-		yourself.
-	^ super asWebsideJson
-		at: 'presentation' put: presentation;
-		yourself
+		yourself] on: Error do: [].
+	json := super asWebsideJson.
+	presentation ifNotNil: [ json at: 'presentation' put: presentation ].	
+	^json
 ]

@@ -362,22 +362,22 @@ WebsideAPI >> debugExpression [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrame [
-	| debugger index frame interval |
 
+	| debugger index frame interval |
 	debugger := self debuggers
-		at: self requestedId
-		ifAbsent: [ ^ self notFound ].
+		            at: self requestedId
+		            ifAbsent: [ ^ self notFound ].
 	index := self requestedIndex.
 	frame := debugger stack at: index ifAbsent: [ ^ self notFound ].
 	interval := debugger pcRangeForContext: frame.
 	interval := NeoJSONObject new
-		at: 'start' put: interval first;
-		at: 'end' put: interval last;
-		yourself.
+		            at: 'start' put: interval first;
+		            at: 'end' put: interval last;
+		            yourself.
 	^ frame asWebsideJson
-		at: 'index' put: index;
-		at: 'interval' put: interval;
-		yourself
+		  at: 'index' put: index;
+		  at: 'interval' put: interval;
+		  yourself
 ]
 
 { #category : #'debugging endpoints' }
@@ -573,19 +573,21 @@ WebsideAPI >> filterMethods: aCollection byAccessTo: aString type: aSymbol [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> frameBindings [
+
 	| debugger frame |
 	debugger := self debuggers
-		at: self requestedId
-		ifAbsent: [ ^ self notFound ].
+		            at: self requestedId
+		            ifAbsent: [ ^ self notFound ].
 	frame := debugger stack
-		at: self requestedIndex
-		ifAbsent: [ ^ self notFound ].
-	^ frame gtDebuggerRetrieveVariableValuePairs
-		collect: [ :b | 
-			NeoJSONObject new
-				at: 'name' put: b key asString;
-				at: 'value' put: b value printString;
-				yourself ]
+		         at: self requestedIndex
+		         ifAbsent: [ ^ self notFound ].
+
+	^ (StDebuggerContext context: frame) buildInspectorNodes collect: [ 
+		  :b | 
+		  NeoJSONObject new
+			  at: 'name' put: b key asString;
+			  at: 'value' put: b value printString;
+			  yourself ]
 ]
 
 { #category : #private }

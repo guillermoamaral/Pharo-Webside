@@ -534,31 +534,33 @@ WebsideAPITest >> testCodeSuggestion [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger [
+
 	| evaluation id debugger error |
 	evaluation := NeoJSONObject new
-		at: 'expression' put: '1 halt factorial';
-		at: 'sync' put: true;
-		yourself.
+		              at: 'expression' put: '1 halt factorial';
+		              at: 'sync' put: true;
+		              yourself.
 	self
 		post: '/evaluations' with: evaluation;
 		deny: client isSuccess.
 	error := NeoJSONObject fromString: client contents.
 	self
-		assert: ((error at: 'description') asLowercase includesSubstring: 'halt');
+		assert:
+			((error at: 'description') asLowercase includesSubstring: 'halt');
 		assert: (error includesKey: 'evaluation').
 	id := error at: 'evaluation'.
 	self assert: id notNil.
-	[ | target frames |
+	[ 
+	| target frames |
 	target := NeoJSONObject new
-		at: 'evaluation' put: id;
-		yourself.
+		          at: 'evaluation' put: id;
+		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	self assert: debugger notNil.
 	id := debugger at: 'id'.
 	frames := self get: '/debuggers/' , id , '/frames'.
-	self assert: frames notEmpty ]
-		ensure: [ debugger notNil
-				ifTrue: [ self delete: '/debuggers/' , id ] ]
+	self assert: frames notEmpty ] ensure: [ 
+		debugger notNil ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
 { #category : #'evaluation  endpoints' }
