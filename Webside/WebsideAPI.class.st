@@ -1057,31 +1057,30 @@ WebsideAPI >> requestedSlot [
 
 { #category : #private }
 WebsideAPI >> requestedTestSuite [
+
 	| packages classes methods suite |
-	packages := self bodyAt: 'packages' ifAbsent: [ #() ].
-	classes := self bodyAt: 'classes' ifAbsent: [ #() ].
-	methods := self bodyAt: 'methods' ifAbsent: [ #() ].
+
+	packages := self bodyAt: 'packages' ifAbsent: [ #(  ) ].
+	classes := self bodyAt: 'classes' ifAbsent: [ #(  ) ].
+	methods := self bodyAt: 'methods' ifAbsent: [ #(  ) ].
 	suite := TestSuite named: self nameForTestSuite.
-	packages
-		do: [ :n | 
-			| p s |
-			p := self packageNamed: n.
-			p notNil
-				ifTrue: [ s := self buildTestSuiteForPackage: p.
-					suite addTest: s ] ].
-	classes
-		do: [ :n | 
-			| c |
-			c := self classNamed: n.
-			(c notNil and: [ c isTestCase ])
-				ifTrue: [ suite addTest: c buildSuiteFromSelectors ] ].
-	methods
-		do: [ :s | 
-			| c m |
-			c := self classNamed: (s at: 'class' ifAbsent: '').
-			m := c selector: (s at: 'selector') asSymbol.
-			(m notNil and: [ m isTestMethod ])
-				ifTrue: [ suite addTest: m ] ].
+	packages do: [ :n | 
+		| p s |
+		p := self packageNamed: n.
+		p notNil ifTrue: [ 
+			s := self buildTestSuiteForPackage: p.
+			suite addTest: s ] ].
+	classes do: [ :n | 
+		| c |
+		c := self classNamed: n.
+		(c notNil and: [ c isTestCase ]) ifTrue: [ 
+			suite addTest: c buildSuiteFromSelectors ] ].
+	methods do: [ :s | 
+		| c m |
+		c := self classNamed: (s at: 'class' ifAbsent: '').
+		m := c compiledMethodAt: (s at: 'selector') asSymbol.
+		(m notNil and: [ m isTestMethod ]) ifTrue: [ 
+			suite addTest: (c selector: m selector) ] ].
 	^ suite
 ]
 
