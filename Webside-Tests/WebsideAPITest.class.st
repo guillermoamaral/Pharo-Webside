@@ -540,15 +540,15 @@ WebsideAPITest >> testCreateDebugger [
 		              at: 'expression' put: '1 halt factorial';
 		              at: 'sync' put: true;
 		              yourself.
-	self
-		post: '/evaluations' with: evaluation;
-		deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
-	self
-		assert:
-			((error at: 'description') asLowercase includesSubstring: 'halt');
-		assert: (error includesKey: 'evaluation').
-	id := error at: 'evaluation'.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert:
+					((error at: 'description') asLowercase includesSubstring: 'halt');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[ 
 	| target frames |
@@ -570,9 +570,15 @@ WebsideAPITest >> testDebuggerContext [
 		at: 'expression' put: '3 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	self post: '/evaluations' with: evaluation; deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
-	id := error at: 'evaluation'.
+ 	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert:
+					((error at: 'description') asLowercase includesSubstring: 'halt');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[ | target context receiver |
 	target := NeoJSONObject new
@@ -605,10 +611,15 @@ WebsideAPITest >> testDebuggerFrames [
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	self
-		post: '/evaluations' with: evaluation;
-		deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert:
+					((error at: 'description') asLowercase includesSubstring: 'halt');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
 	id := error at: 'evaluation'.
 	self assert: id notNil.
 	[ | target frames |
@@ -633,19 +644,19 @@ WebsideAPITest >> testDialect [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testEvaluationError [
+
 	| evaluation error description |
 	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + ';
-		at: 'sync' put: true;
-		yourself.
-	self post: '/evaluations' with: evaluation.
-	self deny: client isSuccess.
-	error := NeoJSONObject fromString: client response entity string.
+		              at: 'expression' put: '3 + '; 
+		              at: 'sync' put: true;
+		              yourself.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | error := NeoJSONObject fromString: client contents ].
+	self assert: error notNil.
 	description := (error at: 'description') asLowercase.
-	self
-		assert:
-			(description includesSubstring: 'primary missing')
-				| (description includesSubstring: 'variable or expression expected')
+	self assert: (description includesSubstring: 'primary missing')
+		| (description includesSubstring: 'variable or expression expected')
 ]
 
 { #category : #'debugging endpoints' }
@@ -655,11 +666,15 @@ WebsideAPITest >> testFrameBindings [
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	self
-		post: '/evaluations' with: evaluation;
-		deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
-	id := error at: 'evaluation'.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert:
+					((error at: 'description') asLowercase includesSubstring: 'halt');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[ | target frames bindings |
 	target := NeoJSONObject new
@@ -1408,11 +1423,15 @@ WebsideAPITest >> testStepInto [
 		at: 'expression' put: '1 halt factorial';
 		at: 'sync' put: true;
 		yourself.
-	self
-		post: '/evaluations' with: evaluation;
-		deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
-	id := error at: 'evaluation'.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert:
+					((error at: 'description') asLowercase includesSubstring: 'halt');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[ | target frame |
 	target := NeoJSONObject new
