@@ -956,40 +956,42 @@ WebsideAPITest >> testMethod [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testMethodClassification [
+
 	| definition classification method |
 	definition := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Object';
-		at: 'category' put: self class name;
-		at: 'sourceCode' put: 'testMethodClassification';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'type' put: 'MethodDefinition';
+		              at: 'class' put: 'Object';
+		              at: 'category' put: self class name;
+		              at: 'sourceCode' put: 'testMethodClassification';
+		              at: 'author' put: self class name;
+		              yourself.
 	classification := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Object';
-		at: 'selector' put: 'testMethodClassification';
-		at: 'category' put: 'testMethodClassification';
-		at: 'author' put: self class name;
-		yourself.
-	[ self post: '/changes' with: definition.
-	method := self
-		get: '/classes/Object/methods/testMethodClassification'.
+		                  at: 'type' put: 'MethodClassification';
+		                  at: 'class' put: 'Object';
+		                  at: 'selector' put: 'testMethodClassification';
+		                  at: 'category' put: 'testMethodClassification';
+		                  at: 'author' put: self class name;
+		                  yourself.
+	[ 
+	self post: '/changes' with: definition.
+	method := self get:
+		          '/classes/Object/methods/testMethodClassification'.
 	self
 		assert: method notNil;
 		assert: (method at: 'category') equals: self class name.
 	self post: '/changes' with: classification.
-	method := self
-		get: '/classes/Object/methods/testMethodClassification'.
+	method := self get:
+		          '/classes/Object/methods/testMethodClassification'.
 	self
 		assert: (method at: 'category')
-		equals: 'testMethodClassification' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'MethodRemove';
-				at: 'class' put: 'Object';
-				at: 'selector' put: 'testMethodClassification';
-				yourself.
-			self post: '/changes' with: remotion ]
+		equals: 'testMethodClassification' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'MethodRemove';
+			            at: 'class' put: 'Object';
+			            at: 'selector' put: 'testMethodClassification';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
