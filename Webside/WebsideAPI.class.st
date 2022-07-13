@@ -307,7 +307,7 @@ WebsideAPI >> compilerRequestor [
 		ifAbsent: [ nil ]
 ]
 
-{ #category : #private }
+{ #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
 	| id process exception context debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [ ^ self notFound ].
