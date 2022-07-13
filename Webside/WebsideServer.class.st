@@ -137,19 +137,22 @@ WebsideServer >> initializeCodeRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeDebuggingRoutes [
+
 	self
 		routeGET: '/debuggers' to: #activeDebuggers;
 		routePOST: '/debuggers' to: #createDebugger;
 		routeGET: '/debuggers/<id>/frames' to: #debuggerFrames;
 		routeGET: '/debuggers/<id>/frames/<index>' to: #debuggerFrame;
 		routeGET: '/debuggers/<id>/frames/<index>/bindings'
-			to: #frameBindings;
+		to: #frameBindings;
 		routePOST: '/debuggers/<id>/frames/<index>/stepover'
-			to: #stepOverDebugger;
+		to: #stepOverDebugger;
+		routePOST: '/debuggers/<id>/frames/<index>/stepthrough'
+		to: #stepThroughDebugger;
 		routePOST: '/debuggers/<id>/frames/<index>/stepinto'
-			to: #stepIntoDebugger;
+		to: #stepIntoDebugger;
 		routePOST: '/debuggers/<id>/frames/<index>/restart'
-			to: #restartDebugger;
+		to: #restartDebugger;
 		routePOST: '/debuggers/<id>/resume' to: #resumeDebugger;
 		routePOST: '/debuggers/<id>/terminate' to: #terminateDebugger;
 		routeDELETE: '/debuggers/<id>' to: #deleteDebugger

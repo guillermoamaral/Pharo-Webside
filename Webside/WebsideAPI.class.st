@@ -1212,6 +1212,20 @@ WebsideAPI >> stepOverDebugger [
 	^ nil
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPI >> stepThroughDebugger [
+
+	| debugger context |
+	debugger := self debuggers
+		            at: self requestedId
+		            ifAbsent: [ ^ self notFound ].
+	context := debugger stack
+		           at: self requestedIndex
+		           ifAbsent: [ ^ self notFound ].
+	debugger stepThrough:  context.
+	^ nil
+]
+
 { #category : #'testing endpoints' }
 WebsideAPI >> stopTestRun [
 	| id run |
