@@ -239,21 +239,21 @@ WebsideAPI >> classVariables [
 
 { #category : #'code endpoints' }
 WebsideAPI >> classes [
+
 	| root tree classes names depth json |
 	root := self queryAt: 'root'.
 	root := root notNil
-		ifTrue: [ self classNamed: root ]
-		ifFalse: [ self defaultRootClass ].
+		        ifTrue: [ self classNamed: root ]
+		        ifFalse: [ self defaultRootClass ].
 	root ifNil: [ ^ self notFound ].
 	tree := self queryAt: 'tree'.
-	tree = 'true'
-		ifTrue: [ depth := self queryAt: 'depth' ifPresent: [:d | d  asInteger ].
-			json := self classTreeFrom: root depth: depth.
-			^ Array with: json ].
-	classes := root withAllSubclasses.
+	tree = 'true' ifTrue: [ 
+		depth := self queryAt: 'depth' ifPresent: [ :d | d asInteger ].
+		json := self classTreeFrom: root depth: depth.
+		^ Array with: json ].
+	classes := root withAllSubclasses reject: [:c | c isMeta ].
 	names := self queryAt: 'names'.
-	names = 'true'
-		ifTrue: [ ^ classes collect: #name ].
+	names = 'true' ifTrue: [ ^ classes collect: #name ].
 	^ classes collect: #asWebsideJson
 ]
 
