@@ -663,41 +663,52 @@ WebsideAPI >> method [
 
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
-	| string methods selector global class ast json |
 
+	| pattern string methods selector global class ast json |
+	pattern := self queriedSelectorMatching.
+	pattern ifNotNil: [ 
+		methods := self methodsWithSelectorMatching: pattern ].
 	string := self queriedReferencingString.
-	string notNil
-		ifTrue: [ methods := self referencesToString: string ].
+	string ifNotNil: [ 
+		methods := methods
+			           ifNil: [ self referencesToString: string ]
+			           ifNotNil: [ 
+			           self referencesToString: string among: methods ] ].
 	selector := self queriedSelector.
-	selector notNil
-		ifTrue: [ methods := methods
-				ifNil: [ self implementorsOf: selector ]
-				ifNotNil: [ methods select: [ :m | m selector = selector ] ] ].
+	selector ifNotNil: [ 
+		methods := methods
+			           ifNil: [ self implementorsOf: selector ]
+			           ifNotNil: [ 
+			           methods select: [ :m | m selector = selector ] ] ].
 	selector := self queriedSending.
-	selector notNil
-		ifTrue: [ methods := methods
-				ifNil: [ self sendersOf: selector ]
-				ifNotNil: [ self sendersOf: selector among: methods ] ].
+	selector ifNotNil: [ 
+		methods := methods
+			           ifNil: [ self sendersOf: selector ]
+			           ifNotNil: [ self sendersOf: selector among: methods ] ].
 	global := self queriedReferencingClass.
-	global notNil
-		ifTrue: [ methods := methods
-				ifNil: [ self referencesToClass: global ]
-				ifNotNil: [ self referencesToClass: global among: methods ] ].
+	global ifNotNil: [ 
+		methods := methods
+			           ifNil: [ self referencesToClass: global ]
+			           ifNotNil: [ 
+			           self referencesToClass: global among: methods ] ].
 	class := self requestedClass ifNil: [ self queriedClass ].
-	(class notNil and: [ methods notNil ])
-		ifTrue: [ methods := methods select: [ :m | m methodClass == class ] ].
-	methods
-		ifNil: [ methods := (class ifNil: [ self defaultRootClass ]) methodDictionary
-				asArray ].
+	(class notNil and: [ methods notNil ]) ifTrue: [ 
+		methods := methods select: [ :m | m methodClass == class ] ].
+	methods ifNil: [ 
+		methods := (class ifNil: [ self defaultRootClass ]) methodDictionary
+			           asArray ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	ast := (self queryAt: 'ast') = 'true'.
-	^ methods
-		collect: [ :m | 
-			json := m asWebsideJson.
-			ast
-				ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
-			json ]
+	^ methods collect: [ :m | 
+		  json := m asWebsideJson.
+		  ast ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
+		  json ]
+]
+
+{ #category : #private }
+WebsideAPI >> methodsWithSelectorMatching: aString [
+^(RBBrowserEnvironment new implementorsMatching: '*',aString, '*') methods
 ]
 
 { #category : #private }
@@ -899,6 +910,11 @@ WebsideAPI >> queriedSelector [
 ]
 
 { #category : #private }
+WebsideAPI >> queriedSelectorMatching [
+	^self queryAt: 'selectorMatching'
+]
+
+{ #category : #private }
 WebsideAPI >> queriedSending [
 	| selector |
 	selector := request at: 'sending' ifAbsent: nil.
@@ -959,6 +975,16 @@ WebsideAPI >> referencesToString: aString [
 	scope := self queriedScope ifNil: [ self queriedClass ].
 	^ SystemNavigation default
 		allMethodsSelect: [ :m |
+			m
+				hasLiteralSuchThat: [ :l | 
+					l isString
+						and: [ l isSymbol not
+								and: [ l includesSubstring: aString caseSensitive: false ] ] ] ]
+]
+
+{ #category : #private }
+WebsideAPI >> referencesToString: aString among: aCollection [
+	^ aCollection select: [ :m |
 			m
 				hasLiteralSuchThat: [ :l | 
 					l isString

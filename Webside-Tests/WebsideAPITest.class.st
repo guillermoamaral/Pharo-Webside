@@ -944,6 +944,16 @@ WebsideAPITest >> testInstanceVariables [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testMatchingSelectors [
+	| matching |
+	matching := self get: 'methods?selectorMatching=testMa*'.
+	self
+		assert: matching notEmpty;
+		assert: (matching
+			anySatisfy: [:m | (m at: 'selector') = 'testMatchingSelectors'])
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testMethod [
 	| method |
 	method := self get: 'classes/Point/methods/x'.
