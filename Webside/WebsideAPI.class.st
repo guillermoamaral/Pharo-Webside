@@ -664,29 +664,24 @@ WebsideAPI >> method [
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
 
-	| pattern string methods selector global class ast json |
-	pattern := self queriedSelectorMatching.
-	pattern ifNotNil: [ 
+	| methods class ast json |
+	self queriedSelectorMatching ifNotNil: [:pattern | 
 		methods := self methodsWithSelectorMatching: pattern ].
-	string := self queriedReferencingString.
-	string ifNotNil: [ 
+	self queriedReferencingString ifNotNil: [:string | 
 		methods := methods
 			           ifNil: [ self referencesToString: string ]
 			           ifNotNil: [ 
 			           self referencesToString: string among: methods ] ].
-	selector := self queriedSelector.
-	selector ifNotNil: [ 
+	self queriedSelector ifNotNil: [:selector | 
 		methods := methods
 			           ifNil: [ self implementorsOf: selector ]
 			           ifNotNil: [ 
 			           methods select: [ :m | m selector = selector ] ] ].
-	selector := self queriedSending.
-	selector ifNotNil: [ 
+                       self queriedSending ifNotNil: [:selector |
 		methods := methods
 			           ifNil: [ self sendersOf: selector ]
 			           ifNotNil: [ self sendersOf: selector among: methods ] ].
-	global := self queriedReferencingClass.
-	global ifNotNil: [ 
+	self queriedReferencingClass ifNotNil: [:global | 
 		methods := methods
 			           ifNil: [ self referencesToClass: global ]
 			           ifNotNil: [ 
