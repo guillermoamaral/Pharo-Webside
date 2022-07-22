@@ -1113,6 +1113,30 @@ WebsideAPITest >> testPackageClasses [
 		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'Object' ])
 ]
 
+{ #category : #'changes endpoints' }
+WebsideAPITest >> testPackageCreation [
+
+	| creation |
+	creation := NeoJSONObject new
+		              at: 'type' put: 'AddPackage';
+		              at: 'package' put: 'TestPackageCreation';
+		              at: 'author' put: self class name;
+		              yourself.
+	[ 
+	| package |
+	self post: '/changes' with: creation.
+	package := self get: '/packages/TestPackageCreation'.
+	self
+		assert: package notNil;
+		assert: package name equals: 'TestPackageCreation' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemovePackage';
+			            at: 'package' put: 'TestPackageCreation';
+			            yourself.
+		self post: '/changes' with: remotion ]
+]
+
 { #category : #'code endpoints' }
 WebsideAPITest >> testPackageMethods [
 	| methods |
@@ -1120,6 +1144,36 @@ WebsideAPITest >> testPackageMethods [
 	self
 		assert: methods notEmpty;
 		assert: (methods anySatisfy: [ :m | (m at: 'class') = 'Object' and: [ (m at: 'selector') = 'asWebsideJson' ]]) 
+]
+
+{ #category : #'changes endpoints' }
+WebsideAPITest >> testPackageRename [
+
+	| creation renaming |
+	creation := NeoJSONObject new
+		            at: 'type' put: 'AddPackage';
+		            at: 'package' put: 'TestPackageRename';
+		            at: 'author' put: self class name;
+		            yourself.
+	renaming := NeoJSONObject new
+		            at: 'type' put: 'RenamePackage';
+		            at: 'package' put: 'TestPackageRename';
+						at: 'newName' put: 'TestPackageRename2';
+		            at: 'author' put: self class name;
+		            yourself.
+	[ 
+	| package |
+	self post: '/changes' with: creation; post: '/changes' with: renaming.
+	package := self get: '/packages/TestPackageRename2'.
+	self
+		assert: package notNil;
+		assert: package name equals: 'TestPackageRename2' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemovePackage';
+			            at: 'package' put: 'TestPackageRename2';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'code endpoints' }
