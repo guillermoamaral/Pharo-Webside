@@ -8,9 +8,3 @@ RBAddClassChange >> fromWebsideJson: json [
 	(definition includesSubstring: 'category:')
 		ifFalse: [ definition := definition , ' category: #Undefined' ]
 ]
-
-{ #category : #'*Webside' }
-RBAddClassChange class >> websideType [
-
-	^ 'AddClass'
-]

@@ -14,9 +14,3 @@ RBAddMethodRefactoring class >> acceptsWebsideJson: json [
 	selector ifNil: [ ^ false ].
 	^ (class includesSelector: selector) not
 ]
-
-{ #category : #'*Webside' }
-RBAddMethodRefactoring class >> websideType [
-
-	^ 'AddMethod'
-]

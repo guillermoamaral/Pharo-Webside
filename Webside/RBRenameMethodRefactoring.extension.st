@@ -17,9 +17,3 @@ RBRenameMethodRefactoring >> fromWebsideJson: json [
 	newSelector ifNotNil: [ newSelector := newSelector asSymbol ].
 
 ]
-
-{ #category : #'*Webside' }
-RBRenameMethodRefactoring class >> websideType [
-
-	^ 'RenameMethod'
-]

@@ -23,9 +23,3 @@ RBAddMethodChange >> fromWebsideJson: json [
 	category ifNil: [ category := Protocol unclassified ].
 	self protocols: { category asSymbol }
 ]
-
-{ #category : #'*Webside' }
-RBAddMethodChange class >> websideType [
-
-	^ 'AddMethod'
-]

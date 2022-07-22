@@ -6,9 +6,3 @@ RBRenameClassChange >> fromWebsideJson: json [
 	oldName := json at: 'class' ifAbsent: nil.
 	newName := json at: 'newName' ifAbsent: nil.
 ]
-
-{ #category : #'*Webside' }
-RBRenameClassChange class >> websideType [
-
-	^ 'RenameClass'
-]

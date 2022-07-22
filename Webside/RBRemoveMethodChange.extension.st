@@ -11,9 +11,3 @@ RBRemoveMethodChange >> fromWebsideJson: json [
 	selector := json at: 'selector' ifAbsent: nil.
 	selector ifNotNil: [selector := selector asSymbol]
 ]
-
-{ #category : #'*Webside' }
-RBRemoveMethodChange class >> websideType [
-
-	^ 'RemoveMethod'
-]
