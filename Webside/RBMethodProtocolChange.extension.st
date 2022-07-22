@@ -11,6 +11,7 @@ RBMethodProtocolChange >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBMethodProtocolChange class >> websideType [ 
-	^'MethodClassification'
+RBMethodProtocolChange class >> websideType [
+
+	^ 'ClassifyMethod'
 ]

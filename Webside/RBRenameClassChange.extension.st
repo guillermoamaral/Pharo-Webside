@@ -9,5 +9,6 @@ RBRenameClassChange >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBRenameClassChange class >> websideType [
-	^ 'ClassRename'
+
+	^ 'RenameClass'
 ]

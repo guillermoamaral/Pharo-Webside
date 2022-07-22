@@ -8,6 +8,7 @@ RBPullUpInstanceVariableRefactoring >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBPullUpInstanceVariableRefactoring class >> websideType [ 
-	^'InstanceVariableMoveUp'
+RBPullUpInstanceVariableRefactoring class >> websideType [
+
+	^ 'MoveUpInstanceVariable'
 ]

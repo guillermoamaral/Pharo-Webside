@@ -11,5 +11,6 @@ RBAddClassChange >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBAddClassChange class >> websideType [
-	^ 'ClassDefinition'
+
+	^ 'AddClass'
 ]

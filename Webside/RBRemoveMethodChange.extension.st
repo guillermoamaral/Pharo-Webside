@@ -14,5 +14,6 @@ RBRemoveMethodChange >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBRemoveMethodChange class >> websideType [
-	^ 'MethodRemove'
+
+	^ 'RemoveMethod'
 ]

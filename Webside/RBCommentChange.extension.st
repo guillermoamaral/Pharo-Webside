@@ -14,5 +14,6 @@ RBCommentChange >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBCommentChange class >> websideType [
-	^ 'ClassCommentDefinition'
+
+	^ 'CommentClass'
 ]

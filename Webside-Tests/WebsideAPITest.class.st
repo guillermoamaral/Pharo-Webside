@@ -162,31 +162,31 @@ WebsideAPITest >> testCancelEvaluation [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCassDefinition [
+
 	| definition |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestCassDefinition';
-		at: 'definition'
-			put:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestCassDefinition';
+		              at: 'definition' put: 'Object
 	subclass: #TestCassDefinition
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
-	[ | class |
+		              at: 'author' put: self class name;
+		              yourself.
+	[ 
+	| class |
 	self post: '/changes' with: definition.
 	class := self get: '/classes/TestCassDefinition'.
 	self
 		assert: class notNil;
-		assert: class name equals: 'TestCassDefinition' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestCassDefinition';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: class name equals: 'TestCassDefinition' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestCassDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'code endpoints' }
@@ -203,74 +203,74 @@ WebsideAPITest >> testCategories [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCategoryRemove [
+
 	| class method remotion |
 	class := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestCategoryRemove';
-		at: 'definition'
-			put:
-			'Object
+		         at: 'type' put: 'AddClass';
+		         at: 'class' put: 'TestCategoryRemove';
+		         at: 'definition' put: 'Object
 	subclass: #TestCategoryRemove
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		         at: 'author' put: self class name;
+		         yourself.
 	method := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'TestCategoryRemove';
-		at: 'category' put: 'x';
-		at: 'sourceCode' put: 'testCategoryRemove';
-		at: 'author' put: self class name;
-		yourself.
+		          at: 'type' put: 'AddMethod';
+		          at: 'class' put: 'TestCategoryRemove';
+		          at: 'category' put: 'x';
+		          at: 'sourceCode' put: 'testCategoryRemove';
+		          at: 'author' put: self class name;
+		          yourself.
 	remotion := NeoJSONObject new
-		at: 'type' put: 'CategoryRemove';
-		at: 'class' put: 'TestCategoryRemove';
-		at: 'category' put: 'x';
-		yourself.
-	[ | categories |
+		            at: 'type' put: 'RemoveCategory';
+		            at: 'class' put: 'TestCategoryRemove';
+		            at: 'category' put: 'x';
+		            yourself.
+	[ 
+	| categories |
 	self
 		post: '/changes' with: class;
 		post: '/changes' with: method;
 		post: '/changes' with: remotion.
 	categories := self get: '/classes/TestCategoryRemove/categories'.
-	self deny: (categories includes: 'x') ]
-		ensure: [ remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestCategoryRemove';
-				yourself.
-			self post: '/changes' with: remotion ]
+	self deny: (categories includes: 'x') ] ensure: [ 
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestCategoryRemove';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCategoryRename [
+
 	| class method renaming |
 	class := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestCategoryRename';
-		at: 'definition'
-			put:
-			'Object
+		         at: 'type' put: 'AddClass';
+		         at: 'class' put: 'TestCategoryRename';
+		         at: 'definition' put: 'Object
 	subclass: #TestCategoryRename
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		         at: 'author' put: self class name;
+		         yourself.
 	method := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'TestCategoryRename';
-		at: 'category' put: 'x';
-		at: 'sourceCode' put: 'testCategoryRename';
-		at: 'author' put: self class name;
-		yourself.
+		          at: 'type' put: 'AddMethod';
+		          at: 'class' put: 'TestCategoryRename';
+		          at: 'category' put: 'x';
+		          at: 'sourceCode' put: 'testCategoryRename';
+		          at: 'author' put: self class name;
+		          yourself.
 	renaming := NeoJSONObject new
-		at: 'type' put: 'CategoryRename';
-		at: 'class' put: 'TestCategoryRename';
-		at: 'category' put: 'x';
-		at: 'newName' put: 'y';
-		yourself.
-	[ | categories |
+		            at: 'type' put: 'RenameCategory';
+		            at: 'class' put: 'TestCategoryRename';
+		            at: 'category' put: 'x';
+		            at: 'newName' put: 'y';
+		            yourself.
+	[ 
+	| categories |
 	self
 		post: '/changes' with: class;
 		post: '/changes' with: method;
@@ -278,80 +278,80 @@ WebsideAPITest >> testCategoryRename [
 	categories := self get: '/classes/TestCategoryRename/categories'.
 	self
 		assert: categories size equals: 1;
-		assert: categories first equals: 'y' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestCategoryRename';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: categories first equals: 'y' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestCategoryRename';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testChanges [
+
 	| change changes |
 	change := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Point';
-		at: 'category' put: self class name;
-		at: 'sourceCode'
-			put:
-			'testChanges
+		          at: 'type' put: 'AddMethod';
+		          at: 'class' put: 'Point';
+		          at: 'category' put: self class name;
+		          at: 'sourceCode' put: 'testChanges
 	^x + 1';
-		at: 'author' put: self class name;
-		yourself.
-	[ | retrieved |
+		          at: 'author' put: self class name;
+		          yourself.
+	[ 
+	| retrieved |
 	self post: '/changes' with: change.
 	changes := self get: '/changes'.
 	self assert: changes notEmpty.
 	retrieved := changes last.
 	self
-		assert: (retrieved at: 'type') equals: 'MethodDefinition';
+		assert: (retrieved at: 'type') equals: 'AddMethod';
 		assert: (retrieved at: 'class') equals: 'Point';
-		assert: (retrieved at: 'selector') equals: 'testChanges' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'MethodRemove';
-				at: 'class' put: 'Point';
-				at: 'selector' put: 'testMethodDefinition';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: (retrieved at: 'selector') equals: 'testChanges' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'class' put: 'Point';
+			            at: 'selector' put: 'testMethodDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testClassCommentDefinition [
+
 	| definition comment |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestClassCommentDefinition';
-		at: 'definition'
-			put:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestClassCommentDefinition';
+		              at: 'definition' put: 'Object
 	subclass: #TestClassCommentDefinition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	comment := NeoJSONObject new
-		at: 'type' put: 'ClassCommentDefinition';
-		at: 'class' put: 'TestClassCommentDefinition';
-		at: 'comment' put: 'Testing class comment';
-		yourself.
-	[ | class |
+		           at: 'type' put: 'CommentClass';
+		           at: 'class' put: 'TestClassCommentDefinition';
+		           at: 'comment' put: 'Testing class comment';
+		           yourself.
+	[ 
+	| class |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: comment.
 	class := self get: '/classes/TestClassCommentDefinition'.
 	self
 		assert: class notNil;
-		assert: class comment equals: 'Testing class comment' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestClassCommentDefinition';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: class comment equals: 'Testing class comment' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestClassCommentDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'code endpoints' }
@@ -366,22 +366,22 @@ WebsideAPITest >> testClassDefinition [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testClassRemove [
+
 	| definition remotion class |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestClassRemove';
-		definition:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestClassRemove';
+		              definition: 'Object
 	subclass: #TestClassRemove
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	remotion := NeoJSONObject new
-		at: 'type' put: 'ClassRemove';
-		at: 'class' put: 'TestClassRemove';
-		yourself.
+		            at: 'type' put: 'RemoveClass';
+		            at: 'class' put: 'TestClassRemove';
+		            yourself.
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: remotion.
@@ -391,70 +391,72 @@ WebsideAPITest >> testClassRemove [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testClassRename [
+
 	| definition renaming class |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestClassRename';
-		definition:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestClassRename';
+		              definition: 'Object
 	subclass: #TestClassRename
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	renaming := NeoJSONObject new
-		at: 'type' put: 'ClassRename';
-		at: 'class' put: 'TestClassRename';
-		at: 'newName' put: 'TestClassRename2';
-		yourself.
-	[ self
+		            at: 'type' put: 'RenameClass';
+		            at: 'class' put: 'TestClassRename';
+		            at: 'newName' put: 'TestClassRename2';
+		            yourself.
+	[ 
+	self
 		post: '/changes' with: definition;
 		post: '/changes' with: renaming.
 	class := self get: '/classes/TestClassRename'.
 	self assert: class isNil.
 	class := self get: '/classes/TestClassRename2'.
-	self assert: class notNil ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestClassRename2';
-				yourself.
-			self post: '/changes' with: remotion ]
+	self assert: class notNil ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestClassRename2';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testClassVariableAddition [
+
 	| definition addition |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestClassVariableAddition';
-		definition:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestClassVariableAddition';
+		              definition: 'Object
 	subclass: #TestClassVariableAddition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	addition := NeoJSONObject new
-		at: 'type' put: 'ClassVariableAddition';
-		at: 'class' put: 'TestClassVariableAddition';
-		at: 'variable' put: 'X';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'AddClassVariable';
+		            at: 'class' put: 'TestClassVariableAddition';
+		            at: 'variable' put: 'X';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: addition.
-	variables := self
-		get: '/classes/TestClassVariableAddition/class-variables'.
-	self
-		assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ])]
-		ensure: [ | remotion |
+	variables := self get:
+		             '/classes/TestClassVariableAddition/class-variables'.
+	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ]) ] 
+		ensure: [ 
+			| remotion |
 			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestClassVariableAddition';
-				yourself.
+				            at: 'type' put: 'RemoveClass';
+				            at: 'class' put: 'TestClassVariableAddition';
+				            yourself.
 			self post: '/changes' with: remotion ]
 ]
 
@@ -495,18 +497,18 @@ WebsideAPITest >> testClasses [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCodeSuggestion [
+
 	| change method error changes |
 	change := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Point';
-		at: 'category' put: self class name;
-		at: 'sourceCode'
-			put:
-			'testMethodDefinition
+		          at: 'type' put: 'AddMethod';
+		          at: 'class' put: 'Point';
+		          at: 'category' put: self class name;
+		          at: 'sourceCode' put: 'testMethodDefinition
 	^t + 1';
-		at: 'author' put: self class name;
-		yourself.
-	[ self
+		          at: 'author' put: self class name;
+		          yourself.
+	[ 
+	self
 		post: '/changes' with: change;
 		deny: client isSuccess.
 	error := NeoJSONObject fromString: client contents.
@@ -518,18 +520,16 @@ WebsideAPITest >> testCodeSuggestion [
 		assert: method notNil;
 		assert: method selector equals: 'testMethodDefinition';
 		assert: method category equals: self class name;
-		assert: method source
-			equals:
-			'testMethodDefinition
+		assert: method source equals: 'testMethodDefinition
 	| t |
-	^t + 1' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'MethodRemove';
-				at: 'class' put: 'Point';
-				at: 'selector' put: 'testMethodDefinition';
-				yourself.
-			self post: '/changes' with: remotion ]
+	^t + 1' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'class' put: 'Point';
+			            at: 'selector' put: 'testMethodDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'debugging endpoints' }
@@ -708,230 +708,228 @@ WebsideAPITest >> testImplementors [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testInstanceVariableAddition [
+
 	| definition addition |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableAddition';
-		definition:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestInstanceVariableAddition';
+		              definition: 'Object
 	subclass: #TestInstanceVariableAddition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	addition := NeoJSONObject new
-		at: 'type' put: 'InstanceVariableAddition';
-		at: 'class' put: 'TestInstanceVariableAddition';
-		at: 'variable' put: 'x';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'AddInstanceVariable';
+		            at: 'class' put: 'TestInstanceVariableAddition';
+		            at: 'variable' put: 'x';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: addition.
-	variables := self
-		get: '/classes/TestInstanceVariableAddition/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableAddition/instance-variables'.
 	self
 		assert: variables size equals: 1;
-		assert: variables first name equals: 'x' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableAddition';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: variables first name equals: 'x' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableAddition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testInstanceVariableMoveDown [
+
 	| superclass class movement |
 	superclass := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableMoveDown';
-		at: 'definition'
-			put:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestInstanceVariableMoveDown';
+		              at: 'definition' put: 'Object
 	subclass: #TestInstanceVariableMoveDown
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	class := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableMoveDown2';
-		at: 'definition'
-			put:
-			'TestInstanceVariableMoveDown
+		         at: 'type' put: 'AddClass';
+		         at: 'class' put: 'TestInstanceVariableMoveDown2';
+		         at: 'definition' put: 'TestInstanceVariableMoveDown
 	subclass: #TestInstanceVariableMoveDown2
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		         at: 'author' put: self class name;
+		         yourself.
 	movement := NeoJSONObject new
-		at: 'type' put: 'InstanceVariableMoveDown';
-		at: 'class' put: 'TestInstanceVariableMoveDown';
-		at: 'variable' put: 'x';
-		at: 'target' put: 'TestInstanceVariableMoveDown2';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'MoveDownInstanceVariable';
+		            at: 'class' put: 'TestInstanceVariableMoveDown';
+		            at: 'variable' put: 'x';
+		            at: 'target' put: 'TestInstanceVariableMoveDown2';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: superclass;
 		post: '/changes' with: class;
 		post: '/changes' with: movement.
-	variables := self
-		get: '/classes/TestInstanceVariableMoveDown/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableMoveDown/instance-variables'.
 	self assert: variables isEmpty.
-	variables := self
-		get: '/classes/TestInstanceVariableMoveDown2/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableMoveDown2/instance-variables'.
 	self
 		assert: variables size equals: 1;
-		assert: variables first name equals: 'x' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableMoveDown2';
-				yourself.
-			self post: '/changes' with: remotion.
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableMoveDown';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: variables first name equals: 'x' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableMoveDown2';
+			            yourself.
+		self post: '/changes' with: remotion.
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableMoveDown';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testInstanceVariableMoveUp [
+
 	| superclass class movement |
 	superclass := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableMoveUp';
-		definition:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestInstanceVariableMoveUp';
+		              definition: 'Object
 	subclass: #TestInstanceVariableMoveUp
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	class := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableMoveUp2';
-		at: 'definition'
-			put:
-			'TestInstanceVariableMoveUp
+		         at: 'type' put: 'AddClass';
+		         at: 'class' put: 'TestInstanceVariableMoveUp2';
+		         at: 'definition' put: 'TestInstanceVariableMoveUp
 	subclass: #TestInstanceVariableMoveUp2
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		         at: 'author' put: self class name;
+		         yourself.
 	movement := NeoJSONObject new
-		at: 'type' put: 'InstanceVariableMoveUp';
-		at: 'class' put: 'TestInstanceVariableMoveUp2';
-		at: 'variable' put: 'x';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'MoveUpInstanceVariable';
+		            at: 'class' put: 'TestInstanceVariableMoveUp2';
+		            at: 'variable' put: 'x';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: superclass;
 		post: '/changes' with: class;
 		post: '/changes' with: movement.
-	variables := self
-		get: '/classes/TestInstanceVariableMoveUp/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableMoveUp/instance-variables'.
 	self
 		assert: variables size equals: 1;
 		assert: variables first name equals: 'x'.
-	variables := self
-		get: '/classes/TestInstanceVariableMoveUp2/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableMoveUp2/instance-variables'.
 	self
 		assert: variables size equals: 1;
 		assert: variables first name equals: 'x';
 		assert: (variables first at: 'class')
-			equals: 'TestInstanceVariableMoveUp' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableMoveUp2';
-				yourself.
-			self post: '/changes' with: remotion.
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableMoveUp';
-				yourself.
-			self post: '/changes' with: remotion ]
+		equals: 'TestInstanceVariableMoveUp' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableMoveUp2';
+			            yourself.
+		self post: '/changes' with: remotion.
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableMoveUp';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testInstanceVariableRemove [
+
 	| definition remotion |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableRemove';
-		at: 'definition'
-			put:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestInstanceVariableRemove';
+		              at: 'definition' put: 'Object
 	subclass: #TestInstanceVariableRemove
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	remotion := NeoJSONObject new
-		at: 'type' put: 'InstanceVariableRemove';
-		at: 'class' put: 'TestInstanceVariableRemove';
-		at: 'variable' put: 'x';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'RemoveInstanceVariable';
+		            at: 'class' put: 'TestInstanceVariableRemove';
+		            at: 'variable' put: 'x';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: remotion.
-	variables := self
-		get: '/classes/TestInstanceVariableRemove/instance-variables'.
-	self assert: variables isEmpty ]
-		ensure: [ remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableRemove';
-				yourself.
-			self post: '/changes' with: remotion ]
+	variables := self get:
+		             '/classes/TestInstanceVariableRemove/instance-variables'.
+	self assert: variables isEmpty ] ensure: [ 
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableRemove';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testInstanceVariableRename [
+
 	| definition renaming |
 	definition := NeoJSONObject new
-		at: 'type' put: 'ClassDefinition';
-		at: 'class' put: 'TestInstanceVariableRename';
-		at: 'definition'
-			put:
-			'Object
+		              at: 'type' put: 'AddClass';
+		              at: 'class' put: 'TestInstanceVariableRename';
+		              at: 'definition' put: 'Object
 	subclass: #TestInstanceVariableRename
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
 	poolDictionaries: ''''';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	renaming := NeoJSONObject new
-		at: 'type' put: 'InstanceVariableRename';
-		at: 'class' put: 'TestInstanceVariableRename';
-		at: 'variable' put: 'x';
-		at: 'newName' put: 'y';
-		yourself.
-	[ | variables |
+		            at: 'type' put: 'RenameInstanceVariable';
+		            at: 'class' put: 'TestInstanceVariableRename';
+		            at: 'variable' put: 'x';
+		            at: 'newName' put: 'y';
+		            yourself.
+	[ 
+	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: renaming.
-	variables := self
-		get: '/classes/TestInstanceVariableRename/instance-variables'.
+	variables := self get:
+		             '/classes/TestInstanceVariableRename/instance-variables'.
 	self
 		assert: variables size equals: 1;
-		assert: variables first name equals: 'y' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'ClassRemove';
-				at: 'class' put: 'TestInstanceVariableRename';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: variables first name equals: 'y' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'class' put: 'TestInstanceVariableRename';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'code endpoints' }
@@ -969,14 +967,14 @@ WebsideAPITest >> testMethodClassification [
 
 	| definition classification method |
 	definition := NeoJSONObject new
-		              at: 'type' put: 'MethodDefinition';
+		              at: 'type' put: 'AddMethod';
 		              at: 'class' put: 'Object';
 		              at: 'category' put: self class name;
 		              at: 'sourceCode' put: 'testMethodClassification';
 		              at: 'author' put: self class name;
 		              yourself.
 	classification := NeoJSONObject new
-		                  at: 'type' put: 'MethodClassification';
+		                  at: 'type' put: 'ClassifyMethod';
 		                  at: 'class' put: 'Object';
 		                  at: 'selector' put: 'testMethodClassification';
 		                  at: 'category' put: 'testMethodClassification';
@@ -997,7 +995,7 @@ WebsideAPITest >> testMethodClassification [
 		equals: 'testMethodClassification' ] ensure: [ 
 		| remotion |
 		remotion := NeoJSONObject new
-			            at: 'type' put: 'MethodRemove';
+			            at: 'type' put: 'RemoveMethod';
 			            at: 'class' put: 'Object';
 			            at: 'selector' put: 'testMethodClassification';
 			            yourself.
@@ -1006,54 +1004,51 @@ WebsideAPITest >> testMethodClassification [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testMethodDefinition [
+
 	| change method |
 	change := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Point';
-		at: 'category' put: self class name;
-		at: 'sourceCode'
-			put:
-			'testMethodDefinition
+		          at: 'type' put: 'AddMethod';
+		          at: 'class' put: 'Point';
+		          at: 'category' put: self class name;
+		          at: 'sourceCode' put: 'testMethodDefinition
 	^x + 1';
-		at: 'author' put: self class name;
-		yourself.
-	[ self post: '/changes' with: change.
+		          at: 'author' put: self class name;
+		          yourself.
+	[ 
+	self post: '/changes' with: change.
 	method := self get: '/classes/Point/methods/testMethodDefinition'.
 	self
 		assert: method notNil;
 		assert: method selector equals: 'testMethodDefinition';
 		assert: method category equals: self class name;
-		assert: method source
-			equals:
-			'testMethodDefinition
-	^x + 1' ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'MethodRemove';
-				at: 'class' put: 'Point';
-				at: 'selector' put: 'testMethodDefinition';
-				yourself.
-			self post: '/changes' with: remotion ]
+		assert: method source equals: 'testMethodDefinition
+	^x + 1' ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'class' put: 'Point';
+			            at: 'selector' put: 'testMethodDefinition';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testMethodRemove [
+
 	| definition remotion method |
 	definition := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Point';
-		at: 'category' put: self class name;
-		at: 'sourceCode'
-			put:
-			'testMethodRemove
+		              at: 'type' put: 'AddMethod';
+		              at: 'class' put: 'Point';
+		              at: 'category' put: self class name;
+		              at: 'sourceCode' put: 'testMethodRemove
 	^x + 1';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	remotion := NeoJSONObject new
-		at: 'type' put: 'MethodRemove';
-		at: 'class' put: 'Point';
-		at: 'selector' put: 'testMethodRemove';
-		yourself.
+		            at: 'type' put: 'RemoveMethod';
+		            at: 'class' put: 'Point';
+		            at: 'selector' put: 'testMethodRemove';
+		            yourself.
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: remotion.
@@ -1378,39 +1373,39 @@ WebsideAPITest >> testScope [
 
 { #category : #'changes endpoints' }
 WebsideAPITest >> testSelectorRename2 [
+
 	| definition renaming |
 	definition := NeoJSONObject new
-		at: 'type' put: 'MethodDefinition';
-		at: 'class' put: 'Point';
-		at: 'category' put: self class name;
-		at: 'sourceCode'
-			put:
-			'testSelectorRename
+		              at: 'type' put: 'AddMethod';
+		              at: 'class' put: 'Point';
+		              at: 'category' put: self class name;
+		              at: 'sourceCode' put: 'testSelectorRename
 	^x + 1';
-		at: 'author' put: self class name;
-		yourself.
+		              at: 'author' put: self class name;
+		              yourself.
 	renaming := NeoJSONObject new
-		at: 'type' put: 'SelectorRename';
-		at: 'class' put: 'Point';
-		at: 'selector' put: 'testSelectorRename';
-		at: 'newSelector' put: 'testSelectorRename2';
-		at: 'author' put: self class name;
-		yourself.
-	[ | method |
+		            at: 'type' put: 'RenameMethod';
+		            at: 'class' put: 'Point';
+		            at: 'selector' put: 'testSelectorRename';
+		            at: 'newSelector' put: 'testSelectorRename2';
+		            at: 'author' put: self class name;
+		            yourself.
+	[ 
+	| method |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: renaming.
 	method := self get: '/classes/Point/methods/testSelectorRename'.
 	self assert: method isNil.
 	method := self get: '/classes/Point/methods/testSelectorRename2'.
-	self assert: method notNil ]
-		ensure: [ | remotion |
-			remotion := NeoJSONObject new
-				at: 'type' put: 'MethodRemove';
-				at: 'class' put: 'Point';
-				at: 'selector' put: 'testSelectorRename2';
-				yourself.
-			self post: '/changes' with: remotion ]
+	self assert: method notNil ] ensure: [ 
+		| remotion |
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'class' put: 'Point';
+			            at: 'selector' put: 'testSelectorRename2';
+			            yourself.
+		self post: '/changes' with: remotion ]
 ]
 
 { #category : #'code endpoints' }
