@@ -38,5 +38,5 @@ RBRefactoryChange >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBRefactoryChange class >> websideType [
-	^ nil
+	^ (self name withoutPrefix: 'RB') withoutSuffix: 'Change'
 ]

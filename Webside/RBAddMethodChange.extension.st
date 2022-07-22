@@ -13,6 +13,7 @@ RBAddMethodChange >> asWebsideJson [
 
 { #category : #'*Webside' }
 RBAddMethodChange >> fromWebsideJson: json [
+
 	| category |
 	super fromWebsideJson: json.
 	selector := json at: 'selector' ifAbsent: nil.
@@ -20,7 +21,7 @@ RBAddMethodChange >> fromWebsideJson: json [
 	source := json at: 'sourceCode' ifAbsent: nil.
 	category := json at: 'category' ifAbsent: nil.
 	category ifNil: [ category := Protocol unclassified ].
-	self protocols: {category asSymbol}
+	self protocols: { category asSymbol }
 ]
 
 { #category : #'*Webside' }

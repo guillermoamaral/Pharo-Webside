@@ -259,13 +259,14 @@ WebsideAPI >> classes [
 
 { #category : #private }
 WebsideAPI >> compilationError: aCompilationError [
-	|  entity |
+
+	| entity |
 	entity := ZnStringEntity
-		with: (NeoJSONWriter toString: aCompilationError asWebsideJson)
-		type:
-			(ZnMimeType applicationJson
-				charSet: 'utf-8';
-				yourself).
+		          with:
+		          (NeoJSONWriter toString: aCompilationError asWebsideJson)
+		          type: (ZnMimeType applicationJson
+				           charSet: 'utf-8';
+				           yourself).
 	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
