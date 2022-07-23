@@ -4,7 +4,7 @@ Extension { #name : #RBAddPackageChange }
 RBAddPackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
-		  at: 'package' put: packageName;
+		  at: 'name' put: packageName;
 		  yourself
 ]
 
@@ -12,6 +12,5 @@ RBAddPackageChange >> asWebsideJson [
 RBAddPackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
-	packageName := json at: 'package' ifAbsent: nil.
-
+	packageName := json at: 'name' ifAbsent: nil
 ]

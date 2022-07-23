@@ -4,7 +4,7 @@ Extension { #name : #RBRemovePackageChange }
 RBRemovePackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
-		  at: 'package' put: packageName;
+		  at: 'name' put: packageName;
 		  yourself
 ]
 
@@ -12,5 +12,5 @@ RBRemovePackageChange >> asWebsideJson [
 RBRemovePackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
-	packageName := json at: 'package' ifAbsent: nil
+	packageName := json at: 'name' ifAbsent: nil
 ]

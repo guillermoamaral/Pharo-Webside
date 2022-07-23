@@ -4,16 +4,15 @@ Extension { #name : #RBRenamePackageChange }
 RBRenamePackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
-		  at: 'package' put: oldName;
+		  at: 'name' put: oldName;
 		  at: 'newName' put: newName;
 		  yourself
-		
 ]
 
 { #category : #'*Webside' }
 RBRenamePackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
-	oldName := json at: 'package' ifAbsent: nil.
-	newName := json at: 'newName' ifAbsent: nil.
+	oldName := json at: 'name' ifAbsent: nil.
+	newName := json at: 'newName' ifAbsent: nil
 ]

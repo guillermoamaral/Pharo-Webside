@@ -1118,10 +1118,10 @@ WebsideAPITest >> testPackageCreation [
 
 	| creation |
 	creation := NeoJSONObject new
-		              at: 'type' put: 'AddPackage';
-		              at: 'package' put: 'TestPackageCreation';
-		              at: 'author' put: self class name;
-		              yourself.
+		            at: 'type' put: 'AddPackage';
+		            at: 'name' put: 'TestPackageCreation';
+		            at: 'author' put: self class name;
+		            yourself.
 	[ 
 	| package |
 	self post: '/changes' with: creation.
@@ -1132,7 +1132,7 @@ WebsideAPITest >> testPackageCreation [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemovePackage';
-			            at: 'package' put: 'TestPackageCreation';
+			            at: 'name' put: 'TestPackageCreation';
 			            yourself.
 		self post: '/changes' with: remotion ]
 ]
@@ -1152,18 +1152,20 @@ WebsideAPITest >> testPackageRename [
 	| creation renaming |
 	creation := NeoJSONObject new
 		            at: 'type' put: 'AddPackage';
-		            at: 'package' put: 'TestPackageRename';
+		            at: 'name' put: 'TestPackageRename';
 		            at: 'author' put: self class name;
 		            yourself.
 	renaming := NeoJSONObject new
 		            at: 'type' put: 'RenamePackage';
-		            at: 'package' put: 'TestPackageRename';
-						at: 'newName' put: 'TestPackageRename2';
+		            at: 'name' put: 'TestPackageRename';
+		            at: 'newName' put: 'TestPackageRename2';
 		            at: 'author' put: self class name;
 		            yourself.
 	[ 
 	| package |
-	self post: '/changes' with: creation; post: '/changes' with: renaming.
+	self
+		post: '/changes' with: creation;
+		post: '/changes' with: renaming.
 	package := self get: '/packages/TestPackageRename2'.
 	self
 		assert: package notNil;
@@ -1171,7 +1173,7 @@ WebsideAPITest >> testPackageRename [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemovePackage';
-			            at: 'package' put: 'TestPackageRename2';
+			            at: 'name' put: 'TestPackageRename2';
 			            yourself.
 		self post: '/changes' with: remotion ]
 ]
