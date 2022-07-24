@@ -3,7 +3,7 @@ Extension { #name : #RBRefactoryClassChange }
 { #category : #'*Webside' }
 RBRefactoryClassChange >> asWebsideJson [
 	^ super asWebsideJson
-		at: 'class' put: className ;
+		at: 'class' put: self changeClass name asString ;
 		yourself
 ]
 
