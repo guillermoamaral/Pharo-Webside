@@ -264,7 +264,7 @@ WebsideServer >> port: anInteger [
 	port := anInteger
 ]
 
-{ #category : #accessing }
+{ #category : #actions }
 WebsideServer >> reset [
 	self debuggers removeAll.
 	self evaluations removeAll.
