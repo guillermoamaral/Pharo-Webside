@@ -207,18 +207,27 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 
 { #category : #private }
 WebsideAPI >> classTreeFromClasses: aCollection [
+
 	| roots json subclasses |
 	roots := Dictionary new.
-	aCollection do: [ :c |
-		json := NeoJSONObject new at: 'name' put: c name; yourself.
-		roots at: c name put: json];
-	select: [ :c | c superclass notNil ] thenDo: [ :c |
-		roots at: c superclass ifPresent: [ :sc |
-			subclasses := sc at: 'subclasses' ifAbsentPut: [ SortedCollection new sortBlock: [:a :b | a name <= b name] ].
-			subclasses add: (roots at: c name)						 ]
-		 ];
-	select: [ :c | c superclass notNil ] thenDo: [ :c | (roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]].
-	^roots asArray sort: [ :a :b | a name <= b name ]
+	aCollection
+		do: [ :c | 
+			json := NeoJSONObject new
+				        at: 'name' put: c name;
+				        yourself.
+			roots at: c name put: json ];
+		select: [ :c | c superclass notNil ] thenDo: [ :c | 
+		roots at: c superclass name ifPresent: [ :sc | 
+			subclasses := sc
+				              at: 'subclasses'
+				              ifAbsentPut: [ 
+				              SortedCollection new sortBlock: [ :a :b | 
+					              a name <= b name ] ].
+			subclasses add: (roots at: c name) ] ];
+		select: [ :c | c superclass notNil ] thenDo: [ :c | 
+		(roots includesKey: c superclass name) ifTrue: [ 
+			roots removeKey: c name ] ].
+	^ roots asArray sort: [ :a :b | a name <= b name ]
 ]
 
 { #category : #'code endpoints' }
@@ -757,20 +766,25 @@ WebsideAPI >> package [
 
 { #category : #'code endpoints' }
 WebsideAPI >> packageClasses [
-	| package classes extended tree names  |
+
+	| package defined extended extensions tree names instance |
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
-	classes := OrderedCollection withAll: package definedClasses.
+	defined := OrderedCollection withAll: package definedClasses.
 	extended := self queryAt: 'extended'.
-	extended = 'true'
-		ifTrue: [ classes addAll: package extendedClasses ].
+	extensions := extended = 'true'
+		              ifTrue: [ 
+						instance := package extendedClasses collect:  [ :c | c instanceSide  ].
+		              (OrderedCollection withAll: instance) removeDuplicates  ]
+		              ifFalse: [ #(  ) ].
 	tree := self queryAt: 'tree'.
-	tree = 'true'
-		ifTrue: [ ^ self classTreeFromClasses: classes ].
+	tree = 'true' ifTrue: [ 
+		^ (self classTreeFromClasses: defined)
+		  , (self classTreeFromClasses: extensions) ].
 	names := self queryAt: 'names'.
-	names = 'true'
-		ifTrue: [ ^ (classes collect: #name) sort ].
-	^ classes collect: #asWebsideJson
+	names = 'true' ifTrue: [ 
+		^ (defined , extensions collect: #name) sort ].
+	^ defined , extensions collect: #asWebsideJson
 ]
 
 { #category : #'code endpoints' }
