@@ -38,5 +38,6 @@ RBRefactoring >> fromWebsideJson: json [
 
 { #category : #'*Webside' }
 RBRefactoring class >> websideType [
-	^ nil
+
+	^ (self name withoutPrefix: 'RB') withoutSuffix: 'Refactoring'
 ]
