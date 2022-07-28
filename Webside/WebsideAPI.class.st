@@ -469,7 +469,7 @@ WebsideAPI >> evaluateExpression [
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
 	semaphore := Semaphore new.
-	block := [ [ object := self compiler evaluate: expression ]
+	block := [ [ object := self evaluateExpression: expression ]
 		on: Exception
 		do: [ :exception | 
 			semaphore signal.
@@ -481,7 +481,9 @@ WebsideAPI >> evaluateExpression [
 		ifTrue: [ self objects at: id put: object ].
 	semaphore signal.
 	object ].
-	process := self evaluations at: id put: block fork.
+	process := block newProcess.
+    self evaluations at: id put: process.
+    process resume.
 	sync
 		ifTrue: [ semaphore wait.
 			object ifNil: [ ^ self evaluationError: id ].
@@ -493,6 +495,11 @@ WebsideAPI >> evaluateExpression [
 		at: 'id' put: id asString;
 		at: 'expression' put: expression;
 		yourself
+]
+
+{ #category : #private }
+WebsideAPI >> evaluateExpression: aString [
+	^self compiler evaluate: aString
 ]
 
 { #category : #private }
