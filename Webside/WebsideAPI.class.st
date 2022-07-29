@@ -89,9 +89,7 @@ WebsideAPI >> addChange [
 	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
-	author := (NeoJSONReader fromString: request entity)
-		          at: 'author'
-		          ifAbsent: 'Unknown'.
+    author := self bodyAt: 'author' ifAbsent: ['Unknown'].
 	Author useAuthor: author during: [ 
 		[ change execute ]
 			on: Error , SyntaxErrorNotification
@@ -157,7 +155,7 @@ WebsideAPI >> changes [
 	changes := #().
 	author
 		ifNotNil: [ changes := changes select: [ :ch | ch author = author ] ].
-	^ changes collect: #asWebsideJson
+    ^ changes collect: [:ch | ch asWebsideJson]
 	
 
 ]
@@ -239,7 +237,7 @@ WebsideAPI >> classVariables [
 		gather: [ :c | 
 			c classVarNames asArray sort
 				collect: [ :v | 
-					NeoJSONObject new
+					self newJsonObject
 						at: 'name' put: v;
 						at: 'class' put: c name , ' class';
 						at: 'type' put: 'class';
@@ -262,8 +260,8 @@ WebsideAPI >> classes [
 		^ Array with: json ].
 	classes := root withAllSubclasses reject: [:c | c isMeta ].
 	names := self queryAt: 'names'.
-	names = 'true' ifTrue: [ ^ classes collect: #name ].
-	^ classes collect: #asWebsideJson
+    names = 'true' ifTrue: [ ^ (classes collect: [:c | c name ]) sort].
+    ^ classes collect: [:c | c asWebsideJson]
 ]
 
 { #category : #private }
@@ -646,7 +644,7 @@ WebsideAPI >> instanceVariables [
 		gather: [ :c | 
 			c instVarNames
 				collect: [ :v | 
-					NeoJSONObject new
+					self newJsonObject
 						at: 'name' put: v;
 						at: 'class' put: c name;
 						at: 'type' put: 'instance';
@@ -754,6 +752,11 @@ WebsideAPI >> newID [
 ]
 
 { #category : #private }
+WebsideAPI >> newJsonObject [
+	^NeoJSONObject new
+]
+
+{ #category : #private }
 WebsideAPI >> notFound [
 	^ZnResponse notFound: 'resource not found'
 ]
@@ -790,8 +793,8 @@ WebsideAPI >> packageClasses [
 		  , (self classTreeFromClasses: extensions) ].
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [ 
-		^ (defined , extensions collect: #name) sort ].
-	^ defined , extensions collect: #asWebsideJson
+    ^ (defined , extensions collect: [:c | c name]) sort ].
+    ^ defined , extensions collect: [:c | c asWebsideJson]
 ]
 
 { #category : #'code endpoints' }
@@ -799,7 +802,7 @@ WebsideAPI >> packageMethods [
 	| package |
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
-	^ package extensionMethods collect: #asWebsideJson
+    ^ package extensionMethods collect: [:m | m asWebsideJson]
 ]
 
 { #category : #private }
@@ -815,8 +818,8 @@ WebsideAPI >> packages [
 	packages := RPackageOrganizer default packages.
 	names := self queryAt: 'names'.
 	names = 'true'
-		ifTrue: [ ^ (packages collect: #name) sort ].
-	^ packages collect: #asWebsideJson
+    ifTrue: [ ^ (packages collect: [:p | p name]) sort ].
+    ^ packages collect: [:p | p asWebsideJson]
 ]
 
 { #category : #private }
@@ -1281,10 +1284,10 @@ WebsideAPI >> stopTestRun [
 
 { #category : #'code endpoints' }
 WebsideAPI >> subclasses [
-| class |
-class := self requestedClass .
-class ifNil: [ ^ self notFound  ].
-^ class subclasses collect: #asWebsideJson 
+	| class |
+    class := self requestedClass .
+    class ifNil: [ ^ self notFound  ].
+    ^ class subclasses collect: [:c | c asWebsideJson] 
 ]
 
 { #category : #'debugging endpoints' }
