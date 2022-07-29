@@ -51,11 +51,11 @@ WebsideAPI >> activeDebuggers [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluation [
-	| id evaluation a |
+	| id evaluation |
 	id := self requestedId .
 	evaluation := self evaluations at: id ifAbsent: [^self notFound].
 	^NeoJSONObject new
-				at: 'id' put: a id asString;
+				at: 'id' put: id asString;
 				yourself 
 ]
 
