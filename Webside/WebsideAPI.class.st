@@ -54,7 +54,7 @@ WebsideAPI >> activeEvaluation [
 	| id evaluation |
 	id := self requestedId .
 	evaluation := self evaluations at: id ifAbsent: [^self notFound].
-	^NeoJSONObject new
+	^self newJsonObject
 				at: 'id' put: id asString;
 				yourself 
 ]
@@ -62,7 +62,7 @@ WebsideAPI >> activeEvaluation [
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
 	^ self evaluations associations
-		collect: [ :a | NeoJSONObject new at: 'id' put: a key asString ; yourself ]
+		collect: [ :a | self newJsonObject at: 'id' put: a key asString ; yourself ]
 ]
 
 { #category : #'testing endpoints' }
@@ -187,7 +187,7 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 	| json subclasses depth names |
 	names := self queryAt: 'names'.
 	json := names = 'true'
-		ifTrue: [ NeoJSONObject new
+		ifTrue: [ self newJsonObject
 			
 				at: 'name' put: aClass name;
 				at: 'superclass'
@@ -210,7 +210,7 @@ WebsideAPI >> classTreeFromClasses: aCollection [
 	roots := Dictionary new.
 	aCollection
 		do: [ :c | 
-			json := NeoJSONObject new
+			json := self newJsonObject
 				        at: 'name' put: c name;
 				        yourself.
 			roots at: c name put: json ];
@@ -378,7 +378,7 @@ WebsideAPI >> debuggerFrame [
 	index := self requestedIndex.
 	frame := debugger stack at: index ifAbsent: [ ^ self notFound ].
 	interval := debugger pcRangeForContext: frame.
-	interval := NeoJSONObject new
+	interval := self newJsonObject
 		            at: 'start' put: interval first;
 		            at: 'end' put: interval last;
 		            yourself.
@@ -396,7 +396,7 @@ WebsideAPI >> debuggerFrames [
 		ifAbsent: [ ^ self notFound ].
 	^ debugger stack
 		withIndexCollect: [ :f :i | 
-			NeoJSONObject new
+			self newJsonObject
 				at: 'index' put: i;
 				at: 'label' put: f method printString;
 				yourself ]
@@ -489,7 +489,7 @@ WebsideAPI >> evaluateExpression [
 			pin
 				ifTrue: [ json at: 'id' put: id asString ].
 			^ json ].
-	^ NeoJSONObject new
+	^ self newJsonObject
 		at: 'id' put: id asString;
 		at: 'expression' put: expression;
 		yourself
@@ -504,7 +504,7 @@ WebsideAPI >> evaluateExpression: aString [
 WebsideAPI >> evaluationError: id [
 	| process json entity |
 	process := self evaluations at: id.
-	json := NeoJSONObject new
+	json := self newJsonObject
 		at: 'description'
 			put: process suspendedContext exception description;
 		at: 'evaluation' put: id asString;
@@ -599,7 +599,7 @@ WebsideAPI >> frameBindings [
 
 	^ (StDebuggerContext context: frame) buildInspectorNodes collect: [ 
 		  :b | 
-		  NeoJSONObject new
+		  self newJsonObject
 			  at: 'name' put: b key asString;
 			  at: 'value' put: b value printString;
 			  yourself ]
@@ -655,7 +655,7 @@ WebsideAPI >> instanceVariables [
 WebsideAPI >> instanceVariablesOf: anObject [
 ^anObject class allInstVarNames
 		collect: [ :n | 
-			NeoJSONObject new
+			self newJsonObject
 				at: 'name' put: n;
 				yourself ]
 ]
@@ -1322,14 +1322,14 @@ WebsideAPI >> testRunStatus [
 	suite := run key.
 	total := self testCountOf: suite.
 	result := run value.
-	summary := NeoJSONObject new
+	summary := self newJsonObject
 		at: 'run' put: result runCount;
 		at: 'passed' put: result passedCount;
 		at: 'failed' put: result failureCount;
 		at: 'errors' put: result errorCount;
 		at: 'skipped' put: result skippedCount;
 		yourself.
-	^ NeoJSONObject new
+	^ self newJsonObject
 		at: 'id' put: id asString;
 		at: 'name' put: suite name;
 		at: 'total' put: total;
