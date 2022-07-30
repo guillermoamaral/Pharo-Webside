@@ -822,7 +822,7 @@ WebsideAPI >> packages [
     ^ packages collect: [:p | p asWebsideJson]
 ]
 
-{ #category : #private }
+{ #category : #'objects endpoints' }
 WebsideAPI >> pinObjectSlot [
 	| slot id |
 	slot := self requestedSlot.
