@@ -169,12 +169,14 @@ WebsideServer >> initializeEvaluationRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeObjectsRoutes [
+
 	self
 		routeGET: '/objects' to: #pinnedObjects;
 		routeGET: '/objects/<id>' to: #pinnedObject;
 		routeDELETE: '/objects/<id>' to: #unpinObject;
 		routeGET: '/objects/<id>/*' to: #pinnedObjectSlots;
-		routePOST: '/objects' to: #pinObjectSlot
+		routePOST: '/objects' to: #pinObjectSlot;
+		routeDELETE: '/objects' to: #unpinAllObjects
 ]
 
 { #category : #initialization }

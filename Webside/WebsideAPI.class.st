@@ -1338,6 +1338,13 @@ WebsideAPI >> testRuns [
 ]
 
 { #category : #'objects endpoints' }
+WebsideAPI >> unpinAllObjects [
+
+	self objects removeAll.
+	^ nil
+]
+
+{ #category : #'objects endpoints' }
 WebsideAPI >> unpinObject [
 
 	self objects removeKey: self requestedId ifAbsent: [ ^ self notFound ].
