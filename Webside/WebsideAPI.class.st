@@ -458,63 +458,64 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
+
 	| debug expression sync pin id semaphore object process block json |
 	debug := self bodyAt: 'debug'.
-	debug == true
-		ifTrue: [ ^ self debugExpression ].
+	debug == true ifTrue: [ ^ self debugExpression ].
 	expression := self bodyAt: 'expression'.
 	sync := (self bodyAt: 'sync') ifNil: true.
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
 	semaphore := Semaphore new.
-	block := [ [ object := self evaluateExpression: expression ]
-		on: Exception
-		do: [ :exception | 
-			semaphore signal.
-			process
-				suspendedContext: exception signalerContext;
-				suspend ].
-	self evaluations removeKey: id ifAbsent: nil.
-	(sync not or: [ pin ])
-		ifTrue: [ self objects at: id put: object ].
-	semaphore signal.
-	object ].
+	block := [ 
+	         [ object := self evaluateExpression: expression ]
+		         on: Exception
+		         do: [ :exception | 
+			         semaphore signal.
+			         process
+				         suspendedContext: exception signalerContext;
+				         suspend ].
+	         self evaluations removeKey: id ifAbsent: nil.
+	         (sync not or: [ pin ]) ifTrue: [ 
+		         self objects at: id put: object ].
+	         semaphore signal.
+	         object ].
 	process := block newProcess.
-    self evaluations at: id put: process.
-    process resume.
-	sync
-		ifTrue: [ semaphore wait.
-			object ifNil: [ ^ self evaluationError: id ].
-			json := object asWebsideJson.
-			pin
-				ifTrue: [ json at: 'id' put: id asString ].
-			^ json ].
+	self evaluations at: id put: process.
+	process resume.
+	sync ifTrue: [ 
+		semaphore wait.
+		object ifNil: [ ^ self evaluationError: id ].
+		json := object asWebsideJson.
+		pin ifTrue: [ json at: 'id' put: id asString ].
+		^ json ].
 	^ self newJsonObject
-		at: 'id' put: id asString;
-		at: 'expression' put: expression;
-		yourself
+		  at: 'id' put: id asString;
+		  at: 'expression' put: expression;
+		  yourself
 ]
 
 { #category : #private }
 WebsideAPI >> evaluateExpression: aString [
-	^self compiler evaluate: aString
+
+	^ self compiler evaluate: aString
 ]
 
 { #category : #private }
 WebsideAPI >> evaluationError: id [
+
 	| process json entity |
 	process := self evaluations at: id.
 	json := self newJsonObject
-		at: 'description'
-			put: process suspendedContext exception description;
-		at: 'evaluation' put: id asString;
-		yourself.
+		        at: 'description'
+		        put: process suspendedContext exception description;
+		        at: 'evaluation' put: id asString;
+		        yourself.
 	entity := ZnStringEntity
-		with: (NeoJSONWriter toString: json)
-		type:
-			(ZnMimeType applicationJson
-				charSet: 'utf-8';
-				yourself).
+		          with: (NeoJSONWriter toString: json)
+		          type: (ZnMimeType applicationJson
+				           charSet: 'utf-8';
+				           yourself).
 	^ ZnResponse serverErrorWithEntity: entity
 ]
 
@@ -740,7 +741,6 @@ WebsideAPI >> nameForTestSuite [
 { #category : #private }
 WebsideAPI >> namedSlotsOf: anObject [
 	| slot |
-	anObject class isVariable ifTrue: [ ^self notFound ].
 	^anObject class allInstVarNames collect: [ :n |
 		slot := self slot: n of: anObject ifAbsent: nil.
 		slot asWebsideJson at: 'slot' put: n; yourself  ]
@@ -836,22 +836,21 @@ WebsideAPI >> pinObjectSlot [
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObject [
-	| id object  |
+
+	| id object |
 	id := self requestedId.
-	self evaluations
-		at: id
-		ifPresent: [ :process | 
-			process isSuspended
-				ifTrue: [ ^ self evaluationError: id ] ].
+	self evaluations at: id ifPresent: [ :process | 
+		process isSuspended ifTrue: [ ^ self evaluationError: id ] ].
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
-		at: 'id' put: id asString;
-		yourself
+		  at: 'id' put: id asString;
+		  yourself
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjectSlots [
 	| id object path index last |
+    self halt.
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
