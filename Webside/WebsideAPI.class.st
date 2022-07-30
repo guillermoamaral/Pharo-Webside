@@ -849,24 +849,19 @@ WebsideAPI >> pinnedObject [
 
 { #category : #'objects endpoints' }
 WebsideAPI >> pinnedObjectSlots [
+
 	| id object path index last |
-    self halt.
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
 	index := path indexOf: 'objects'.
-	path
-		from: index + 2
-		to: path size - 1
-		do:
-			[ :s | object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
+	path from: index + 2 to: path size - 1 do: [ :s | 
+		object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
 	last := path last.
-	last = 'instance-variables'
-		ifTrue: [ ^ self instanceVariablesOf: object ].
-	last = 'named-slots'
-		ifTrue: [ ^ self namedSlotsOf: object ].
-	last = 'indexed-slots'
-		ifTrue: [ ^ self indexedSlotsOf: object ].
+	last = 'instance-variables' ifTrue: [ 
+		^ self instanceVariablesOf: object ].
+	last = 'named-slots' ifTrue: [ ^ self namedSlotsOf: object ].
+	last = 'indexed-slots' ifTrue: [ ^ self indexedSlotsOf: object ].
 	object := self slot: last of: object ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 ]
