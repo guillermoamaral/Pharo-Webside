@@ -887,16 +887,12 @@ WebsideAPI >> queriedAssigning [
 
 { #category : #private }
 WebsideAPI >> queriedCategory [
-	| category |
-	category := request at: 'category' ifAbsent: nil.
-	^category ifNotNil: [category asSymbol]
+	^self queryAt: 'category' ifPresent: [:c | c asSymbol]
 ]
 
 { #category : #private }
 WebsideAPI >> queriedClass [
-	| name |
-	name := request at: 'class' ifAbsent: nil.
-	^name ifNotNil: [self classNamed: name]
+	^self queryAt: 'class' ifPresent: [:n | self classNamed: n]
 ]
 
 { #category : #private }
@@ -911,16 +907,12 @@ WebsideAPI >> queriedReferencingString [
 
 { #category : #private }
 WebsideAPI >> queriedScope [
-	| scope |
-	scope := request at: 'scope' ifAbsent: nil.
-	^ scope ifNotNil: [ self classNamed: scope ]
+	^self queryAt: 'scope' ifPresent: [:s | self classNamed: s ]
 ]
 
 { #category : #private }
 WebsideAPI >> queriedSelector [
-	| selector |
-	selector := request at: 'selector' ifAbsent: nil.
-	^selector ifNotNil: [selector asSymbol]
+	^self queryAt: 'selector' ifPresent: [:s | s asSymbol]
 ]
 
 { #category : #private }
@@ -930,9 +922,7 @@ WebsideAPI >> queriedSelectorMatching [
 
 { #category : #private }
 WebsideAPI >> queriedSending [
-	| selector |
-	selector := request at: 'sending' ifAbsent: nil.
-	^selector ifNotNil: [selector asSymbol]
+	^self queryAt: 'sending' ifPresent: [:s | s asSymbol]
 ]
 
 { #category : #private }
