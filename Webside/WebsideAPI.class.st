@@ -11,12 +11,6 @@ Class {
 		'request',
 		'server'
 	],
-	#classVars : [
-		'Debuggers',
-		'Evaluations',
-		'Objects',
-		'Workspaces'
-	],
 	#category : #'Webside-Base'
 }
 
@@ -584,7 +578,7 @@ WebsideAPI >> filterMethods: aCollection byAccessTo: aString type: aSymbol [
 			(class classVarNames includes: aString)
 				ifTrue: [ variable := class classVariableNamed: aString.
 					filtered addAll: (methods
-						select: [ :m | self doesMethod: m accessVariable: slot for: aSymbol ]
+						select: [ :m | self doesMethod: m accessVariable: variable for: aSymbol ]
 						 )] ].
 	^ filtered
 ]
