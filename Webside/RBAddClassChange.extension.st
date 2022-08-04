@@ -2,9 +2,16 @@ Extension { #name : #RBAddClassChange }
 
 { #category : #'*Webside' }
 RBAddClassChange >> fromWebsideJson: json [
-	
+
+	| superclass |
 	super fromWebsideJson: json.
-	definition := json at: 'definition' ifAbsent: ''.
-	(definition includesSubstring: 'category:')
-		ifFalse: [ definition := definition , ' category: #Undefined' ]
+	category := json at: 'package' ifAbsent: [ 'Undefined' ].
+	definition := json at: 'definition' ifAbsent: [ 
+		              superclass := json at: 'superclass'.
+		              superclass , ' subclass: ' , className printString
+		              ,
+		              ' instanceVariableNames: '''' classVariableNames: '''' poolDictionaries: '''' category: #'
+		              , category ].
+	(definition includesSubstring: 'category:') ifFalse: [ 
+		definition := definition , ' category: #' , category ]
 ]

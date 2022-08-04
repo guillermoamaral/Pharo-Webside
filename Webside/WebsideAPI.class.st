@@ -1,6 +1,8 @@
 "
 self startServer
 
+self stopServer
+
 "
 Class {
 	#name : #WebsideAPI,
