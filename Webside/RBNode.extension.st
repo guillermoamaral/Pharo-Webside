@@ -3,11 +3,11 @@ Extension { #name : #RBNode }
 { #category : #'*Webside' }
 RBNode >> asWebsideJson [
 
-	^ NeoJSONObject new
-		at: 'type' put: self websideType;
-		at: 'start' put: self start;
-		at: 'end' put: self stop;
-		yourself
+	^ super asWebsideJson
+		  at: 'type' put: self websideType;
+		  at: 'start' put: self start;
+		  at: 'end' put: self stop;
+		  yourself
 ]
 
 { #category : #'*Webside' }
