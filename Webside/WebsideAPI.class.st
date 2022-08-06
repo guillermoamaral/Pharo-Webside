@@ -613,23 +613,22 @@ WebsideAPI >> implementorsOf: aSymbol [
 
 { #category : #private }
 WebsideAPI >> indexedSlotsOf: anObject [
+
 	| from to slot |
-	anObject class isVariable
-		ifFalse: [ ^ self notFound ].
+	anObject class isVariable ifFalse: [ ^ self notFound ].
 	from := self
-		queryAt: 'from'
-		ifPresent: [ :f | f asInteger ]
-		ifAbsent: [ 1 ].
+		        queryAt: 'from'
+		        ifPresent: [ :f | f asInteger ]
+		        ifAbsent: [ 1 ].
 	to := self
-		queryAt: 'to'
-		ifPresent: [ :t | t asInteger ]
-		ifAbsent: [ anObject size ].
-	^ (from to: to)
-		collect: [ :i | 
-			slot := anObject basicAt: i.
-			slot asWebsideJson
-				at: 'slot' put: i;
-				yourself ]
+		      queryAt: 'to'
+		      ifPresent: [ :t | t asInteger ]
+		      ifAbsent: [ anObject size ].
+	^ (from to: to) collect: [ :i | 
+		  slot := anObject basicAt: i.
+		  slot asWebsideJson
+			  at: 'slot' put: i;
+			  yourself ]
 ]
 
 { #category : #'code endpoints' }

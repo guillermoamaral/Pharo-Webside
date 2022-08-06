@@ -3,9 +3,10 @@ Extension { #name : #CompiledBlock }
 { #category : #'*Webside' }
 CompiledBlock >> asWebsideJson [
 
-	^ NeoJSONObject new
+	^ super asWebsideJson
 		  at: 'selector' put: self selector;
-		  at: 'class' put: (self methodClass ifNotNil: [ :c | c name ]);
+		  at: 'methodClass'
+		  put: (self methodClass ifNotNil: [ :c | c name ]);
 		  at: 'package' put: (self package ifNotNil: [ :p | p name ]);
 		  at: 'source' put: self sourceCode;
 		  at: 'author' put: self author;
