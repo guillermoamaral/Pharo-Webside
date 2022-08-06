@@ -693,17 +693,21 @@ WebsideAPITest >> testFrameBindings [
 
 { #category : #'code endpoints' }
 WebsideAPITest >> testImplementors [
+
 	| implementors local |
 	implementors := self get: 'methods?selector=reciprocal'.
 	self
 		assert: implementors notEmpty;
-		assert: (implementors allSatisfy: [ :m | m selector = 'reciprocal' ]);
-		assert: (implementors anySatisfy: [ :m | (m at: 'class') = 'Fraction' ]).
+		assert:
+			(implementors allSatisfy: [ :m | m selector = 'reciprocal' ]);
+		assert:
+			(implementors anySatisfy: [ :m | 
+					 (m at: 'methodClass') = 'Fraction' ]).
 	local := self get: 'methods?selector=reciprocal&class=Fraction'.
 	self
 		assert: local notEmpty;
 		assert: (local allSatisfy: [ :m | m selector = 'reciprocal' ]);
-		assert: (local allSatisfy: [ :m | (m at: 'class') = 'Fraction' ])
+		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
 { #category : #'changes endpoints' }
@@ -1058,11 +1062,12 @@ WebsideAPITest >> testMethodRemove [
 
 { #category : #'code endpoints' }
 WebsideAPITest >> testMethods [
+
 	| methods |
 	methods := self get: 'classes/Point/methods'.
 	self
 		assert: methods notEmpty;
-		assert: (methods allSatisfy: [ :m | (m at: 'class') = 'Point' ])
+		assert: (methods allSatisfy: [ :m | (m at: 'methodClass') = 'Point' ])
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -1139,11 +1144,14 @@ WebsideAPITest >> testPackageCreation [
 
 { #category : #'code endpoints' }
 WebsideAPITest >> testPackageMethods [
+
 	| methods |
 	methods := self get: 'packages/Webside/methods'.
 	self
 		assert: methods notEmpty;
-		assert: (methods anySatisfy: [ :m | (m at: 'class') = 'Object' and: [ (m at: 'selector') = 'asWebsideJson' ]]) 
+		assert: (methods anySatisfy: [ :m | 
+					 (m at: 'methodClass') = 'Object' and: [ 
+							 (m at: 'selector') = 'asWebsideJson' ] ])
 ]
 
 { #category : #'changes endpoints' }
@@ -1471,12 +1479,12 @@ WebsideAPITest >> testSenders [
 	self
 		assert: senders notEmpty;
 		assert: (senders allSatisfy: [ :m | m source includesSubstring: 'reciprocal' ]);
-		assert: (senders anySatisfy: [ :m | (m at: 'class') = 'Fraction' ]).
+		assert: (senders anySatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ]).
 	local := self get: 'methods?sending=reciprocal&class=Fraction'.
 	self
 		assert: local notEmpty;
 		assert: (local allSatisfy: [ :m | m source includesSubstring: ' reciprocal' ]);
-		assert: (local allSatisfy: [ :m | (m at: 'class') = 'Fraction' ])
+		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
 { #category : #'debugging endpoints' }
