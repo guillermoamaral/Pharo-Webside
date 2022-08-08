@@ -169,7 +169,7 @@ WebsideServer >> initializeEvaluationRoutes [
 { #category : #initialization }
 WebsideServer >> initializeGeneralRoutes [
 	self
-		routeGET: '/dialect' to: #dialect
+		routeGET: '/dialect' to: #dialect;
         routePOST: '/save' to: #saveImage
 ]
 
