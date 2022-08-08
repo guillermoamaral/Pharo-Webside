@@ -436,7 +436,7 @@ WebsideAPI >> deleteWorkspace [
 	^ nil
 ]
 
-{ #category : #'code endpoints' }
+{ #category : #'general endpoints' }
 WebsideAPI >> dialect [
 	^'Pharo'
 ]
@@ -1167,6 +1167,11 @@ WebsideAPI >> runTests [
 	^ suite asWebsideJson
 		at: 'id' put: id asString;
 		yourself
+]
+
+{ #category : #'general endpoints' }
+WebsideAPI >> saveImage [
+	(Smalltalk class snapshot: true andQuit: false)
 ]
 
 { #category : #private }

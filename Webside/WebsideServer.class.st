@@ -117,7 +117,6 @@ WebsideServer >> initializeChangesRoutes [
 { #category : #initialization }
 WebsideServer >> initializeCodeRoutes [
 	self
-		routeGET: '/dialect' to: #dialect;
 		routeGET: '/packages' to: #packages;
 		routeGET: '/packages/<name>' to: #package;
 		routeGET: '/packages/<name>/classes' to: #packageClasses;
@@ -168,6 +167,13 @@ WebsideServer >> initializeEvaluationRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializeGeneralRoutes [
+	self
+		routeGET: '/dialect' to: #dialect
+        routePOST: '/save' to: #saveImage
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeObjectsRoutes [
 
 	self
@@ -202,7 +208,8 @@ WebsideServer >> initializeResources [
 WebsideServer >> initializeRoutes [
 	self
     	initializePreflightRoutes;
-		initializeCodeRoutes;
+		initializeGeneralRoutes;
+        initializeCodeRoutes;
 		initializeChangesRoutes;
 		initializeEvaluationRoutes;
 		initializeObjectsRoutes;
