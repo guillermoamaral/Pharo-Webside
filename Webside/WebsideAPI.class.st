@@ -85,11 +85,14 @@ WebsideAPI >> addChange [
 	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
-    author := self bodyAt: 'author' ifAbsent: ['Unknown'].
+	author := self bodyAt: 'author' ifAbsent: [ 'Unknown' ].
 	Author useAuthor: author during: [ 
 		[ change execute ]
 			on: Error , SyntaxErrorNotification
 			do: [ :e | ^ self compilationError: e ] ].
+	"Temporary approach of changes until a better way of gathering system changes is implemented"
+	server changes 
+		add: change.
 	^ change asWebsideJson
 ]
 
@@ -145,15 +148,16 @@ WebsideAPI >> categories [
 
 { #category : #'changes endpoints' }
 WebsideAPI >> changes [
+
 	| author changes |
 	author := self queryAt: 'author'.
-	changes := EpMonitor current log entries select: [:e | e content isCodeChange].
-	changes := #().
-	author
-		ifNotNil: [ changes := changes select: [ :ch | ch author = author ] ].
-    ^ changes collect: [:ch | ch asWebsideJson]
-	
-
+	changes := EpMonitor current log entries select: [ :e | 
+		           e content isCodeChange ].
+	"Temporary approach until a better way of gathering changes is implemented"
+	changes := server changes.
+	author ifNotNil: [ 
+		changes := changes select: [ :ch | ch author = author ] ].
+	^ changes collect: #asWebsideJson
 ]
 
 { #category : #'code endpoints' }

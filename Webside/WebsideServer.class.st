@@ -42,6 +42,12 @@ WebsideServer >> baseUrl [
 ]
 
 { #category : #accessing }
+WebsideServer >> changes [
+
+	^ self resourcesAt: #changes
+]
+
+{ #category : #accessing }
 WebsideServer >> debuggers [
 	^ self resourcesAt: #debuggers
 ]
@@ -196,12 +202,17 @@ WebsideServer >> initializePreflightRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeResources [
+
 	resources := Dictionary new.
-	
-	resources at: #evaluations put: Dictionary new;
-	at: #objects put: Dictionary new;
-	at: #workspaces put: Dictionary new;
-	at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new
+
+	resources
+		at: #evaluations put: Dictionary new;
+		at: #objects put: Dictionary new;
+		at: #workspaces put: Dictionary new;
+		at: #debuggers put: Dictionary new;
+		at: #testRuns put: Dictionary new;
+		"Temporary changes store until a better way to gather system changes is implemented"
+		at: #changes put: OrderedCollection new
 ]
 
 { #category : #initialization }

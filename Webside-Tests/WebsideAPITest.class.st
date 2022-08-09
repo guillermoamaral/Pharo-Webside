@@ -313,7 +313,7 @@ WebsideAPITest >> testChanges [
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveMethod';
 			            at: 'class' put: 'Point';
-			            at: 'selector' put: 'testMethodDefinition';
+			            at: 'selector' put: 'testChanges';
 			            yourself.
 		self post: '/changes' with: remotion ]
 ]
