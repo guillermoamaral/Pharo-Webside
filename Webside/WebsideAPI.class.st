@@ -1175,7 +1175,9 @@ WebsideAPI >> runTests [
 
 { #category : #'general endpoints' }
 WebsideAPI >> saveImage [
-	(Smalltalk class snapshot: true andQuit: false)
+
+	Smalltalk class snapshot: true andQuit: false.
+	^true
 ]
 
 { #category : #private }
