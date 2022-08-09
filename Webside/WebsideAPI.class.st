@@ -368,6 +368,35 @@ WebsideAPI >> debugExpression [
 	^ id asString
 ]
 
+{ #category : #'testing endpoints' }
+WebsideAPI >> debugTest [
+
+	| run class selector semaphore block exception process |
+	run := self testRuns
+		       at: self requestedId
+		       ifAbsent: [ ^ self notFound ].
+	class := self classNamed: (self bodyAt: 'class').
+	class ifNil: [ ^ self notFound ].
+	selector := (self bodyAt: 'selector') asSymbol.
+	"test := run suite allCases
+		detect: [:t | t class == class and: [t selector == selector]]
+		ifNone: [^self notFound]."
+	semaphore := Semaphore new.
+	block := [ 
+	         [ class debug: selector ]
+		         on: Exception
+		         do: [ :e | 
+			         semaphore signal.
+			         exception := e.
+			         process
+				         suspendedContext: e signalerContext;
+				         suspend ] ].
+	process := block newProcess.
+	process resume.
+	semaphore wait.
+	^ nil
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrame [
 
