@@ -379,7 +379,7 @@ WebsideAPI >> debugTest [
 	class := self classNamed: (self bodyAt: 'class').
 	class ifNil: [ ^ self notFound ].
 	selector := (self bodyAt: 'selector') asSymbol.
-	"test := run suite allCases
+	" test := run suite allCases
 		detect: [:t | t class == class and: [t selector == selector]]
 		ifNone: [^self notFound]."
 	semaphore := Semaphore new.
