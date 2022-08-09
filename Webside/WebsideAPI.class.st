@@ -371,9 +371,10 @@ WebsideAPI >> debugExpression [
 { #category : #'testing endpoints' }
 WebsideAPI >> debugTest [
 
-	| run class selector semaphore block exception process |
+	| id run class selector semaphore exception process block context debugger |
+	id := self requestedId.
 	run := self testRuns
-		       at: self requestedId
+		       at: id
 		       ifAbsent: [ ^ self notFound ].
 	class := self classNamed: (self bodyAt: 'class').
 	class ifNil: [ ^ self notFound ].
@@ -394,7 +395,22 @@ WebsideAPI >> debugTest [
 	process := block newProcess.
 	process resume.
 	semaphore wait.
-	^ nil
+	context := exception signalerContext.
+	debugger := process
+		            newDebugSessionNamed: exception description
+		            startedAt: context.
+	context selector == #doesNotUnderstand: ifTrue: [ 
+		context := context sender ].
+	debugger restart: context.
+	context selector == #halt ifTrue: [ 
+		debugger
+			stepOver;
+			stepOver ].
+	self debuggers at: id put: debugger.
+	^ debugger asWebsideJson
+		  at: 'id' put: id asString;
+		  at: 'description' put: exception description;
+		  yourself
 ]
 
 { #category : #'debugging endpoints' }
