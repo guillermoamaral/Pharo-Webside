@@ -88,11 +88,10 @@ WebsideAPI >> addChange [
 	author := self bodyAt: 'author' ifAbsent: [ 'Unknown' ].
 	Author useAuthor: author during: [ 
 		[ change execute ]
-			on: Error , SyntaxErrorNotification
+			on: Error , SyntaxErrorNotification , OCUndeclaredVariableWarning
 			do: [ :e | ^ self compilationError: e ] ].
-	"Temporary approach of changes until a better way of gathering system changes is implemented"
-	server changes 
-		add: change.
+	"Temporary workaround until a better way of gathering system changes is implemented"
+	server changes add: change.
 	^ change asWebsideJson
 ]
 
@@ -153,7 +152,7 @@ WebsideAPI >> changes [
 	author := self queryAt: 'author'.
 	changes := EpMonitor current log entries select: [ :e | 
 		           e content isCodeChange ].
-	"Temporary approach until a better way of gathering changes is implemented"
+	"Temporary workaround until a better way of gathering changes is implemented"
 	changes := server changes.
 	author ifNotNil: [ 
 		changes := changes select: [ :ch | ch author = author ] ].
@@ -265,12 +264,18 @@ WebsideAPI >> classes [
 ]
 
 { #category : #private }
-WebsideAPI >> compilationError: aCompilationError [
+WebsideAPI >> compilationError: error [
 
-	| entity |
+	| entity json suggestion |
+	json := error asWebsideJson.
+	(error isKindOf: OCUndeclaredVariableWarning) ifTrue: [ 
+		suggestion := self declareVariableSuggestionsFrom: error.
+		suggestion ifNotNil: [ 
+			json
+				at: 'suggestion' put: suggestion key;
+				at: 'changes' put: suggestion value ] ].
 	entity := ZnStringEntity
-		          with:
-		          (NeoJSONWriter toString: aCompilationError asWebsideJson)
+		          with: (NeoJSONWriter toString: json)
 		          type: (ZnMimeType applicationJson
 				           charSet: 'utf-8';
 				           yourself).
@@ -448,6 +453,18 @@ WebsideAPI >> debuggerFrames [
 { #category : #private }
 WebsideAPI >> debuggers [
 	^ server debuggers
+]
+
+{ #category : #private }
+WebsideAPI >> declareVariableSuggestionsFrom: anOCUndeclaredVariableWarning [
+	| identifier |
+	identifier := anOCUndeclaredVariableWarning node name.
+	identifier first isLowercase ifTrue: [ 
+		^ 'Declare ' , identifier printString , ' as temporary variable'
+		  ->
+			  { (self
+				   methodChangeFrom: self requestedChange
+				   withTemp: identifier) asWebsideJson } ]
 ]
 
 { #category : #private }
@@ -717,6 +734,27 @@ WebsideAPI >> method [
 	(self queryAt: 'ast') = 'true'
 		ifTrue: [ json at: 'ast' put: method ast asWebsideJson ].
 	^ json
+]
+
+{ #category : #private }
+WebsideAPI >> methodChangeFrom: anRBAddMethodChange withTemp: aString [
+
+	| original ast declaration position source head tail newSource |
+	original := self requestedChange.
+	ast := RBParser parseMethod: anRBAddMethodChange source.
+	declaration := ast temporaries isEmpty
+		               ifTrue: [ 
+			               ' | ' , aString , ' | 
+	' ]
+		               ifFalse: [ ' ' , aString , ' ' ].
+	position := ast body rightBar ifNil: [ ast body start ].
+	source := ast sourceCode.
+	head := source copyFrom: 1 to: position - 1.
+	tail := source copyFrom: position to: source size.
+	newSource := head , declaration , tail.
+	^ original copy
+		  instVarNamed: 'source' put: newSource;
+		  yourself
 ]
 
 { #category : #'code endpoints' }
