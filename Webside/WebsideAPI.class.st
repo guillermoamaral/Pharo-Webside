@@ -266,14 +266,11 @@ WebsideAPI >> classes [
 { #category : #private }
 WebsideAPI >> compilationError: error [
 
-	| entity json suggestion |
+	| entity json suggestions |
 	json := error asWebsideJson.
 	(error isKindOf: OCUndeclaredVariableWarning) ifTrue: [ 
-		suggestion := self declareVariableSuggestionsFrom: error.
-		suggestion ifNotNil: [ 
-			json
-				at: 'suggestion' put: suggestion key;
-				at: 'changes' put: suggestion value ] ].
+		suggestions := self declareVariableSuggestionsFrom: error.
+		suggestions ifNotNil: [ json at: 'suggestions' put: suggestions ] ]. 
 	entity := ZnStringEntity
 		          with: (NeoJSONWriter toString: json)
 		          type: (ZnMimeType applicationJson
@@ -457,14 +454,31 @@ WebsideAPI >> debuggers [
 
 { #category : #private }
 WebsideAPI >> declareVariableSuggestionsFrom: anOCUndeclaredVariableWarning [
-	| identifier |
+
+	| original identifier temporary instance |
+	original := self requestedChange.
 	identifier := anOCUndeclaredVariableWarning node name.
-	identifier first isLowercase ifTrue: [ 
-		^ 'Declare ' , identifier printString , ' as temporary variable'
-		  ->
-			  { (self
-				   methodChangeFrom: self requestedChange
-				   withTemp: identifier) asWebsideJson } ]
+	identifier first isLowercase ifFalse: [ ^ nil ].
+	temporary := self newJsonObject.
+	temporary
+		at: 'description'
+		put: 'Declare ' , identifier printString , ' as temporary variable';
+		at: 'changes'
+		put:
+			{ (self methodChangeFrom: original withTemp: identifier)
+				asWebsideJson }.
+	instance := self newJsonObject.
+	instance
+		at: 'description'
+		put: 'Declare ' , identifier printString , ' as instance variable';
+		at: 'changes' put: { 
+				(RBAddInstanceVariableChange
+					 add: identifier
+					 to: original changeClass) asWebsideJson.
+				original asWebsideJson }.
+	^ { 
+		  temporary.
+		  instance }
 ]
 
 { #category : #private }
