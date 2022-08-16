@@ -24,12 +24,17 @@ WebsideClient class >> to: url [
 
 { #category : #evaluations }
 WebsideClient >> evaluate: aString [
+	^self evaluate: aString sync: true
+]
+
+{ #category : #evaluations }
+WebsideClient >> evaluate: aString sync: aBoolean [
 
 	| evaluation json error |
 	evaluation := NeoJSONObject new.
 	evaluation
 		at: 'expression' put: aString;
-		at: 'sync' put: true.
+		at: 'sync' put: aBoolean.
 	client post: url , '/evaluations' contents: evaluation.
 	client response hasEntity ifTrue: [ 
 		json := NeoJSONReader fromString: client entity contents ].
@@ -38,9 +43,7 @@ WebsideClient >> evaluate: aString [
 			         ifNil: [ client statusLine reason ]
 			         ifNotNil: [ json at: 'description' ifAbsent: [  ] ].
 		self error: error ].
-	^ json 
-		  at: 'printString'
-		  ifAbsent: [ self error: 'Result cannot be printed' ]
+	^ json
 ]
 
 { #category : #initialization }
