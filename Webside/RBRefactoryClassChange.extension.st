@@ -5,11 +5,11 @@ RBRefactoryClassChange >> asWebsideJson [
 
 	| moniker |
 	moniker := className ifNotNil: [ 
-		        isMeta
-			        ifTrue: [ className , ' class' ]
-			        ifFalse: [ className ] ].
+		           isMeta
+			           ifTrue: [ className , ' class' ]
+			           ifFalse: [ className ] ].
 	^ super asWebsideJson
-		  at: 'class' put: moniker asString;
+		  at: 'className' put: moniker asString;
 		  yourself
 ]
 
@@ -17,8 +17,8 @@ RBRefactoryClassChange >> asWebsideJson [
 RBRefactoryClassChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
-	className := json at: 'class' ifAbsent: nil.
+	className := json at: 'className' ifAbsent: nil.
 	isMeta := className notNil and: [ className endsWith: ' class' ].
 	className ifNotNil: [ 
-		className := (className withoutSuffix: ' class') asSymbol ].
+		className := (className withoutSuffix: ' class') asSymbol ]
 ]
