@@ -22,6 +22,12 @@ WebsideClient class >> to: url [
 	^self new url: url
 ]
 
+{ #category : #services }
+WebsideClient >> dialect [
+
+	^ client get: url , '/dialect'
+]
+
 { #category : #evaluations }
 WebsideClient >> evaluate: aString [
 	^self evaluate: aString sync: true
