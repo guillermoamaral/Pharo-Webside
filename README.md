@@ -1,5 +1,5 @@
 # Pharo-Webside
-[Webside](https://github.com/guillermoamaral/Webside) API implementation in Pharo.
+[Webside](https://github.com/guillermoamaral/Webside) API implementation for Pharo (currently, Pharo 10).
 
 ## Installation
 
