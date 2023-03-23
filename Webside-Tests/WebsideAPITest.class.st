@@ -1096,6 +1096,32 @@ WebsideAPITest >> testObjectContext [
 		ensure: [ self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testObjectSlotContext [
+	| evaluation object |
+	evaluation := NeoJSONObject new 
+		at: 'expression' put: '3 @ 4';
+		at: 'sync' put: true;
+		at: 'pin' put: true;
+		yourself.
+	object := self post: '/evaluations' with: evaluation.
+	[| context x |
+		context := NeoJSONObject new
+			at: 'object' put: (object at: 'id') , '/x';
+			yourself.
+		evaluation := NeoJSONObject new
+			at: 'expression' put: 'self';
+			at: 'sync' put: true;
+			at: 'pin' put: false;
+			at: 'context' put: context;
+			yourself.
+		x := self post: '/evaluations' with: evaluation.
+		self
+			assert: (x at: 'class') = 'SmallInteger';
+			assert: (x at: 'printString') = '3']
+		ensure: [self delete: '/objects/' , (object at: 'id') asString]
+]
+
 { #category : #'code endpoints' }
 WebsideAPITest >> testPackage [
 	| package |

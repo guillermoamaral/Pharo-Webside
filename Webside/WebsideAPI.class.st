@@ -294,7 +294,7 @@ WebsideAPI >> compilerReceiver [
 	context at: 'class' ifPresent: [ :name | ^ self classNamed: name ].
 	context
 		at: 'object'
-		ifPresent: [ :id | ^ self objects at: (UUID fromString: id) ifAbsent: nil ].
+		ifPresent: [ :path | ^ self objectFromPath: path ].
 	context
 		at: 'debugger'
 		ifPresent: [ :id | 
@@ -856,6 +856,20 @@ WebsideAPI >> notFound [
 ]
 
 { #category : #private }
+WebsideAPI >> objectFromPath: uri [
+	| path id slot |
+ 	path := uri substrings: '/'.
+	id := UUID fromString: path first.
+    slot := self objects at: id ifAbsent: [^nil].
+	slot isNil ifTrue: [^nil].
+	path
+		from: 2
+		to: path size
+		do: [:s | slot := self slot: s of: slot ifAbsent: [^nil]].
+	^slot
+]
+
+{ #category : #private }
 WebsideAPI >> objects [
 	^server objects
 ]
@@ -1113,14 +1127,13 @@ WebsideAPI >> requestedClass [
 
 { #category : #private }
 WebsideAPI >> requestedContext [
-	| context name id debugger index |
+	| context name path id debugger index |
 	context := self bodyAt: 'context' ifAbsent: [ ^nil ].
 	name := context at: 'class' ifAbsent: nil.
 	name ifNotNil: [ ^ self classNamed: name ].
-	id := context at: 'object' ifAbsent: nil.
-	id
-		ifNotNil: [ id := UUID fromString: id.
-			^ self objects at: id ifAbsent: nil ].
+	path := context at: 'object' ifAbsent: nil.
+	path
+		ifNotNil: [ ^ self objectFromPath: path ].
 	id := context at: 'workspace' ifAbsent: nil.
 	id
 		ifNotNil: [ id := UUID fromString: id.
@@ -1165,18 +1178,10 @@ WebsideAPI >> requestedSelector [
 
 { #category : #private }
 WebsideAPI >> requestedSlot [
-	| uri path index id slot |
-	uri := self bodyAt: 'uri' ifAbsent: [ ^ nil ].
-	path := uri substrings: '/'.
-	index := path indexOf: 'objects' ifAbsent: [ ^ nil ].
-	id := path at: index + 1 ifAbsent: [ ^ nil ].
-	id := UUID fromString: id.
-	slot := self objects at: id ifAbsent: [ ^ nil ].
-	path
-		from: index + 2
-		to: path size
-		do: [ :s | slot := self slot: s of: slot ifAbsent: [ ^ nil ] ].
-	^ slot
+	| uri |
+	uri := self bodyAt: 'uri' ifAbsent: [^nil].
+	uri := uri copyFrom: (uri indexOfSubCollection: '/objects/') + 9 to: uri size.
+	^self objectFromPath: uri
 ]
 
 { #category : #private }
