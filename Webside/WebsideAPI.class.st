@@ -96,6 +96,25 @@ WebsideAPI >> addChange [
 ]
 
 { #category : #private }
+WebsideAPI >> annotationsForMethod: aCompiledMethod [
+
+	^ aCompiledMethod critiques
+		  select: [ :c | c sourceAnchor providesInterval ]
+		  thenCollect: [ :c | 
+			  | interval type |
+			  interval := c sourceAnchor interval.
+			  type := c rule severity == #error ifTrue: ['error'] ifFalse: ['warning'].
+				"The severity could be #information, #warning or #error, but for the moment, the frontend only handles warnings.
+				On the other hand, error"
+			  self newJsonObject
+				  at: 'from' put: interval first;
+				  at: 'to' put: interval last;
+				  at: 'type' put: 'warning';
+				  at: 'description' put: c title;
+				  yourself ]
+]
+
+{ #category : #private }
 WebsideAPI >> badRequest: aString [
 	^ZnResponse 
 	badRequest: request 
@@ -774,24 +793,24 @@ WebsideAPI >> methodChangeFrom: anRBAddMethodChange withTemp: aString [
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
 
-	| methods class ast json |
-	self queriedSelectorMatching ifNotNil: [:pattern | 
+	| methods class ast json annotations |
+	self queriedSelectorMatching ifNotNil: [ :pattern | 
 		methods := self methodsWithSelectorMatching: pattern ].
-	self queriedReferencingString ifNotNil: [:string | 
+	self queriedReferencingString ifNotNil: [ :string | 
 		methods := methods
 			           ifNil: [ self referencesToString: string ]
 			           ifNotNil: [ 
 			           self referencesToString: string among: methods ] ].
-	self queriedSelector ifNotNil: [:selector | 
+	self queriedSelector ifNotNil: [ :selector | 
 		methods := methods
 			           ifNil: [ self implementorsOf: selector ]
 			           ifNotNil: [ 
 			           methods select: [ :m | m selector = selector ] ] ].
-                       self queriedSending ifNotNil: [:selector |
+	self queriedSending ifNotNil: [ :selector | 
 		methods := methods
 			           ifNil: [ self sendersOf: selector ]
 			           ifNotNil: [ self sendersOf: selector among: methods ] ].
-	self queriedReferencingClass ifNotNil: [:global | 
+	self queriedReferencingClass ifNotNil: [ :global | 
 		methods := methods
 			           ifNil: [ self referencesToClass: global ]
 			           ifNotNil: [ 
@@ -805,10 +824,13 @@ WebsideAPI >> methods [
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	ast := (self queryAt: 'ast') = 'true'.
+	annotations := (self queryAt: 'annotations') = 'true'.
 	^ methods collect: [ :m | 
 		  json := m asWebsideJson.
 		  ast ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
-		  json ]
+		  annotations
+			ifTrue: [json at: 'annotations' put: (self annotationsForMethod: m)].
+			 json ]
 ]
 
 { #category : #private }
