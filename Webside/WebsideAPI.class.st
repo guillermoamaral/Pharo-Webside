@@ -338,6 +338,7 @@ WebsideAPI >> compilerRequestor [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
+
 	| id process exception context debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [ ^ self notFound ].
 	id := UUID fromString: id.
@@ -345,21 +346,21 @@ WebsideAPI >> createDebugger [
 	exception := process suspendedContext exception.
 	context := exception signalerContext.
 	"process suspendedContext: context."
+	context selector == #doesNotUnderstand: ifTrue: [ 
+		context := context sender ].
 	debugger := process
-		newDebugSessionNamed: exception description
-		startedAt: context.
-	context selector == #doesNotUnderstand:
-		ifTrue: [ context := context sender ].
-	debugger restart: context.
-	context selector == #halt
-		ifTrue: [ debugger
-				stepOver;
-				stepOver ].
+		            newDebugSessionNamed: exception description
+		            startedAt: context.
+	context selector == #halt ifTrue: [ 
+		debugger restart: context.
+		debugger
+			stepOver;
+			stepOver ].
 	self debuggers at: id put: debugger.
 	^ debugger asWebsideJson
-		at: 'id' put: id asString;
-		at: 'description' put: debugger name;
-		yourself
+		  at: 'id' put: id asString;
+		  at: 'description' put: debugger name;
+		  yourself
 ]
 
 { #category : #'workspaces endpoints' }

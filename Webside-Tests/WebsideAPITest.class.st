@@ -955,6 +955,57 @@ WebsideAPITest >> testMatchingSelectors [
 			anySatisfy: [:m | (m at: 'selector') = 'testMatchingSelectors'])
 ]
 
+{ #category : #'debugging endpoints' }
+WebsideAPITest >> testMessageNotUnderstood [
+
+	| change method evaluation error id debugger target frame remotion |
+	change := NeoJSONObject new
+		          at: 'type' put: 'AddMethod';
+		          at: 'className' put: 'Object';
+		          at: 'category' put: self class name;
+		          at: 'sourceCode' put: 'blah
+1.
+2.
+3 blahblahblah';
+		          at: 'author' put: self class name;
+		          yourself.
+	[ 
+	self post: '/changes' with: change.
+	method := self get: '/classes/Object/methods/blah'.
+	self assert: method notNil.
+	evaluation := NeoJSONObject new
+		              at: 'expression' put: 'Object new blah';
+		              at: 'sync' put: true;
+		              yourself.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents.
+			self
+				assert: ((error at: 'description') asLowercase includesSubstring:
+							 'blahblahblah');
+				assert: (error includesKey: 'evaluation').
+			id := error at: 'evaluation' ].
+	self assert: id notNil.
+	[
+	target := NeoJSONObject new
+		          at: 'evaluation' put: id;
+		          yourself.
+	debugger := self post: '/debuggers' with: target.
+	id := debugger at: 'id'.
+	frame := self get: '/debuggers/' , id , '/frames/1'.
+	self
+		assert: ((frame at: 'method') at: 'selector') equals: 'blah';
+		assert: ((frame at: 'interval') at: 'start') > 10 ] ensure: [ 
+		self delete: '/debuggers/' , id asString ] ] ensure: [ 
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveMethod';
+			            at: 'className' put: 'Object';
+			            at: 'selector' put: 'blah';
+			            yourself.
+		self post: '/changes' with: remotion ]
+]
+
 { #category : #'code endpoints' }
 WebsideAPITest >> testMethod [
 	| method |
