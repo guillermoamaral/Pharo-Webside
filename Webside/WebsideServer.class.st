@@ -122,6 +122,7 @@ WebsideServer >> initializeChangesRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeCodeRoutes [
+
 	self
 		routeGET: '/packages' to: #packages;
 		routeGET: '/packages/<name>' to: #package;
@@ -132,12 +133,14 @@ WebsideServer >> initializeCodeRoutes [
 		routeGET: '/classes/<name>/subclasses' to: #subclasses;
 		routeGET: '/classes/<name>/variables' to: #variables;
 		routeGET: '/classes/<name>/instance-variables'
-			to: #instanceVariables;
+		to: #instanceVariables;
 		routeGET: '/classes/<name>/class-variables' to: #classVariables;
 		routeGET: '/classes/<name>/categories' to: #categories;
+		routeGET: '/classes/<name>/used-categories' to: #usedCategories;
 		routeGET: '/classes/<name>/methods' to: #methods;
 		routeGET: '/classes/<name>/methods/<selector>' to: #method;
-		routeGET: '/methods' to: #methods
+		routeGET: '/methods' to: #methods;
+		routeGET: '/usual-categories' to: #usualCategories
 ]
 
 { #category : #initialization }

@@ -1476,6 +1476,17 @@ WebsideAPI >> urlAt: aString [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPI >> usedlCategories [
+
+	^ #(  )
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> usualCategories [
+^#()
+]
+
+{ #category : #'code endpoints' }
 WebsideAPI >> variables [
 	| class |
 	class := self requestedClass.
