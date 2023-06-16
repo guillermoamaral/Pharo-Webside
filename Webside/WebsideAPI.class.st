@@ -1476,6 +1476,12 @@ WebsideAPI >> urlAt: aString [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPI >> usedCategories [
+
+	^ #(  )
+]
+
+{ #category : #'code endpoints' }
 WebsideAPI >> usedlCategories [
 
 	^ #(  )
