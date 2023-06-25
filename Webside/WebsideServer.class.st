@@ -260,10 +260,12 @@ WebsideServer >> initializeTestsRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeWorkspacesRoutes [
+
 	self
 		routePOST: '/workspaces' to: #createWorkspace;
 		routeGET: '/workspaces' to: #activeWorkspaces;
 		routeGET: '/workspaces/<id>' to: #workspace;
+		routePUT: '/workspaces/<id>' to: #updateWorkspace;
 		routeDELETE: '/workspaces/<id>' to: #deleteWorkspace
 ]
 
@@ -338,6 +340,13 @@ WebsideServer >> routePOST: uri to: selector [
 		POST:
 			(baseUri , uri)
 				-> [ :request | self handleRequest: request with: selector ]
+]
+
+{ #category : #initialization }
+WebsideServer >> routePUT: uri to: selector [
+
+	server PUT: baseUri , uri
+		-> [ :request | self handleRequest: request with: selector ]
 ]
 
 { #category : #accessing }

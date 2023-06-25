@@ -365,10 +365,14 @@ WebsideAPI >> createDebugger [
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> createWorkspace [
-	| id |
+
+	| id workspace |
 	id := self newID.
-	self workspaces at: id put: Workspace new.
-	^ id asString
+	workspace := Workspace new.
+	self workspaces at: id put: workspace.
+	^ workspace asWebsideJson
+		  at: 'id' put: id asString;
+		  yourself
 ]
 
 { #category : #private }
@@ -1470,6 +1474,19 @@ WebsideAPI >> unpinObject [
 	^ nil
 ]
 
+{ #category : #'workspaces endpoints' }
+WebsideAPI >> updateWorkspace [
+
+	| id workspace source |
+	id := self requestedId.
+	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
+	source := self bodyAt: 'source' ifAbsent: ''.
+	workspace contents: source.
+	^ workspace asWebsideJson
+		  at: 'id' put: id asString;
+		  yourself
+]
+
 { #category : #private }
 WebsideAPI >> urlAt: aString [
 	^request at: aString ifAbsent: nil
@@ -1502,9 +1519,13 @@ WebsideAPI >> variables [
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> workspace [
-	^ self workspaces
-		at: self requestedId
-		ifAbsent: [ self notFound ]
+
+	| id workspace |
+	id := self requestedId.
+	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
+	^ workspace asWebsideJson
+		  at: 'id' put: id asString;
+		  yourself
 ]
 
 { #category : #private }
