@@ -440,7 +440,7 @@ WebsideAPI >> debugTest [
 { #category : #'debugging endpoints' }
 WebsideAPI >> debuggerFrame [
 
-	| debugger index frame interval |
+	| debugger index frame interval  json  method |
 	debugger := self debuggers
 		            at: self requestedId
 		            ifAbsent: [ ^ self notFound ].
@@ -451,10 +451,17 @@ WebsideAPI >> debuggerFrame [
 		            at: 'start' put: interval first;
 		            at: 'end' put: interval last;
 		            yourself.
-	^ frame asWebsideJson
-		  at: 'index' put: index;
-		  at: 'interval' put: interval;
-		  yourself
+	json := frame asWebsideJson.
+	json 
+          at: 'index' put: index;
+		  at: 'interval' put: interval.
+	method := json
+		at: 'method'
+		ifAbsent: [].
+    method ifNotNil: [:m | m
+			at: 'annotations'
+			put: (self annotationsForMethod: frame method)].
+	^json
 ]
 
 { #category : #'debugging endpoints' }
@@ -771,6 +778,8 @@ WebsideAPI >> method [
 	json := method asWebsideJson.
 	(self queryAt: 'ast') = 'true'
 		ifTrue: [ json at: 'ast' put: method ast asWebsideJson ].
+    (self queryAt: 'annotations') = 'true'
+		ifTrue: [json at: 'annotations' put: (self annotationsForMethod: method)].
 	^ json
 ]
 
