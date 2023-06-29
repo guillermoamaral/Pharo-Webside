@@ -458,7 +458,9 @@ WebsideAPI >> debuggerFrame [
 	method := json
 		at: 'method'
 		ifAbsent: [].
-    method ifNotNil: [:m | m
+    method ifNotNil: [:m |
+          m
+            at: 'ast' put: frame method ast asWebsideJson;
 			at: 'annotations'
 			put: (self annotationsForMethod: frame method)].
 	^json
