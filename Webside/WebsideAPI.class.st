@@ -997,6 +997,7 @@ WebsideAPI >> pinnedObject [
 WebsideAPI >> pinnedObjectSlots [
 
 	| id object path index last |
+
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
@@ -1216,10 +1217,13 @@ WebsideAPI >> requestedSelector [
 
 { #category : #private }
 WebsideAPI >> requestedSlot [
+
 	| uri |
-	uri := self bodyAt: 'uri' ifAbsent: [^nil].
-	uri := uri copyFrom: (uri indexOfSubCollection: '/objects/') + 9 to: uri size.
-	^self objectFromPath: uri
+	uri := self bodyAt: 'uri' ifAbsent: [ ^ nil ].
+	uri := uri
+		       copyFrom: (uri indexOfSubCollection: '/objects/') + 9
+		       to: uri size.
+	^ self  objectFromPath: uri
 ]
 
 { #category : #private }
