@@ -1,7 +1,7 @@
 Extension { #name : #Dictionary }
 
 { #category : #'*Webside' }
-Dictionary >> asWebsideJson [
+Dictionary >> websidePresentations [ 
 
 	| columns rows presentation |
 	columns := OrderedCollection new.
@@ -16,7 +16,7 @@ Dictionary >> asWebsideJson [
 				 at: 'label' put: 'Value';
 				 at: 'align' put: 'left';
 				 yourself).
-	rows := self keysSortedSafely  collect: [ :k | 
+	rows := self keysSortedSafely collect: [ :k | 
 		        NeoJSONObject new
 			        at: 'key' put: k asString;
 			        at: 'value' put: (self at: k) asString;
@@ -27,7 +27,5 @@ Dictionary >> asWebsideJson [
 		                at: 'columns' put: columns;
 		                at: 'rows' put: rows;
 		                yourself.
-	^ super asWebsideJson
-		  at: 'presentation' put: presentation;
-		  yourself
+	^ super websidePresentations , { presentation }
 ]

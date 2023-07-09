@@ -376,6 +376,11 @@ WebsideAPI >> createWorkspace [
 ]
 
 { #category : #private }
+WebsideAPI >> customPresentationsOf: anObject [
+	^anObject websidePresentations
+]
+
+{ #category : #private }
 WebsideAPI >> debugExpression [
 	| expression method receiver process context debugger id |
 	expression := self bodyAt: 'expression' ifAbsent: [''].
@@ -1009,6 +1014,7 @@ WebsideAPI >> pinnedObjectSlots [
 		^ self instanceVariablesOf: object ].
 	last = 'named-slots' ifTrue: [ ^ self namedSlotsOf: object ].
 	last = 'indexed-slots' ifTrue: [ ^ self indexedSlotsOf: object ].
+    last = 'custom-presentations' ifTrue: [^self customPresentationsOf: object].
 	object := self slot: last of: object ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 ]

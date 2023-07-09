@@ -11,3 +11,9 @@ Object >> asWebsideJson [
 		at: 'printString' put: printed;
 		yourself
 ]
+
+{ #category : #'*Webside' }
+Object >> websidePresentations [
+
+	^#()
+]
