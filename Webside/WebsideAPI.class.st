@@ -118,7 +118,8 @@ WebsideAPI >> annotationsForMethod: aCompiledMethod [
 WebsideAPI >> autocompletions [
 
 	| class source position completion entries n |
-	class := (self bodyAt: 'class') ifNotNil: [ :name | self classNamed: name ].
+	class := (self bodyAt: 'class') ifNotNil: [ :name | 
+		         self classNamed: name ].
 	source := self
 		          bodyAt: 'source'
 		          ifAbsent: [ ^ self badRequest: 'missing source' ].
@@ -130,9 +131,9 @@ WebsideAPI >> autocompletions [
 		              class: class
 		              source: source
 		              position: position.
-		entries := completion entries.
-		n := 20 min: entries size.
-	^ (entries copyFrom: 1 to: n)  collect: #asWebsideJson
+	entries := completion entries.
+	n := 20 min: entries size.
+	^ (entries copyFrom: 1 to: n) collect: #asWebsideJson
 ]
 
 { #category : #private }
