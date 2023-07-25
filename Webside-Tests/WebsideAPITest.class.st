@@ -498,7 +498,7 @@ WebsideAPITest >> testClasses [
 { #category : #'changes endpoints' }
 WebsideAPITest >> testCodeSuggestion [
 
-	| change method error changes |
+	| change method error suggestions |
 	change := NeoJSONObject new
 		          at: 'type' put: 'AddMethod';
 		          at: 'className' put: 'Point';
@@ -507,21 +507,23 @@ WebsideAPITest >> testCodeSuggestion [
 	^t + 1';
 		          at: 'author' put: self class name;
 		          yourself.
-	[ 
+	[
 	self
-		post: '/changes' with: change;
-		deny: client isSuccess.
-	error := NeoJSONObject fromString: client contents.
+		post: '/changes' with: change]
+		on: Error
+		do: [ :e | 
+			error := NeoJSONObject fromString: client contents].
+[
 	self assert: error notNil.
-	changes := error at: 'changes'.
-	self post: '/changes' with: changes first.
+	suggestions := error at: 'suggestions'.
+	self post: '/changes' with: suggestions first changes first.
 	method := self get: '/classes/Point/methods/testMethodDefinition'.
 	self
 		assert: method notNil;
 		assert: method selector equals: 'testMethodDefinition';
 		assert: method category equals: self class name;
 		assert: method source equals: 'testMethodDefinition
-	| t |
+	 | t | 
 	^t + 1' ] ensure: [ 
 		| remotion |
 		remotion := NeoJSONObject new
@@ -1345,7 +1347,7 @@ WebsideAPITest >> testPinnedObjectIndexedSlots [
 	id := result at: 'id'.
 	self
 		assert: (result at: 'class') equals: 'Array';
-		assert: (result at: 'indexable') equals: true.
+		assert: (result at: 'hasIndexedSlots') equals: true.
 	slots := self get: '/objects/' , id asString , '/indexed-slots'.
 	self
 		assert: slots size equals: 3;
@@ -1406,7 +1408,7 @@ WebsideAPITest >> testPinnedObjectNamedSlots [
 	id := result at: 'id'.
 	self
 		assert: (result at: 'class') equals: 'Point';
-		assert: (result at: 'indexable') equals: false.
+		assert: (result at: 'hasIndexedSlots') equals: false.
 	slots := self get: '/objects/' , id asString , '/named-slots'.
 	self
 		assert: slots size equals: 2;
