@@ -2,5 +2,8 @@ Extension { #name : #NECSymbolEntry }
 
 { #category : #'*Webside' }
 NECSymbolEntry >> websideType [
-	^'method'
+	| global |
+	global := Smalltalk at: contents ifAbsent: [].
+	(global notNil and:[global isClass ]) ifTrue: [ ^'class' ].  
+	^ 'variable'
 ]
