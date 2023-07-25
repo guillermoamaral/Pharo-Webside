@@ -140,7 +140,8 @@ WebsideServer >> initializeCodeRoutes [
 		routeGET: '/classes/<name>/methods' to: #methods;
 		routeGET: '/classes/<name>/methods/<selector>' to: #method;
 		routeGET: '/methods' to: #methods;
-		routeGET: '/usual-categories' to: #usualCategories
+		routeGET: '/usual-categories' to: #usualCategories;
+		routePOST: '/autocompletions' to: #autocompletions
 ]
 
 { #category : #initialization }

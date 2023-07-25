@@ -114,6 +114,27 @@ WebsideAPI >> annotationsForMethod: aCompiledMethod [
 				  yourself ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> autocompletions [
+
+	| class source position completion entries n |
+	class := (self bodyAt: 'class') ifNotNil: [ :name | self classNamed: name ].
+	source := self
+		          bodyAt: 'source'
+		          ifAbsent: [ ^ self badRequest: 'missing source' ].
+	position := self
+		            bodyAt: 'position'
+		            ifAbsent: [ ^ self badRequest: 'missing position' ].
+	completion := CompletionContext
+		              engine: CompletionEngine new
+		              class: class
+		              source: source
+		              position: position.
+		entries := completion entries.
+		n := 20 min: entries size.
+	^ (entries copyFrom: 1 to: n)  collect: #asWebsideJson
+]
+
 { #category : #private }
 WebsideAPI >> badRequest: aString [
 	^ZnResponse 
