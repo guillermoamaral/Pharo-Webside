@@ -1460,6 +1460,16 @@ WebsideAPITest >> testPinnedObjects [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testQuickSearch [
+	| results |
+	results := self get: 'search?text=Point&ignoreCase=false'.
+	self
+		assert: results notEmpty;
+		assert: (results
+			anySatisfy: [:r | (r at: 'type') = 'class' and: [(r at: 'text') = 'Point']])
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testReferencesToClass [
 	| references |
 	references := self get: 'methods?referencingClass=Fraction'.
