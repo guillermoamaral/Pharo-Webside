@@ -3,7 +3,7 @@ Extension { #name : #Dictionary }
 { #category : #'*Webside' }
 Dictionary >> websidePresentations [ 
 
-	| columns rows presentation |
+	| columns rows presentation  presentations |
 	columns := OrderedCollection new.
 	columns
 		add: (NeoJSONObject new
@@ -27,5 +27,6 @@ Dictionary >> websidePresentations [
 		                at: 'columns' put: columns;
 		                at: 'rows' put: rows;
 		                yourself.
-	^ super websidePresentations , { presentation }
+    presentations := super websidePresentations reject: [:p | (p at: 'type') = 'table'].
+	^ presentations , { presentation }
 ]
