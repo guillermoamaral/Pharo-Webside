@@ -1459,7 +1459,7 @@ WebsideAPI >> stopTestRun [
 { #category : #'code endpoints' }
 WebsideAPI >> subclasses [
 	| class |
-    class := self requestedClass .
+    class := self requestedClass.
     class ifNil: [ ^ self notFound  ].
     ^ class subclasses collect: [:c | c asWebsideJson] 
 ]
