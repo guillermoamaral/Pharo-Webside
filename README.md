@@ -1,5 +1,5 @@
 # Pharo-Webside
-[Webside](https://github.com/guillermoamaral/Webside) API implementation for Pharo (currently, Pharo 9 and 10).
+[Webside](https://github.com/guillermoamaral/Webside) API implementation for Pharo (currently supported version: Pharo 11).
 
 ## Installation
 
