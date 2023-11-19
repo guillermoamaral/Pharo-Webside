@@ -3,7 +3,7 @@ Extension { #name : #RBAddClassChange }
 { #category : #'*Webside' }
 RBAddClassChange >> fromWebsideJson: json [
 
-	| superclass msg |
+	| superclass doit |
 	super fromWebsideJson: json.
 	category := json at: 'package' ifAbsent: [ 'Undefined' ].
 	definition := json at: 'definition' ifAbsent: [ 
@@ -14,8 +14,8 @@ RBAddClassChange >> fromWebsideJson: json [
 		              , category ].
 	(definition includesSubstring: 'category:') ifFalse: [ 
 		definition := definition , ' category: #' , category ].
-	msg := OpalCompiler new
+	doit := OpalCompiler new
 		       noPattern: true;
 		       parse: definition.
-	className := msg arguments first value asString
+	className := doit body statements first value arguments first value asString
 ]
