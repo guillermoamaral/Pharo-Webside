@@ -222,6 +222,23 @@ WebsideAPI >> classNamed: aString [
 		ifFalse: [ class ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> classTemplate [
+	| package |
+	package := self queryAt: 'package'.
+	package ifNil: [ ^self badRequest: 'no package specified'].
+	^self newJsonObject
+		at: 'template' put: true;
+		at: 'name' put: 'MyClass';
+		at: 'definition'
+		put: 'Object
+	subclass: #MyClass
+	instanceVariableNames: ''''
+	classVariableNames: ''''
+	package: ''', package , '''';
+		yourself
+]
+
 { #category : #private }
 WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 	| json subclasses depth names |
@@ -831,6 +848,21 @@ WebsideAPI >> methodChangeFrom: anRBAddMethodChange withTemp: aString [
 	^ original copy
 		  instVarNamed: 'source' put: newSource;
 		  yourself
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> methodTemplate [
+	^self newJsonObject
+		at: 'template' put: true;
+		at: 'selector' put: 'methodSelectorAndArgumentNames';
+		at: 'source'
+		put: 'methodSelectorAndArgumentNames
+	"comment stating purpose of instance-side method"
+	"scope: class-variables  &  instance-variables"
+
+	| temporary variable names |
+	statements';
+		yourself
 ]
 
 { #category : #'code endpoints' }

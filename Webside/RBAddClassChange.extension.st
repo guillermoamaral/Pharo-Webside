@@ -12,8 +12,6 @@ RBAddClassChange >> fromWebsideJson: json [
 		              ,
 		              ' instanceVariableNames: '''' classVariableNames: '''' poolDictionaries: '''' category: #'
 		              , category ].
-	(definition includesSubstring: 'category:') ifFalse: [ 
-		definition := definition , ' category: #' , category ].
 	doit := OpalCompiler new
 		       noPattern: true;
 		       parse: definition.
