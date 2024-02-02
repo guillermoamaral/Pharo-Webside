@@ -181,9 +181,11 @@ WebsideServer >> initializeEvaluationRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeGeneralRoutes [
+
 	self
 		routeGET: '/dialect' to: #dialect;
-        routePOST: '/save' to: #saveImage
+		routeGET: '/logo' to: #logo;
+		routePOST: '/save' to: #saveImage
 ]
 
 { #category : #initialization }
