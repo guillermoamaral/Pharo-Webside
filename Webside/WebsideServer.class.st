@@ -185,6 +185,7 @@ WebsideServer >> initializeGeneralRoutes [
 	self
 		routeGET: '/dialect' to: #dialect;
 		routeGET: '/logo' to: #logo;
+        routeGET: '/colors' to: #colors;
 		routePOST: '/save' to: #saveImage
 ]
 

@@ -321,6 +321,14 @@ WebsideAPI >> classes [
     ^ classes collect: [:c | c asWebsideJson]
 ]
 
+{ #category : #'general endpoints' }
+WebsideAPI >> colors [
+	^self newJsonObject
+		at: 'primary' put: '#3297d4';
+		at: 'secondary' put: '#1565c0';
+		yourself
+]
+
 { #category : #private }
 WebsideAPI >> compilationError: error [
 
