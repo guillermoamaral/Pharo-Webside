@@ -306,9 +306,7 @@ WebsideAPI >> classes [
 
 	| root tree classes names depth json |
 	root := self queryAt: 'root'.
-	root := root notNil
-		        ifTrue: [ self classNamed: root ]
-		        ifFalse: [ self defaultRootClass ].
+	root := root ifNil: [self defaultRootClass] ifNotNil: [ self classNamed: root ].
 	root ifNil: [ ^ self notFound ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [ 
@@ -819,6 +817,19 @@ WebsideAPI >> instanceVariablesOf: anObject [
 				yourself ]
 ]
 
+{ #category : #private }
+WebsideAPI >> jsonFromMethods: aCollection [
+     | ast  annotations  json | 
+	ast := (self queryAt: 'ast') = 'true'.
+	annotations := (self queryAt: 'annotations') = 'true'.
+	^ aCollection collect: [ :m | 
+		  json := m asWebsideJson.
+		  ast ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
+		  annotations
+			ifTrue: [json at: 'annotations' put: (self annotationsForMethod: m)].
+			 json ]
+]
+
 { #category : #'general endpoints' }
 WebsideAPI >> logo [
 
@@ -827,20 +838,15 @@ WebsideAPI >> logo [
 
 { #category : #'code endpoints' }
 WebsideAPI >> method [
-	| class selector method json |
+	| class selector json |
 	class := self requestedClass.
 	class ifNil: [ ^ self notFound ].
 	selector := self requestedSelector.
 	selector ifNil: [ ^ self notFound ].
 	(class includesSelector: selector)
 		ifFalse: [ ^ self notFound ].
-	method := class >> selector.
-	json := method asWebsideJson.
-	(self queryAt: 'ast') = 'true'
-		ifTrue: [ json at: 'ast' put: method ast asWebsideJson ].
-    (self queryAt: 'annotations') = 'true'
-		ifTrue: [json at: 'annotations' put: (self annotationsForMethod: method)].
-	^ json
+	json := self jsonFromMethods: {class >> selector}.
+	^ json first
 ]
 
 { #category : #private }
@@ -882,7 +888,7 @@ WebsideAPI >> methodTemplate [
 { #category : #'code endpoints' }
 WebsideAPI >> methods [
 
-	| methods class ast json annotations |
+	| methods class |
 	self queriedSelectorMatching ifNotNil: [ :pattern | 
 		methods := self methodsWithSelectorMatching: pattern ].
 	self queriedReferencingString ifNotNil: [ :string | 
@@ -912,14 +918,7 @@ WebsideAPI >> methods [
 			           asArray ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
-	ast := (self queryAt: 'ast') = 'true'.
-	annotations := (self queryAt: 'annotations') = 'true'.
-	^ methods collect: [ :m | 
-		  json := m asWebsideJson.
-		  ast ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
-		  annotations
-			ifTrue: [json at: 'annotations' put: (self annotationsForMethod: m)].
-			 json ]
+	^ self jsonFromMethods: methods
 ]
 
 { #category : #private }
