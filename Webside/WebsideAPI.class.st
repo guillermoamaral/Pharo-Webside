@@ -1397,7 +1397,7 @@ WebsideAPI >> saveImage [
 
 { #category : #'code endpoints' }
 WebsideAPI >> search [
-	| text ignoreCase position type model |
+	| text ignoreCase position type model results |
 	text := self queryAt: 'text' ifAbsent: [^self badRequest: 'missing text'].
 	ignoreCase := (self queryAt: 'ignoreCase') = 'true'.
 	position := (self queryAt: 'position' ifAbsent: [#beginning]) asSymbol.
@@ -1406,7 +1406,8 @@ WebsideAPI >> search [
     model processSearch: text on: StSpotter new.
     [550 milliSeconds wait]
       doWhileTrue: [model scheduler workers anySatisfy: [:w | w isBusy]].
-	^model results select: [:r | r websideType notNil] thenCollect: #asWebsideJson
+    results := model activeStep activeQuery candidatesList candidates asArray collect: [:l | l value].
+	^results select: [:r | r websideType notNil] thenCollect: #asWebsideJson
 ]
 
 { #category : #private }

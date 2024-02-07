@@ -3,7 +3,7 @@ Extension { #name : #StEntry }
 { #category : #'*Webside' }
 StEntry >> asWebsideJson [
 
-	^ NeoJSONObject new
+	^ super asWebsideJson
 		  at: 'type' put: self websideType;
 		  at: 'text' put: self asString;
 		  yourself
