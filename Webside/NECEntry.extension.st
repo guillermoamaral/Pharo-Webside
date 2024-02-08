@@ -3,7 +3,7 @@ Extension { #name : #NECEntry }
 { #category : #'*Webside' }
 NECEntry >> asWebsideJson [
 
-	^ NeoJSONObject new
+	^ super asWebsideJson
 		  at: 'label' put: self contents;
 		  at: 'detail'
 		  put:
