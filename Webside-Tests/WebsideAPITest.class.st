@@ -171,16 +171,16 @@ WebsideAPITest >> testCassDefinition [
 	subclass: #TestCassDefinition
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
-	[ 
+	[
 	| class |
 	self post: '/changes' with: definition.
 	class := self get: '/classes/TestCassDefinition'.
 	self
 		assert: class notNil;
-		assert: class name equals: 'TestCassDefinition' ] ensure: [ 
+		assert: class name equals: 'TestCassDefinition' ] ensure: [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
@@ -212,7 +212,7 @@ WebsideAPITest >> testCategoryRemove [
 	subclass: #TestCategoryRemove
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		         at: 'author' put: self class name;
 		         yourself.
 	method := NeoJSONObject new
@@ -227,14 +227,14 @@ WebsideAPITest >> testCategoryRemove [
 		            at: 'className' put: 'TestCategoryRemove';
 		            at: 'category' put: 'x';
 		            yourself.
-	[ 
+	[
 	| categories |
 	self
 		post: '/changes' with: class;
 		post: '/changes' with: method;
 		post: '/changes' with: remotion.
 	categories := self get: '/classes/TestCategoryRemove/categories'.
-	self deny: (categories includes: 'x') ] ensure: [ 
+	self deny: (categories includes: 'x') ] ensure: [
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestCategoryRemove';
@@ -253,7 +253,7 @@ WebsideAPITest >> testCategoryRename [
 	subclass: #TestCategoryRename
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		         at: 'author' put: self class name;
 		         yourself.
 	method := NeoJSONObject new
@@ -269,7 +269,7 @@ WebsideAPITest >> testCategoryRename [
 		            at: 'category' put: 'x';
 		            at: 'newName' put: 'y';
 		            yourself.
-	[ 
+	[
 	| categories |
 	self
 		post: '/changes' with: class;
@@ -278,7 +278,7 @@ WebsideAPITest >> testCategoryRename [
 	categories := self get: '/classes/TestCategoryRename/categories'.
 	self
 		assert: categories size equals: 1;
-		assert: categories first equals: 'y' ] ensure: [ 
+		assert: categories first equals: 'y' ] ensure: [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
@@ -329,7 +329,7 @@ WebsideAPITest >> testClassCommentDefinition [
 	subclass: #TestClassCommentDefinition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	comment := NeoJSONObject new
@@ -337,7 +337,7 @@ WebsideAPITest >> testClassCommentDefinition [
 		           at: 'className' put: 'TestClassCommentDefinition';
 		           at: 'comment' put: 'Testing class comment';
 		           yourself.
-	[ 
+	[
 	| class |
 	self
 		post: '/changes' with: definition;
@@ -345,7 +345,7 @@ WebsideAPITest >> testClassCommentDefinition [
 	class := self get: '/classes/TestClassCommentDefinition'.
 	self
 		assert: class notNil;
-		assert: class comment equals: 'Testing class comment' ] ensure: [ 
+		assert: class comment equals: 'Testing class comment' ] ensure: [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
@@ -375,7 +375,7 @@ WebsideAPITest >> testClassRemove [
 	subclass: #TestClassRemove
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	remotion := NeoJSONObject new
@@ -400,7 +400,7 @@ WebsideAPITest >> testClassRename [
 	subclass: #TestClassRename
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	renaming := NeoJSONObject new
@@ -408,14 +408,14 @@ WebsideAPITest >> testClassRename [
 		            at: 'className' put: 'TestClassRename';
 		            at: 'newName' put: 'TestClassRename2';
 		            yourself.
-	[ 
+	[
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: renaming.
 	class := self get: '/classes/TestClassRename'.
 	self assert: class isNil.
 	class := self get: '/classes/TestClassRename2'.
-	self assert: class notNil ] ensure: [ 
+	self assert: class notNil ] ensure: [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
@@ -435,7 +435,7 @@ WebsideAPITest >> testClassVariableAddition [
 	subclass: #TestClassVariableAddition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	addition := NeoJSONObject new
@@ -443,15 +443,15 @@ WebsideAPITest >> testClassVariableAddition [
 		            at: 'className' put: 'TestClassVariableAddition';
 		            at: 'variable' put: 'X';
 		            yourself.
-	[ 
+	[
 	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: addition.
 	variables := self get:
 		             '/classes/TestClassVariableAddition/class-variables'.
-	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ]) ] 
-		ensure: [ 
+	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ]) ]
+		ensure: [
 			| remotion |
 			remotion := NeoJSONObject new
 				            at: 'type' put: 'RemoveClass';
@@ -723,7 +723,7 @@ WebsideAPITest >> testInstanceVariableAddition [
 	subclass: #TestInstanceVariableAddition
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	addition := NeoJSONObject new
@@ -731,7 +731,7 @@ WebsideAPITest >> testInstanceVariableAddition [
 		            at: 'className' put: 'TestInstanceVariableAddition';
 		            at: 'variable' put: 'x';
 		            yourself.
-	[ 
+	[
 	| variables |
 	self
 		post: '/changes' with: definition;
@@ -740,7 +740,7 @@ WebsideAPITest >> testInstanceVariableAddition [
 		             '/classes/TestInstanceVariableAddition/instance-variables'.
 	self
 		assert: variables size equals: 1;
-		assert: variables first name equals: 'x' ] ensure: [ 
+		assert: variables first name equals: 'x' ] ensure: [
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
@@ -760,7 +760,7 @@ WebsideAPITest >> testInstanceVariableMoveDown [
 	subclass: #TestInstanceVariableMoveDown
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	class := NeoJSONObject new
@@ -770,7 +770,7 @@ WebsideAPITest >> testInstanceVariableMoveDown [
 	subclass: #TestInstanceVariableMoveDown2
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		         at: 'author' put: self class name;
 		         yourself.
 	movement := NeoJSONObject new
@@ -817,7 +817,7 @@ WebsideAPITest >> testInstanceVariableMoveUp [
 	subclass: #TestInstanceVariableMoveUp
 	instanceVariableNames: ''''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	class := NeoJSONObject new
@@ -827,7 +827,7 @@ WebsideAPITest >> testInstanceVariableMoveUp [
 	subclass: #TestInstanceVariableMoveUp2
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		         at: 'author' put: self class name;
 		         yourself.
 	movement := NeoJSONObject new
@@ -877,7 +877,7 @@ WebsideAPITest >> testInstanceVariableRemove [
 	subclass: #TestInstanceVariableRemove
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	remotion := NeoJSONObject new
@@ -911,7 +911,7 @@ WebsideAPITest >> testInstanceVariableRename [
 	subclass: #TestInstanceVariableRename
 	instanceVariableNames: ''x''
 	classVariableNames: ''''
-	poolDictionaries: ''''';
+	package: ''Unclassified''';
 		              at: 'author' put: self class name;
 		              yourself.
 	renaming := NeoJSONObject new
@@ -1657,36 +1657,41 @@ WebsideAPITest >> testVariables [
 
 { #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspace [
-	| id |
-	id := self post: '/workspaces'.
-	[ | context assignment evaluation result |
+
+	| response id |
+	response := self post: '/workspaces'.
+	id := response at: 'id'.
+	[
+	| context assignment evaluation result |
 	context := NeoJSONObject new
-		at: 'workspace' put: id;
-		yourself.
+		           at: 'workspace' put: id;
+		           yourself.
 	assignment := NeoJSONObject new
-		at: 'expression' put: 'a := 1';
-		at: 'sync' put: true;
-		context: context;
-		yourself.
+		              at: 'expression' put: 'a := 1';
+		              at: 'sync' put: true;
+		              context: context;
+		              yourself.
 	self post: '/evaluations' with: assignment.
 	evaluation := NeoJSONObject new
-		at: 'expression' put: 'a';
-		at: 'sync' put: true;
-		context: context;
-		yourself.
+		              at: 'expression' put: 'a';
+		              at: 'sync' put: true;
+		              context: context;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	self
 		assert: (result at: 'class') equals: 'SmallInteger';
-		assert: (result at: 'printString') equals: '1' ]
-		ensure: [ self delete: '/workspaces/' , id ]
+		assert: (result at: 'printString') equals: '1' ] ensure: [
+		self delete: '/workspaces/' , id ]
 ]
 
 { #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspaces [
-	| id result |
-	id := self post: '/workspaces'.
-	[result := self get: '/workspaces'.
-	self
-		assert: (result anySatisfy: [:w | (w at: 'id') = id])]
+
+	| response id result |
+	response := self post: '/workspaces'.
+	id := response at: 'id'.
+	[
+	result := self get: '/workspaces'.
+	self assert: (result anySatisfy: [ :w | (w at: 'id') = id ]) ]
 		ensure: [ self delete: '/workspaces/' , id ]
 ]

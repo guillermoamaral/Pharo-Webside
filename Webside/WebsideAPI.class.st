@@ -86,10 +86,10 @@ WebsideAPI >> addChange [
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
 	author := self bodyAt: 'author' ifAbsent: [ 'Unknown' ].
-	Author useAuthor: author during: [ 
+	Author useAuthor: author during: [
 		[ change execute ]
-			on: Error , SyntaxErrorNotification , OCUndeclaredVariableWarning
-			do: [ :e | ^ self compilationError: e ] ].
+			on: Exception - Halt
+			do: [ :e | ^ self changeError: e from: change] ].
 	"Temporary workaround until a better way of gathering system changes is implemented"
 	server changes add: change.
 	^ change asWebsideJson
@@ -184,6 +184,22 @@ WebsideAPI >> categories [
 	class := self requestedClass.
 	class ifNil: [^self notFound].
 	^class protocols
+]
+
+{ #category : #private }
+WebsideAPI >> changeError: error from: change [
+
+	| json suggestions data type entity |
+	json := error asWebsideJson.
+	((error isKindOf: OCUndeclaredVariableWarning) and: [ change isKindOf: RBAddMethodChange ]) ifTrue: [
+		suggestions := self declareVariableSuggestionsFrom: error.
+		suggestions ifNotNil: [ json at: 'suggestions' put: suggestions ] ].
+	data := NeoJSONWriter toString: json.
+	type := ZnMimeType applicationJson
+		        charSet: 'utf-8';
+		        yourself.
+	entity := ZnStringEntity with: data type: type.
+	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
 { #category : #'changes endpoints' }
@@ -325,22 +341,6 @@ WebsideAPI >> colors [
 		at: 'primary' put: '#3297d4';
 		at: 'secondary' put: '#1565c0';
 		yourself
-]
-
-{ #category : #private }
-WebsideAPI >> compilationError: error [
-
-	| entity json suggestions |
-	json := error asWebsideJson.
-	(error isKindOf: OCUndeclaredVariableWarning) ifTrue: [ 
-		suggestions := self declareVariableSuggestionsFrom: error.
-		suggestions ifNotNil: [ json at: 'suggestions' put: suggestions ] ]. 
-	entity := ZnStringEntity
-		          with: (NeoJSONWriter toString: json)
-		          type: (ZnMimeType applicationJson
-				           charSet: 'utf-8';
-				           yourself).
-	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
 { #category : #private }
