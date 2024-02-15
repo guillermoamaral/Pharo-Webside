@@ -14,14 +14,15 @@ CompiledMethod >> asWebsideJson [
 		at: 'author' put: self author;
 		at: 'timestamp' put: self timeStamp;
 		at: 'overriding' put: self isOverriding;
-		at: 'overriden' put: self isOverridden.
-	self isTestMethod ifTrue: [ 
+		at: 'overriden' put: self isOverridden;
+		at: 'needsRecompilation' put: self usesUndeclareds.
+	self isTestMethod ifTrue: [
 		status := self isPassedTest
 			          ifTrue: [ 'passed' ]
-			          ifFalse: [ 
+			          ifFalse: [
 				          self isFailedTest
 					          ifTrue: [ 'failed' ]
-					          ifFalse: [ 
+					          ifFalse: [
 						          self isErrorTest
 							          ifTrue: [ 'error' ]
 							          ifFalse: [ 'unknown' ] ] ].
