@@ -1059,6 +1059,15 @@ WebsideAPITest >> testMethodClassification [
 		self post: '/changes' with: remotion ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPITest >> testMethodCount [
+
+	| methods count |
+	methods := self get: 'classes/Point/methods'.
+	count := self get: 'classes/Point/methods?count=true'.
+	self assert: count equals: methods size
+]
+
 { #category : #'changes endpoints' }
 WebsideAPITest >> testMethodDefinition [
 

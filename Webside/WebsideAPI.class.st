@@ -889,35 +889,36 @@ WebsideAPI >> methodTemplate [
 WebsideAPI >> methods [
 
 	| methods class |
-	self queriedSelectorMatching ifNotNil: [ :pattern | 
+	self queriedSelectorMatching ifNotNil: [ :pattern |
 		methods := self methodsWithSelectorMatching: pattern ].
-	self queriedReferencingString ifNotNil: [ :string | 
+	self queriedReferencingString ifNotNil: [ :string |
 		methods := methods
 			           ifNil: [ self referencesToString: string ]
-			           ifNotNil: [ 
+			           ifNotNil: [
 			           self referencesToString: string among: methods ] ].
-	self queriedSelector ifNotNil: [ :selector | 
+	self queriedSelector ifNotNil: [ :selector |
 		methods := methods
 			           ifNil: [ self implementorsOf: selector ]
-			           ifNotNil: [ 
+			           ifNotNil: [
 			           methods select: [ :m | m selector = selector ] ] ].
-	self queriedSending ifNotNil: [ :selector | 
+	self queriedSending ifNotNil: [ :selector |
 		methods := methods
 			           ifNil: [ self sendersOf: selector ]
 			           ifNotNil: [ self sendersOf: selector among: methods ] ].
-	self queriedReferencingClass ifNotNil: [ :global | 
+	self queriedReferencingClass ifNotNil: [ :global |
 		methods := methods
 			           ifNil: [ self referencesToClass: global ]
-			           ifNotNil: [ 
+			           ifNotNil: [
 			           self referencesToClass: global among: methods ] ].
 	class := self requestedClass ifNil: [ self queriedClass ].
-	(class notNil and: [ methods notNil ]) ifTrue: [ 
+	(class notNil and: [ methods notNil ]) ifTrue: [
 		methods := methods select: [ :m | m methodClass == class ] ].
-	methods ifNil: [ 
+	methods ifNil: [
 		methods := (class ifNil: [ self defaultRootClass ]) methodDictionary
 			           asArray ].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
+	(self queryAt: 'count') = 'true' ifTrue: [ ^methods size ].
 	^ self jsonFromMethods: methods
 ]
 
