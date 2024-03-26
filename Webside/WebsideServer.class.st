@@ -180,6 +180,13 @@ WebsideServer >> initializeEvaluationRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializeExtensionsRoutes [
+
+	self
+		routeGET: '/extensions' to: #extensions
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeGeneralRoutes [
 
 	self
@@ -227,16 +234,17 @@ WebsideServer >> initializeResources [
 
 { #category : #initialization }
 WebsideServer >> initializeRoutes [
+
 	self
-    	initializePreflightRoutes;
+		initializePreflightRoutes;
 		initializeGeneralRoutes;
-        initializeCodeRoutes;
+		initializeCodeRoutes;
 		initializeChangesRoutes;
 		initializeEvaluationRoutes;
 		initializeObjectsRoutes;
 		initializeWorkspacesRoutes;
 		initializeDebuggingRoutes;
-		initializeTestsRoutes 
+		initializeTestsRoutes; initializeExtensionsRoutes
 ]
 
 { #category : #initialization }

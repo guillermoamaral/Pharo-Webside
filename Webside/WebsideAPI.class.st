@@ -681,6 +681,11 @@ WebsideAPI >> evaluations [
 	^server evaluations
 ]
 
+{ #category : #'extensions endpoints' }
+WebsideAPI >> extensions [
+	^#()
+]
+
 { #category : #private }
 WebsideAPI >> filterByCategory: aCollection [
 	| category |
