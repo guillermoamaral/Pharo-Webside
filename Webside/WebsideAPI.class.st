@@ -617,6 +617,7 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 WebsideAPI >> evaluateExpression [
 
 	| debug expression sync pin id semaphore object process block json |
+	
 	debug := self bodyAt: 'debug'.
 	debug == true ifTrue: [ ^ self debugExpression ].
 	expression := self bodyAt: 'expression'.
@@ -624,23 +625,23 @@ WebsideAPI >> evaluateExpression [
 	pin := (self bodyAt: 'pin') ifNil: false.
 	id := self newID.
 	semaphore := Semaphore new.
-	block := [ 
+	block := [
 	         [ object := self evaluateExpression: expression ]
 		         on: Exception
-		         do: [ :exception | 
+		         do: [ :exception |
 			         semaphore signal.
 			         process
 				         suspendedContext: exception signalerContext;
 				         suspend ].
 	         self evaluations removeKey: id ifAbsent: nil.
-	         (sync not or: [ pin ]) ifTrue: [ 
+	         (sync not or: [ pin ]) ifTrue: [
 		         self objects at: id put: object ].
 	         semaphore signal.
 	         object ].
 	process := block newProcess.
 	self evaluations at: id put: process.
 	process resume.
-	sync ifTrue: [ 
+	sync ifTrue: [
 		semaphore wait.
 		object ifNil: [ ^ self evaluationError: id ].
 		json := object asWebsideJson.
@@ -1062,8 +1063,9 @@ WebsideAPI >> pinObjectSlot [
 WebsideAPI >> pinnedObject [
 
 	| id object |
+
 	id := self requestedId.
-	self evaluations at: id ifPresent: [ :process | 
+	self evaluations at: id ifPresent: [ :process |
 		process isSuspended ifTrue: [ ^ self evaluationError: id ] ].
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
@@ -1403,19 +1405,35 @@ WebsideAPI >> saveImage [
 
 { #category : #'code endpoints' }
 WebsideAPI >> search [
-	| text ignoreCase position type model results  grouped |
-	text := self queryAt: 'text' ifAbsent: [^self badRequest: 'missing text'].
+
+	| text ignoreCase position type model results grouped |
+	text := self
+		        queryAt: 'text'
+		        ifAbsent: [ ^ self badRequest: 'missing text' ].
 	ignoreCase := (self queryAt: 'ignoreCase') = 'true'.
-	position := (self queryAt: 'position' ifAbsent: [#beginning]) asSymbol.
+	position := (self queryAt: 'position' ifAbsent: [ #beginning ])
+		            asSymbol.
 	type := self queryAt: 'type' ifAbsent: 'all'.
-    model := StSpotterModel new.
-    model processSearch: text on: StSpotter new.
-    [550 milliSeconds wait]
-      doWhileTrue: [model scheduler workers anySatisfy: [:w | w isBusy]].
-    results := model activeStep activeQuery candidatesList candidates asArray collect: [:l | l value].
-    grouped := Dictionary new.
-	results select: [:r | r websideType notNil and: [type = 'all' or: [r websideType = type]]] thenDo: [:r | grouped at: r asString ifAbsentPut: [r]].
-    ^grouped values asArray collect: #asWebsideJson
+	type = 'class' ifTrue: [
+		^ Smalltalk allClasses
+			  select: [ :class |
+				  class name
+					  includesSubstring: text
+					  caseSensitive: ignoreCase = 'false' ]
+			  thenCollect: [:c | self newJsonObject at: 'type' put: 'class'; at: 'text' put: c name asString; yourself ]].
+	model := StSpotterModel new.
+	model processSearch: text on: StSpotter new.
+	[ 550 milliSeconds wait ] doWhileTrue: [
+		model scheduler workers anySatisfy: [ :w | w isBusy ] ].
+	results := model activeStep activeQuery candidatesList candidates
+		           asArray collect: [ :l | l value ].
+	grouped := Dictionary new.
+	results
+		select: [ :r |
+			r websideType notNil and: [
+				type = 'all' or: [ r websideType = type ] ] ]
+		thenDo: [ :r | grouped at: r asString ifAbsentPut: [ r ] ].
+	^ grouped values asArray collect: #asWebsideJson
 ]
 
 { #category : #private }
