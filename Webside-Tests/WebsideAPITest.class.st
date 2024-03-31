@@ -1694,6 +1694,32 @@ WebsideAPITest >> testWorkspace [
 ]
 
 { #category : #'workspaces endpoints' }
+WebsideAPITest >> testWorkspaceBindings [
+
+	| response id bindings |
+	response := self post: '/workspaces'.
+	id := response at: 'id'.
+	[
+	| context assignment evaluation result |
+	context := NeoJSONObject new
+		           at: 'workspace' put: id;
+		           yourself.
+	assignment := NeoJSONObject new
+		              at: 'expression' put: 'a := 1';
+		              at: 'sync' put: true;
+		              context: context;
+		              yourself.
+	self post: '/evaluations' with: assignment.
+
+	bindings := self get: '/workspaces/' , id , '/bindings'.
+	self
+		assert: bindings size equals: 1;
+		assert: (bindings first at: 'name') equals: 'a';
+        assert: (bindings first at: 'value') equals: 1 printString] ensure: [
+		self delete: '/workspaces/' , id ]
+]
+
+{ #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspaces [
 
 	| response id result |

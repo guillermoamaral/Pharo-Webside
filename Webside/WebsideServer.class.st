@@ -281,7 +281,8 @@ WebsideServer >> initializeWorkspacesRoutes [
 		routeGET: '/workspaces' to: #activeWorkspaces;
 		routeGET: '/workspaces/<id>' to: #workspace;
 		routePUT: '/workspaces/<id>' to: #updateWorkspace;
-		routeDELETE: '/workspaces/<id>' to: #deleteWorkspace
+		routeDELETE: '/workspaces/<id>' to: #deleteWorkspace;
+        routeGET: '/workspaces/<id>/bindings' to: #workspaceBindings
 ]
 
 { #category : #testing }

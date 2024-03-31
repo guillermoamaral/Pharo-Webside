@@ -1657,6 +1657,19 @@ WebsideAPI >> workspace [
 		  yourself
 ]
 
+{ #category : #'workspaces endpoints' }
+WebsideAPI >> workspaceBindings [
+
+	| id workspace |
+	id := self requestedId.
+	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
+	^workspace bindings associations collect: [:a | 
+		self newJsonObject
+			at: 'name' put: a key;
+			at: 'value' put: a value printString;
+			yourself]
+]
+
 { #category : #private }
 WebsideAPI >> workspaces [
 	^ server workspaces
