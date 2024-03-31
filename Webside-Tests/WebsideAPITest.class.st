@@ -1700,7 +1700,7 @@ WebsideAPITest >> testWorkspaceBindings [
 	response := self post: '/workspaces'.
 	id := response at: 'id'.
 	[
-	| context assignment evaluation result |
+	| context assignment |
 	context := NeoJSONObject new
 		           at: 'workspace' put: id;
 		           yourself.
