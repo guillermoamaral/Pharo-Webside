@@ -97,7 +97,7 @@ WebsideAPI >> addChange [
 
 { #category : #private }
 WebsideAPI >> annotationsForMethod: aCompiledMethod [
-
+    aCompiledMethod isCompiledMethod ifFalse: [^#()].
 	^ aCompiledMethod critiques
 		  select: [ :c | c sourceAnchor providesInterval ]
 		  thenCollect: [ :c | 
