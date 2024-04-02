@@ -684,7 +684,33 @@ WebsideAPI >> evaluations [
 
 { #category : #'extensions endpoints' }
 WebsideAPI >> extensions [
-	^#()
+	"The following are examples (yet valid/valuable) of how to extend the predefined set of changes.
+  For more information check Webside API documentation at https://github.com/guillermoamaral/Webside"
+
+	^ OrderedCollection new
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'method';
+				   at: 'label' put: 'Push down';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'PushDownMethod';
+						    at: 'className' put: '{element.methodClass}';
+						    at: 'selector' put: '{element.selector}';
+						    yourself);
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+					  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'method';
+				   at: 'label' put: 'Push up';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'PullUpMethod';
+						    at: 'className' put: '{element.methodClass}';
+						    at: 'selector' put: '{element.selector}';
+						    yourself);
+				   at: 'section' put: 'Refactorings';
+				   yourself);	
+		  yourself
 ]
 
 { #category : #private }

@@ -3,13 +3,13 @@ Extension { #name : #RBMethodRefactoring }
 { #category : #'*Webside' }
 RBMethodRefactoring >> asWebsideJson [
 	^ super asWebsideJson
-		at: 'class' put: class name;
+		at: 'className' put: class name;
 		yourself
 ]
 
 { #category : #'*Webside' }
 RBMethodRefactoring >> fromWebsideJson: json [
 	super fromWebsideJson: json.
-	class := json at: 'class' ifAbsent: nil.
+	class := json at: 'className' ifAbsent: nil.
 	class ifNotNil: [class := self classObjectFor: class asSymbol].
 ]
