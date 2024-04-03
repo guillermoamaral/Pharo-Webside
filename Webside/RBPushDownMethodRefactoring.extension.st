@@ -11,7 +11,7 @@ RBPushDownMethodRefactoring >> asWebsideJson [
 RBPushDownMethodRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
-	json halt
+	json
 		at: 'selectors'
 		ifPresent: [ :a | selectors := a collect: [ :s | s asSymbol ] ].
 	json at: 'selector' ifPresent: [ :s | selectors := { s asSymbol } ]
