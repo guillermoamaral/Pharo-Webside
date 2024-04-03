@@ -684,8 +684,8 @@ WebsideAPI >> evaluations [
 
 { #category : #'extensions endpoints' }
 WebsideAPI >> extensions [
-	"The following are examples (yet valid/valuable) of how to extend the predefined set of changes.
-  For more information check Webside API documentation at https://github.com/guillermoamaral/Webside"
+	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
+  For more information, check API documentation at https://github.com/guillermoamaral/Webside."
 
 	^ OrderedCollection new
 		  add: (self newJsonObject
@@ -699,7 +699,7 @@ WebsideAPI >> extensions [
 						    yourself);
 				   at: 'section' put: 'Refactorings';
 				   yourself);
-					  add: (self newJsonObject
+		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'method';
 				   at: 'label' put: 'Push up';
@@ -709,7 +709,23 @@ WebsideAPI >> extensions [
 						    at: 'selector' put: '{element.selector}';
 						    yourself);
 				   at: 'section' put: 'Refactorings';
-				   yourself);	
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'class';
+				   at: 'label' put: 'Insert superclass';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'InsertClass';
+						    at: 'className' put: '{element.name}';
+						    at: 'newName' put: '{parameters.newName}';
+						    yourself);
+				   at: 'parameters' put: { (self newJsonObject
+					    at: 'name' put: 'newName';
+					    at: 'label' put: 'New class name';
+					    at: 'type' put: 'input';
+					    yourself) };
+				   at: 'section' put: 'Refactorings';
+				   yourself);
 		  yourself
 ]
 
@@ -1432,7 +1448,7 @@ WebsideAPI >> saveImage [
 { #category : #'code endpoints' }
 WebsideAPI >> search [
 
-	| text ignoreCase position type model results grouped |
+	| text ignoreCase position type model results grouped  matches |
 	text := self
 		        queryAt: 'text'
 		        ifAbsent: [ ^ self badRequest: 'missing text' ].
@@ -1441,12 +1457,13 @@ WebsideAPI >> search [
 		            asSymbol.
 	type := self queryAt: 'type' ifAbsent: 'all'.
 	type = 'class' ifTrue: [
-		^ Smalltalk allClasses
+		matches := Smalltalk allClasses
 			  select: [ :class |
 				  class name
 					  includesSubstring: text
-					  caseSensitive: ignoreCase = 'false' ]
-			  thenCollect: [:c | self newJsonObject at: 'type' put: 'class'; at: 'text' put: c name asString; yourself ]].
+					  caseSensitive: ignoreCase = 'false' ].
+        matches sort: [:a :b | (a alike: text) >= (b alike: text)].
+        ^matches collect: [:c | self newJsonObject at: 'type' put: 'class'; at: 'text' put: c name asString; yourself ]].
 	model := StSpotterModel new.
 	model processSearch: text on: StSpotter new.
 	[ 550 milliSeconds wait ] doWhileTrue: [
