@@ -279,25 +279,27 @@ WebsideAPI >> classTreeFrom: aClass depth: anInteger [
 { #category : #private }
 WebsideAPI >> classTreeFromClasses: aCollection [
 
-	| roots json subclasses |
+	| roots json subclasses removable |
 	roots := Dictionary new.
+	removable := Set new.
 	aCollection
-		do: [ :c | 
+		do: [ :c |
 			json := self newJsonObject
 				        at: 'name' put: c name;
 				        yourself.
 			roots at: c name put: json ];
-		select: [ :c | c superclass notNil ] thenDo: [ :c | 
-		roots at: c superclass name ifPresent: [ :sc | 
+		select: [ :c | c superclass notNil ] thenDo: [ :c |
+		roots at: c superclass name ifPresent: [ :sc |
 			subclasses := sc
 				              at: 'subclasses'
-				              ifAbsentPut: [ 
-				              SortedCollection new sortBlock: [ :a :b | 
+				              ifAbsentPut: [
+				              SortedCollection new sortBlock: [ :a :b |
 					              a name <= b name ] ].
-			subclasses add: (roots at: c name) ] ];
-		select: [ :c | c superclass notNil ] thenDo: [ :c | 
-		(roots includesKey: c superclass name) ifTrue: [ 
-			roots removeKey: c name ] ].
+			subclasses add: (roots at: c name).
+			removable add: c name ] ].
+		removable do: [ :n |
+		
+			roots removeKey: n ] .
 	^ roots asArray sort: [ :a :b | a name <= b name ]
 ]
 
