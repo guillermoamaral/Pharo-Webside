@@ -724,7 +724,7 @@ WebsideAPI >> extensions [
 		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'method';
-				   at: 'label' put: 'Move to class';
+				   at: 'label' put: 'Move to another class';
 				   at: 'properties' put: (self newJsonObject
 						    at: 'type' put: 'MoveMethodToClass';
 						    at: 'className' put: '{element.methodClass}';
@@ -737,6 +737,17 @@ WebsideAPI >> extensions [
 					    at: 'type' put: 'text';
                         at: 'options' put: '{classes}';
 					    yourself) };
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'method';
+				   at: 'label' put: 'Move to class side';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'MoveMethodToClassSide';
+						    at: 'className' put: '{element.methodClass}';
+                            at: 'selector' put: '{element.selector}';
+						    yourself);
 				   at: 'section' put: 'Refactorings';
 				   yourself);
 		  yourself

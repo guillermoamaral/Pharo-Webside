@@ -4,9 +4,9 @@ Extension { #name : #RBMoveMethodToClassRefactoring }
 RBMoveMethodToClassRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
-			at: 'className' put: method classBinding name;
+		  at: 'className' put: method methodClass name;
 		  at: 'selector' put: method selector;
-		at: 'newName' put: class name;
+		  at: 'newName' put: class name;
 		  yourself
 ]
 
@@ -15,7 +15,7 @@ RBMoveMethodToClassRefactoring >> fromWebsideJson: json [
 
 	| c |
 	super fromWebsideJson: json.
-	json
+	json 
 		at: 'newName'
 		ifPresent: [ :n | class := self classObjectFor: n asSymbol ];
 		at: 'className' ifPresent: [ :n |
