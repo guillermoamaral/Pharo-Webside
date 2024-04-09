@@ -724,7 +724,7 @@ WebsideAPI >> extensions [
 				   at: 'parameters' put: { (self newJsonObject
 					    at: 'name' put: 'newName';
 					    at: 'label' put: 'New class name';
-					    at: 'type' put: 'input';
+					    at: 'type' put: 'text';
 					    yourself) };
 				   at: 'section' put: 'Refactorings';
 				   yourself);
