@@ -619,16 +619,15 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 WebsideAPI >> evaluateExpression [
 
 	| debug expression sync pin id semaphore object process block json |
-	
 	debug := self bodyAt: 'debug'.
 	debug == true ifTrue: [ ^ self debugExpression ].
 	expression := self bodyAt: 'expression'.
-	sync := (self bodyAt: 'sync') ifNil: true.
-	pin := (self bodyAt: 'pin') ifNil: false.
+	sync := (self bodyAt: 'sync') ifNil: [ true ].
+	pin := (self bodyAt: 'pin') ifNil: [ false ].
 	id := self newID.
 	semaphore := Semaphore new.
 	block := [
-	         [ object := self evaluateExpression: expression ]
+	         [ object :=  self compiler evaluate: expression ]
 		         on: Exception
 		         do: [ :exception |
 			         semaphore signal.
@@ -653,12 +652,6 @@ WebsideAPI >> evaluateExpression [
 		  at: 'id' put: id asString;
 		  at: 'expression' put: expression;
 		  yourself
-]
-
-{ #category : #private }
-WebsideAPI >> evaluateExpression: aString [
-
-	^ self compiler evaluate: aString
 ]
 
 { #category : #private }
