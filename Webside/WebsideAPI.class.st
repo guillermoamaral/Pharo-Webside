@@ -1503,6 +1503,19 @@ WebsideAPI >> search [
 	^ grouped values asArray collect: #asWebsideJson
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> selectorInCode [
+
+	| source position extractor |
+	source := self bodyAt: 'code'.
+	position := self bodyAt: 'position'.
+	extractor := CNSelectorExtractor new.
+	^ position
+		  ifNil: [ extractor extractSelectorFromSelection: source ]
+		  ifNotNil: [
+		  extractor extractSelectorFromSource: source atPosition: position ]
+]
+
 { #category : #private }
 WebsideAPI >> sendersOf: aSymbol [
 	| scope |
