@@ -1504,10 +1504,10 @@ WebsideAPI >> search [
 ]
 
 { #category : #'code endpoints' }
-WebsideAPI >> selectorInCode [
+WebsideAPI >> selectorInSource [
 
 	| source position extractor |
-	source := self bodyAt: 'code'.
+	source := self bodyAt: 'source'.
 	position := self bodyAt: 'position'.
 	extractor := CNSelectorExtractor new.
 	^ position
