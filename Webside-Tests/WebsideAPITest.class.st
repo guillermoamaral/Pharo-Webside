@@ -1571,6 +1571,17 @@ WebsideAPITest >> testScope [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testSelectorInSource [
+	| selector source |
+    source := NeoJSONObject new at: 'source' put: 'to: 2 do: [:i'; yourself.
+	selector := self post: 'selectors' with: source.
+	self assert: selector equals: 'to:do:'.
+    source := NeoJSONObject new at: 'source' put: '1 to: 2 do: [:i |'; at: 'position' put: 3; yourself.
+	selector := self post: 'selectors' with: source.
+	self assert: selector equals: 'to:do:'.
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testSenders [
 	| senders local |
 	senders := self get: 'methods?sending=reciprocal'.
