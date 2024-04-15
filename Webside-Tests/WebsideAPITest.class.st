@@ -1353,7 +1353,7 @@ WebsideAPITest >> testRemoveMethod [
 { #category : #'changes endpoints' }
 WebsideAPITest >> testRenameCategory [
 
-	| class method renaming |
+	| class method renaming categories remotion |
 	class := NeoJSONObject new
 		         at: 'type' put: 'AddClass';
 		         at: 'className' put: 'TestCategoryRename';
@@ -1373,13 +1373,11 @@ WebsideAPITest >> testRenameCategory [
 		          yourself.
 	renaming := NeoJSONObject new
 		            at: 'type' put: 'RenameCategory';
-		            at: 'class' put: 'TestCategoryRename';
+		            at: 'className' put: 'TestCategoryRename';
 		            at: 'category' put: 'x';
 		            at: 'newName' put: 'y';
 		            yourself.
-	[
-	| categories |
-	self
+	[self
 		post: '/changes' with: class;
 		post: '/changes' with: method;
 		post: '/changes' with: renaming.
@@ -1387,7 +1385,6 @@ WebsideAPITest >> testRenameCategory [
 	self
 		assert: categories size equals: 1;
 		assert: categories first equals: 'y' ] ensure: [
-		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestCategoryRename';
