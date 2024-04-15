@@ -686,9 +686,9 @@ WebsideAPI >> extensions [
 		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'method';
-				   at: 'label' put: 'Push down';
+				   at: 'label' put: 'Push up';
 				   at: 'properties' put: (self newJsonObject
-						    at: 'type' put: 'PushDownMethod';
+						    at: 'type' put: 'PullUpMethod';
 						    at: 'className' put: '{element.methodClass}';
 						    at: 'selector' put: '{element.selector}';
 						    yourself);
@@ -697,9 +697,9 @@ WebsideAPI >> extensions [
 		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'method';
-				   at: 'label' put: 'Push up';
+				   at: 'label' put: 'Push down';
 				   at: 'properties' put: (self newJsonObject
-						    at: 'type' put: 'PullUpMethod';
+						    at: 'type' put: 'PushDownMethod';
 						    at: 'className' put: '{element.methodClass}';
 						    at: 'selector' put: '{element.selector}';
 						    yourself);
@@ -748,6 +748,24 @@ WebsideAPI >> extensions [
 						    at: 'className' put: '{element.methodClass}';
                             at: 'selector' put: '{element.selector}';
 						    yourself);
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'method';
+				   at: 'label' put: 'Move to package';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'MoveMethodsToPackage';
+						    at: 'className' put: '{element.methodClass}';
+                            at: 'selector' put: '{element.selector}';
+						    at: 'package' put: '{parameters.package}';
+						    yourself);
+				   at: 'parameters' put: { (self newJsonObject
+					    at: 'name' put: 'package';
+					    at: 'label' put: 'Target pacakge';
+					    at: 'type' put: 'text';
+                        at: 'options' put: '{packages}';
+					    yourself) };
 				   at: 'section' put: 'Refactorings';
 				   yourself);
 		  yourself
@@ -1297,10 +1315,12 @@ WebsideAPI >> request: aTeaRequest [
 
 { #category : #private }
 WebsideAPI >> requestedChange [
+
 	| json change |
 	json := NeoJSONReader fromString: request entity.
 	change := RBRefactoryChange fromWebsideJson: json.
-   change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
+	change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
+	change ifNil: [ change := CmdCommand fromWebsideJson: json ].
 	^ change
 ]
 
