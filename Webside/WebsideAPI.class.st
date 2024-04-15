@@ -95,6 +95,11 @@ WebsideAPI >> addChange [
 	^ change asWebsideJson
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> allCategories [
+	^  Smalltalk globals organization categories
+]
+
 { #category : #private }
 WebsideAPI >> annotationsForMethod: aCompiledMethod [
     aCompiledMethod isCompiledMethod ifFalse: [^#()].
@@ -1723,12 +1728,6 @@ WebsideAPI >> urlAt: aString [
 
 { #category : #'code endpoints' }
 WebsideAPI >> usedCategories [
-
-	^ #(  )
-]
-
-{ #category : #'code endpoints' }
-WebsideAPI >> usedlCategories [
 
 	^ #(  )
 ]
