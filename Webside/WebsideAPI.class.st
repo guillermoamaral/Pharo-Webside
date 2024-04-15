@@ -690,6 +690,39 @@ WebsideAPI >> extensions [
 	^ OrderedCollection new
 		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'class';
+				   at: 'label' put: 'Insert superclass';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'InsertClass';
+						    at: 'className' put: '{element.name}';
+						    at: 'newName' put: '{parameters.newName}';
+						    yourself);
+				   at: 'parameters' put: { (self newJsonObject
+					    at: 'name' put: 'newName';
+					    at: 'label' put: 'New class name';
+					    at: 'type' put: 'text';
+					    yourself) };
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'class';
+				   at: 'label' put: 'Move to package';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'MoveClassToGroup';
+						    at: 'className' put: '{element.name}';
+						    at: 'package' put: '{parameters.package}';
+						    yourself);
+				   at: 'parameters' put: { (self newJsonObject
+					    at: 'name' put: 'package';
+					    at: 'label' put: 'Target package';
+					    at: 'type' put: 'text';
+                        at: 'options' put: '{packages}';
+					    yourself) };
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'method';
 				   at: 'label' put: 'Push up';
 				   at: 'properties' put: (self newJsonObject
@@ -708,22 +741,6 @@ WebsideAPI >> extensions [
 						    at: 'className' put: '{element.methodClass}';
 						    at: 'selector' put: '{element.selector}';
 						    yourself);
-				   at: 'section' put: 'Refactorings';
-				   yourself);
-		  add: (self newJsonObject
-				   at: 'extensionType' put: 'change';
-				   at: 'elementType' put: 'class';
-				   at: 'label' put: 'Insert superclass';
-				   at: 'properties' put: (self newJsonObject
-						    at: 'type' put: 'InsertClass';
-						    at: 'className' put: '{element.name}';
-						    at: 'newName' put: '{parameters.newName}';
-						    yourself);
-				   at: 'parameters' put: { (self newJsonObject
-					    at: 'name' put: 'newName';
-					    at: 'label' put: 'New class name';
-					    at: 'type' put: 'text';
-					    yourself) };
 				   at: 'section' put: 'Refactorings';
 				   yourself);
 		  add: (self newJsonObject
