@@ -192,14 +192,11 @@ WebsideAPI >> categories [
 ]
 
 { #category : #private }
-WebsideAPI >> changeError: error from: change [
+WebsideAPI >> changeError: exception from: change [
 
-	| json suggestions data type entity |
-	json := error asWebsideJson.
-	((error isKindOf: OCUndeclaredVariableWarning) and: [ change isKindOf: RBAddMethodChange ]) ifTrue: [
-		suggestions := self declareVariableSuggestionsFrom: error.
-		suggestions ifNotNil: [ json at: 'suggestions' put: suggestions ] ].
-	data := NeoJSONWriter toString: json.
+	| error data type entity |
+	error := WebsideChangeError on: exception from: change.
+	data := NeoJSONWriter toString: error asWebsideJson.
 	type := ZnMimeType applicationJson
 		        charSet: 'utf-8';
 		        yourself.
@@ -540,35 +537,6 @@ WebsideAPI >> debuggerFrames [
 { #category : #private }
 WebsideAPI >> debuggers [
 	^ server debuggers
-]
-
-{ #category : #private }
-WebsideAPI >> declareVariableSuggestionsFrom: anOCUndeclaredVariableWarning [
-
-	| original identifier temporary instance |
-	original := self requestedChange.
-	identifier := anOCUndeclaredVariableWarning node name.
-	identifier first isLowercase ifFalse: [ ^ nil ].
-	temporary := self newJsonObject.
-	temporary
-		at: 'description'
-		put: 'Declare ' , identifier printString , ' as temporary variable';
-		at: 'changes'
-		put:
-			{ (self methodChangeFrom: original withTemp: identifier)
-				asWebsideJson }.
-	instance := self newJsonObject.
-	instance
-		at: 'description'
-		put: 'Declare ' , identifier printString , ' as instance variable';
-		at: 'changes' put: { 
-				(RBAddInstanceVariableChange
-					 add: identifier
-					 to: original changeClass) asWebsideJson.
-				original asWebsideJson }.
-	^ { 
-		  temporary.
-		  instance }
 ]
 
 { #category : #private }
@@ -959,27 +927,6 @@ WebsideAPI >> method [
 		ifFalse: [ ^ self notFound ].
 	json := self jsonFromMethods: {class >> selector}.
 	^ json first
-]
-
-{ #category : #private }
-WebsideAPI >> methodChangeFrom: anRBAddMethodChange withTemp: aString [
-
-	| original ast declaration position source head tail newSource |
-	original := self requestedChange.
-	ast := RBParser parseMethod: anRBAddMethodChange source.
-	declaration := ast temporaries isEmpty
-		               ifTrue: [ 
-			               ' | ' , aString , ' | 
-	' ]
-		               ifFalse: [ ' ' , aString , ' ' ].
-	position := ast body rightBar ifNil: [ ast body start ].
-	source := ast sourceCode.
-	head := source copyFrom: 1 to: position - 1.
-	tail := source copyFrom: position to: source size.
-	newSource := head , declaration , tail.
-	^ original copy
-		  instVarNamed: 'source' put: newSource;
-		  yourself
 ]
 
 { #category : #'code endpoints' }
