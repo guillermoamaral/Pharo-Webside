@@ -13,7 +13,7 @@ Class {
 WebsideChangeError class >> classFor: anException [
 
 	^ (anException isKindOf: OCSemanticWarning)
-		  ifTrue: [ WebsideCompilationError ]
+		  ifTrue: [ WebsideCompilationError]
 		  ifFalse: [ WebsideChangeError ]
 ]
 

@@ -9,6 +9,6 @@ RBRefactoryProtocolChange >> asWebsideJson [
 
 { #category : #'*Webside' }
 RBRefactoryProtocolChange >> fromWebsideJson: json [
-	super fromWebsideJson: json.
+	super  fromWebsideJson: json.
 	protocol := json at: 'category' ifAbsent: nil
 ]
