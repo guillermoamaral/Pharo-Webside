@@ -11,7 +11,7 @@ RBRefactoryChange class >> acceptsWebsideJson: json [
 RBRefactoryChange >> asWebsideJson [
 	^ NeoJSONObject new
 		at: 'type' put: self class websideType asString;
-		at: 'label' put: self changeString;
+		at: 'label' put: ([self changeString] on: Error do: [self class websideType]);
 		at: 'package' put: nil;
 		at: 'timestamp' put: DateAndTime now asString;
 		at: 'author' put: Author uniqueInstance fullName;
