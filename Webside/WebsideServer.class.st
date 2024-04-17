@@ -22,6 +22,12 @@ Class {
 }
 
 { #category : #accessing }
+WebsideServer >> addChange: change [
+
+	self changes add: change
+]
+
+{ #category : #accessing }
 WebsideServer >> apiClass: aClass [
 	apiClass := aClass
 ]
