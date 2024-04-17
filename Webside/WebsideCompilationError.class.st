@@ -4,6 +4,11 @@ Class {
 	#category : #Webside
 }
 
+{ #category : #testing }
+WebsideCompilationError class >> canWrap: anException [
+  ^{OCSemanticWarning. SyntaxErrorNotification} includes: anException class
+]
+
 { #category : #private }
 WebsideCompilationError >> addSuggestionsForUndeclaredVariable: identifier [
 
@@ -31,20 +36,6 @@ WebsideCompilationError >> addSuggestionsForUndeclaredVariable: identifier [
 					 add: identifier
 					 to: change changeClass).
 				change }
-]
-
-{ #category : #json }
-WebsideCompilationError >> asWebsideJson [
-
-	| interval |
-	interval := NeoJSONObject new
-		            at: 'start' put: error node start;
-		            at: 'end' put: error node stop;
-		            yourself.
-	^ super asWebsideJson
-		  at: 'description' put: self messageText;
-		  at: 'interval' put: interval;
-		  yourself
 ]
 
 { #category : #accessing }

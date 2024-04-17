@@ -9,12 +9,15 @@ Class {
 	#category : #'Webside-Base'
 }
 
+{ #category : #testing }
+WebsideChangeError class >> canWrap: anException [
+    ^false
+]
+
 { #category : #private }
 WebsideChangeError class >> classFor: anException [
 
-	^ (anException isKindOf: OCSemanticWarning)
-		  ifTrue: [ WebsideCompilationError]
-		  ifFalse: [ WebsideChangeError ]
+	^ self allSubclasses detect: [:c | c canWrap: anException] ifNone: [ WebsideChangeError ]
 ]
 
 { #category : #'instance creation' }
@@ -31,8 +34,7 @@ WebsideChangeError >> addSuggestion: aString changes: aCollection [
 { #category : #json }
 WebsideChangeError >> asWebsideJson [
 	 | json  todo | 
-	json := super asWebsideJson.
-    json at: 'description' put: error description.
+	json := error asWebsideJson.
 	suggestions isEmpty ifTrue: [^json].
 	todo := suggestions associations collect: [:a | 
 		NeoJSONObject

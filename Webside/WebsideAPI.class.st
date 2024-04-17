@@ -192,10 +192,12 @@ WebsideAPI >> categories [
 ]
 
 { #category : #private }
-WebsideAPI >> changeError: exception from: change [
+WebsideAPI >> changeError: anException from: change [
 
 	| error data type entity |
-	error := WebsideChangeError on: exception from: change.
+	error := (anException isKindOf: WebsideChangeError)
+		         ifTrue: [ anException ]
+		         ifFalse: [ WebsideChangeError on: anException from: change ].
 	data := NeoJSONWriter toString: error asWebsideJson.
 	type := ZnMimeType applicationJson
 		        charSet: 'utf-8';
