@@ -216,7 +216,8 @@ WebsideAPITest >> testAddMethod [
 		assert: method selector equals: 'testMethodDefinition';
 		assert: method category equals: self class name;
 		assert: method source equals: 'testMethodDefinition
-	^x + 1' ] ensure: [ 
+
+	^ x + 1' ] ensure: [ 
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveMethod';
@@ -473,8 +474,9 @@ WebsideAPITest >> testCodeSuggestion [
 		assert: method selector equals: 'testMethodDefinition';
 		assert: method category equals: self class name;
 		assert: method source equals: 'testMethodDefinition
-	 | t | 
-	^t + 1' ] ensure: [ 
+
+	| t |
+	^ t + 1' ] ensure: [ 
 		| remotion |
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveMethod';

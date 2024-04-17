@@ -6,7 +6,10 @@ Class {
 
 { #category : #testing }
 WebsideCompilationError class >> canWrap: anException [
-  ^{OCSemanticWarning. SyntaxErrorNotification} includes: anException class
+
+	^ {
+		  OCSemanticWarning.
+		  SyntaxErrorNotification } anySatisfy: [:c | anException isKindOf: c]
 ]
 
 { #category : #private }
