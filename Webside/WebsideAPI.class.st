@@ -91,7 +91,7 @@ WebsideAPI >> addChange [
 			on: Exception - Halt
 			do: [ :e | ^ self changeError: e from: change] ].
 	"Temporary workaround until a better way of gathering system changes is implemented"
-	server changes add: change.
+	server addChange: change.
 	^ change asWebsideJson
 ]
 
