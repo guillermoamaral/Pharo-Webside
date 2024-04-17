@@ -1528,7 +1528,7 @@ WebsideAPI >> search [
 				  class name
 					  includesSubstring: text
 					  caseSensitive: ignoreCase = 'false' ].
-        matches sort: [:a :b | (a alike: text) >= (b alike: text)].
+        matches sort: [:a :b | (a name alike: text) >= (b name alike: text)].
         ^matches collect: [:c | self newJsonObject at: 'type' put: 'class'; at: 'text' put: c name asString; yourself ]].
 	model := StSpotterModel new.
 	model processSearch: text on: StSpotter new.
