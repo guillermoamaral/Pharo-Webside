@@ -687,7 +687,7 @@ WebsideAPI >> extensions [
 					    at: 'name' put: 'package';
 					    at: 'label' put: 'Target package';
 					    at: 'type' put: 'text';
-                        at: 'options' put: '{packages}';
+					    at: 'options' put: '{packages}';
 					    yourself) };
 				   at: 'section' put: 'Refactorings';
 				   yourself);
@@ -720,14 +720,14 @@ WebsideAPI >> extensions [
 				   at: 'properties' put: (self newJsonObject
 						    at: 'type' put: 'MoveMethodToClass';
 						    at: 'className' put: '{element.methodClass}';
-                            at: 'selector' put: '{element.selector}';
+						    at: 'selector' put: '{element.selector}';
 						    at: 'newName' put: '{parameters.newName}';
 						    yourself);
 				   at: 'parameters' put: { (self newJsonObject
 					    at: 'name' put: 'newName';
 					    at: 'label' put: 'Target class name';
 					    at: 'type' put: 'text';
-                        at: 'options' put: '{classes}';
+					    at: 'options' put: '{classes}';
 					    yourself) };
 				   at: 'section' put: 'Refactorings';
 				   yourself);
@@ -738,7 +738,7 @@ WebsideAPI >> extensions [
 				   at: 'properties' put: (self newJsonObject
 						    at: 'type' put: 'MoveMethodToClassSide';
 						    at: 'className' put: '{element.methodClass}';
-                            at: 'selector' put: '{element.selector}';
+						    at: 'selector' put: '{element.selector}';
 						    yourself);
 				   at: 'section' put: 'Refactorings';
 				   yourself);
@@ -749,15 +749,27 @@ WebsideAPI >> extensions [
 				   at: 'properties' put: (self newJsonObject
 						    at: 'type' put: 'MoveMethodsToPackage';
 						    at: 'className' put: '{element.methodClass}';
-                            at: 'selector' put: '{element.selector}';
+						    at: 'selector' put: '{element.selector}';
 						    at: 'package' put: '{parameters.package}';
 						    yourself);
 				   at: 'parameters' put: { (self newJsonObject
 					    at: 'name' put: 'package';
 					    at: 'label' put: 'Target pacakge';
 					    at: 'type' put: 'text';
-                        at: 'options' put: '{packages}';
+					    at: 'options' put: '{packages}';
 					    yourself) };
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'variable';
+				   at: 'label' put: 'Create accessors';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type' put: 'CreateAccessorsForVariableTransformation';
+						    at: 'className' put: '{element.class}';
+						    at: 'variable' put: '{element.name}';
+						    at: 'variableType' put: '{element.type}';
+						    yourself);
 				   at: 'section' put: 'Refactorings';
 				   yourself);
 		  yourself
