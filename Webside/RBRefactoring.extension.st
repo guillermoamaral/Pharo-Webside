@@ -37,12 +37,6 @@ RBRefactoring >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRefactoring >> websideExecute: ensure [
-
-	^ self execute
-]
-
-{ #category : #'*Webside' }
 RBRefactoring class >> websideType [
 
 	^ (self name withoutPrefix: 'RB') withoutSuffix: 'Refactoring'

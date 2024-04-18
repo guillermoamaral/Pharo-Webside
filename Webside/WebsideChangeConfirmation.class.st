@@ -27,7 +27,7 @@ WebsideChangeConfirmation >> confirm: originalChange asking: question [
 	change := originalChange.
 	messageText := 'Confirm'.
 	self
-		addSuggestion: question changes: { originalChange };
+		suggest: question withChanges: { originalChange };
 		signal
 ]
 

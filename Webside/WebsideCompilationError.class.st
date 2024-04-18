@@ -29,12 +29,12 @@ WebsideCompilationError >> addSuggestionsForUndeclaredVariable: identifier [
 	variation := change copy.
 	variation instVarNamed: 'source' put: head , temps , tail.
 	self
-		addSuggestion:
+		suggest:
 			'Declare ' , identifier printString , ' as temporary variable'
-		changes: { variation };
-		addSuggestion:
+		withChanges: { variation };
+		suggest:
 			'Declare ' , identifier printString , ' as instance variable'
-		changes: {
+		withChanges: {
 				(RBAddInstanceVariableChange
 					 add: identifier
 					 to: change changeClass).

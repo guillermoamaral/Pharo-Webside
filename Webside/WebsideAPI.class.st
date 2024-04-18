@@ -82,13 +82,12 @@ WebsideAPI >> activeWorkspaces [
 { #category : #'changes endpoints' }
 WebsideAPI >> addChange [
 
-	| change author ensure |
+	| change author |
 	change := self requestedChange.
 	change ifNil: [ ^ self badRequest: 'Change not supported' ].
 	author := self bodyAt: 'author' ifAbsent: [ 'Unknown' ].
-	ensure := self bodyAt: 'confirmed' ifAbsent: [ false ].
 	Author useAuthor: author during: [
-		[ change websideExecute: ensure ]
+		[ change websideExecute ]
 			on: Exception - Halt
 			do: [ :e | ^ self changeError: e from: change ] ].
 	"Temporary workaround until a better way of gathering system changes is implemented"

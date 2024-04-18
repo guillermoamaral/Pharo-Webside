@@ -21,14 +21,15 @@ WebsideChangeError class >> classFor: anException [
 ]
 
 { #category : #'instance creation' }
+WebsideChangeError class >> from: change [
+
+	^ self new from: change
+]
+
+{ #category : #'instance creation' }
 WebsideChangeError class >> on: anException from: change [
 
 	^ (self classFor: anException) new on: anException from: change
-]
-
-{ #category : #accessing }
-WebsideChangeError >> addSuggestion: aString changes: aCollection [
-	suggestions at: aString put: aCollection
 ]
 
 { #category : #json }
@@ -47,6 +48,13 @@ WebsideChangeError >> asWebsideJson [
 	^ json
 ]
 
+{ #category : #accessing }
+WebsideChangeError >> from: originalChange [
+
+	change := originalChange.
+
+]
+
 { #category : #initialization }
 WebsideChangeError >> initialize [
 	super initialize.
@@ -57,4 +65,10 @@ WebsideChangeError >> initialize [
 WebsideChangeError >> on: anException from: originalChange [
   change := originalChange.
   error := anException
+]
+
+{ #category : #accessing }
+WebsideChangeError >> suggest: aString withChanges: aCollection [
+
+	suggestions at: aString put: aCollection
 ]

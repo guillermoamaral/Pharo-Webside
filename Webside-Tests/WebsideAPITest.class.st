@@ -1279,7 +1279,7 @@ WebsideAPITest >> testRemoveCategory [
 ]
 
 { #category : #'changes endpoints' }
-WebsideAPITest >> testRemoveCategoryConfirmation [
+WebsideAPITest >> testRemoveCategoryWithMethods [
 
 	| class method categories remotion error suggestions |
 	class := NeoJSONObject new
@@ -1304,7 +1304,6 @@ WebsideAPITest >> testRemoveCategoryConfirmation [
 		            at: 'className' put: 'TestRemoveCategory';
 		            at: 'category' put: 'testRemoveCategory';
 		            yourself.
-
 	[
 	self
 		post: '/changes' with: class;
@@ -1319,12 +1318,14 @@ WebsideAPITest >> testRemoveCategoryConfirmation [
 	suggestions := error at: 'suggestions'.
 	self
 		assert: suggestions size equals: 1;
-		assert: (suggestions first at: 'changes') size equals: 1;
-		assert: ((suggestions first at: 'changes') first at: 'confirmed')
-		equals: true.
+		assert:
+			((suggestions first at: 'description') includesSubstring:
+					 'not empty').
 	categories := self get: '/classes/TestRemoveCategory/categories'.
 	self assert: (categories includes: 'testRemoveCategory').
-	self post: '/changes' with: (suggestions first at: 'changes') first.
+	(suggestions first at: 'changes') do: [ :ch |
+		self post: '/changes' with: ch ].
+	categories := self get: '/classes/TestRemoveCategory/categories'.
 	self deny: (categories includes: 'testRemoveCategory') ] ensure: [
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';

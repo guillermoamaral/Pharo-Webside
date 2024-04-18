@@ -38,7 +38,7 @@ CmdCommand >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-CmdCommand >> websideExecute: ensure [
+CmdCommand >> websideExecute [
 
 	^ self execute
 ]
