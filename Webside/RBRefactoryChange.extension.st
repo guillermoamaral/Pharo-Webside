@@ -26,6 +26,10 @@ RBRefactoryChange class >> classForWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
+RBRefactoryChange >> fromWebsideJson: json [
+]
+
+{ #category : #'*Webside' }
 RBRefactoryChange class >> fromWebsideJson: json [
 	| class |
 	class := self classForWebsideJson: json.
@@ -33,7 +37,9 @@ RBRefactoryChange class >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
-RBRefactoryChange >> fromWebsideJson: json [
+RBRefactoryChange >> websideExecute: ensure [
+
+	^ self execute
 ]
 
 { #category : #'*Webside' }

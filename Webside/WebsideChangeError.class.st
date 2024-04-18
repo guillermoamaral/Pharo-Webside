@@ -33,15 +33,18 @@ WebsideChangeError >> addSuggestion: aString changes: aCollection [
 
 { #category : #json }
 WebsideChangeError >> asWebsideJson [
-	 | json  todo | 
-	json := error asWebsideJson.
-	suggestions isEmpty ifTrue: [^json].
-	todo := suggestions associations collect: [:a | 
-		NeoJSONObject
-			with: 'description' -> a key
-			with: 'changes' -> (a value collect: #asWebsideJson)].
+
+	| json todo |
+	json := error
+		        ifNil: [ super asWebsideJson ]
+		        ifNotNil: [ error asWebsideJson ].
+	suggestions isEmpty ifTrue: [ ^ json ].
+	todo := suggestions associations collect: [ :a |
+		        NeoJSONObject
+			        with: 'description' -> a key
+			        with: 'changes' -> (a value collect: #asWebsideJson) ].
 	json at: 'suggestions' put: todo asArray.
-	^json
+	^ json
 ]
 
 { #category : #initialization }

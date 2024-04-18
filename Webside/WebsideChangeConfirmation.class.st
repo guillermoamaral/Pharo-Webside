@@ -4,8 +4,35 @@ Class {
 	#category : #Webside
 }
 
+{ #category : #'as yet unclassified' }
+WebsideChangeConfirmation class >> confirm: originalChange asking: question [
+
+	^ self new confirm: originalChange asking: question
+]
+
+{ #category : #json }
+WebsideChangeConfirmation >> asWebsideJson [
+
+	| json |
+	json := super asWebsideJson.
+	((json at: 'suggestions') first at: 'changes') first
+		at: 'confirmed'
+		put: true.
+	^ json
+]
+
 { #category : #accessing }
-WebsideChangeConfirmation >> on: anException from: originalChange [
-  super on: anException from: originalChange.
-  self addSuggestion: self description changes: {originalChange}
+WebsideChangeConfirmation >> confirm: originalChange asking: question [
+
+	change := originalChange.
+	messageText := 'Confirm'.
+	self
+		addSuggestion: question changes: { originalChange };
+		signal
+]
+
+{ #category : #accessing }
+WebsideChangeConfirmation >> description [
+
+	^ messageText
 ]

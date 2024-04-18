@@ -1279,6 +1279,61 @@ WebsideAPITest >> testRemoveCategory [
 ]
 
 { #category : #'changes endpoints' }
+WebsideAPITest >> testRemoveCategoryConfirmation [
+
+	| class method categories remotion error suggestions |
+	class := NeoJSONObject new
+		         at: 'type' put: 'AddClass';
+		         at: 'className' put: 'TestRemoveCategory';
+		         at: 'definition' put: 'Object
+	subclass: #TestRemoveCategory
+	instanceVariableNames: ''''
+	classVariableNames: ''''
+	package: ''Unclassified''';
+		         at: 'author' put: self class name;
+		         yourself.
+	method := NeoJSONObject new
+		          at: 'type' put: 'AddMethod';
+		          at: 'className' put: 'TestRemoveCategory';
+		          at: 'category' put: 'testRemoveCategory';
+		          at: 'sourceCode' put: 'x';
+		          at: 'author' put: self class name;
+		          yourself.
+	remotion := NeoJSONObject new
+		            at: 'type' put: 'RemoveCategory';
+		            at: 'className' put: 'TestRemoveCategory';
+		            at: 'category' put: 'testRemoveCategory';
+		            yourself.
+
+	[
+	self
+		post: '/changes' with: class;
+		post: '/changes' with: method.
+	categories := self get: '/classes/TestRemoveCategory/categories'.
+	self assert: (categories includes: 'testRemoveCategory').
+	[ self post: '/changes' with: remotion ]
+		on: Error
+		do: [ :e | error := NeoJSONObject fromString: client contents ].
+
+	self assert: error notNil.
+	suggestions := error at: 'suggestions'.
+	self
+		assert: suggestions size equals: 1;
+		assert: (suggestions first at: 'changes') size equals: 1;
+		assert: ((suggestions first at: 'changes') first at: 'confirmed')
+		equals: true.
+	categories := self get: '/classes/TestRemoveCategory/categories'.
+	self assert: (categories includes: 'testRemoveCategory').
+	self post: '/changes' with: (suggestions first at: 'changes') first.
+	self deny: (categories includes: 'testRemoveCategory') ] ensure: [
+		remotion := NeoJSONObject new
+			            at: 'type' put: 'RemoveClass';
+			            at: 'className' put: 'TestRemoveCategory';
+			            yourself.
+		self post: '/changes' with: remotion ]
+]
+
+{ #category : #'changes endpoints' }
 WebsideAPITest >> testRemoveClass [
 
 	| definition remotion class |
@@ -1409,9 +1464,9 @@ WebsideAPITest >> testRenameClass [
 	| definition renaming class remotion |
 	definition := NeoJSONObject new
 		              at: 'type' put: 'AddClass';
-		              at: 'className' put: 'TestClassRename';
+		              at: 'className' put: 'TestRenameClass';
 		              definition: 'Object
-	subclass: #TestClassRename
+	subclass: #TestRenameClass
 	instanceVariableNames: ''''
 	classVariableNames: ''''
 	package: ''Unclassified''';
@@ -1419,21 +1474,20 @@ WebsideAPITest >> testRenameClass [
 		              yourself.
 	renaming := NeoJSONObject new
 		            at: 'type' put: 'RenameClass';
-		            at: 'className' put: 'TestClassRename';
-		            at: 'newName' put: 'TestClassRename2';
+		            at: 'className' put: 'TestRenameClass';
+		            at: 'newName' put: 'TestRenameClass22';
 		            yourself.
 	[
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: renaming.
-	class := self get: '/classes/TestClassRename'.
+	class := self get: '/classes/TestRenameClass'.
 	self assert: class isNil.
-	class := self get: '/classes/TestClassRename2'.
+	class := self get: '/classes/TestRenameClass22'.
 	self assert: class notNil ] ensure: [
-
 		remotion := NeoJSONObject new
 			            at: 'type' put: 'RemoveClass';
-			            at: 'className' put: 'TestClassRename2';
+			            at: 'className' put: 'TestRenameClass22';
 			            yourself.
 		self post: '/changes' with: remotion ]
 ]

@@ -38,6 +38,12 @@ CmdCommand >> fromWebsideJson: json [
 ]
 
 { #category : #'*Webside' }
+CmdCommand >> websideExecute: ensure [
+
+	^ self execute
+]
+
+{ #category : #'*Webside' }
 CmdCommand class >> websideType [
 
 	^ ((self name withoutPrefix: 'Cly') withoutPrefix: 'Syc') withoutSuffix: 'Command'
