@@ -763,9 +763,22 @@ WebsideAPI >> extensions [
 		  add: (self newJsonObject
 				   at: 'extensionType' put: 'change';
 				   at: 'elementType' put: 'variable';
-				   at: 'label' put: 'Create accessors';
+				   at: 'label' put: 'Generate accessors';
 				   at: 'properties' put: (self newJsonObject
 						    at: 'type' put: 'CreateAccessorsForVariableTransformation';
+						    at: 'className' put: '{element.class}';
+						    at: 'variable' put: '{element.name}';
+						    at: 'variableType' put: '{element.type}';
+						    yourself);
+				   at: 'section' put: 'Refactorings';
+				   yourself);
+		  add: (self newJsonObject
+				   at: 'extensionType' put: 'change';
+				   at: 'elementType' put: 'variable';
+				   at: 'label' put: 'Generate lazy accessors';
+				   at: 'properties' put: (self newJsonObject
+						    at: 'type'
+						    put: 'CreateLazyAccessorsForVariableTransformation';
 						    at: 'className' put: '{element.class}';
 						    at: 'variable' put: '{element.name}';
 						    at: 'variableType' put: '{element.type}';
