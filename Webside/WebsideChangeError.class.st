@@ -39,6 +39,7 @@ WebsideChangeError >> asWebsideJson [
 	json := error
 		        ifNil: [ super asWebsideJson ]
 		        ifNotNil: [ error asWebsideJson ].
+	error ifNil: [ json at: 'description' put: messageText ].
 	suggestions isEmpty ifTrue: [ ^ json ].
 	todo := suggestions associations collect: [ :a |
 		        NeoJSONObject
@@ -51,8 +52,7 @@ WebsideChangeError >> asWebsideJson [
 { #category : #accessing }
 WebsideChangeError >> from: originalChange [
 
-	change := originalChange.
-
+	change := originalChange
 ]
 
 { #category : #initialization }

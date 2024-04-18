@@ -11,6 +11,7 @@ RBRemoveProtocolChange >> websideExecute [
 	changes := OrderedCollection withAll: remotions.
 	changes add: self.
 	(WebsideChangeError from: self)
+		messageText: 'Remove category';
 		suggest:
 			'Category is not empty. Do you want to remove all its methods?'
 		withChanges: changes;
