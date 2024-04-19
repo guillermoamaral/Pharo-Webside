@@ -28,3 +28,26 @@ SycMoveMethodsToPackageCommand >> fromWebsideJson: json [
 		at: 'package'
 		ifPresent: [ :p | package := environment packageNamed: p ]
 ]
+
+{ #category : #'*Webside' }
+SycMoveMethodsToPackageCommand class >> websideExtension [
+
+	^ NeoJSONObject new
+		  at: 'extensionType' put: 'change';
+		  at: 'elementType' put: 'method';
+		  at: 'label' put: 'Move to package';
+		  at: 'properties' put: (NeoJSONObject new
+				   at: 'type' put: self websideType;
+				   at: 'className' put: '{element.methodClass}';
+				   at: 'selector' put: '{element.selector}';
+				   at: 'package' put: '{parameters.package}';
+				   yourself);
+		  at: 'parameters' put: { (NeoJSONObject new
+			   at: 'name' put: 'package';
+			   at: 'label' put: 'Target pacakge';
+			   at: 'type' put: 'text';
+			   at: 'options' put: '{packages}';
+			   yourself) };
+		  at: 'section' put: 'Refactorings';
+		  yourself
+]

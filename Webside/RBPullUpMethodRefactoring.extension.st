@@ -18,3 +18,19 @@ RBPullUpMethodRefactoring >> fromWebsideJson: json [
 	json at: 'selector' ifPresent: [ :s | selectors := { s asSymbol } ].
 	self pullUp:  selectors from: class  to: class superclass 
 ]
+
+{ #category : #'*Webside' }
+RBPullUpMethodRefactoring class >> websideExtension [
+
+	^ NeoJSONObject new
+		  at: 'extensionType' put: 'change';
+		  at: 'elementType' put: 'method';
+		  at: 'label' put: 'Push up';
+		  at: 'properties' put: (NeoJSONObject new
+				   at: 'type' put: self websideType;
+				   at: 'className' put: '{element.methodClass}';
+				   at: 'selector' put: '{element.selector}';
+				   yourself);
+		  at: 'section' put: 'Refactorings';
+		  yourself
+]

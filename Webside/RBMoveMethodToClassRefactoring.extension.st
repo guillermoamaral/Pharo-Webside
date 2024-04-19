@@ -25,3 +25,26 @@ RBMoveMethodToClassRefactoring >> fromWebsideJson: json [
 				ifPresent: [ :s |
 					method := c realClass compiledMethodAt: s asSymbol ] ]
 ]
+
+{ #category : #'*Webside' }
+RBMoveMethodToClassRefactoring class >> websideExtension [
+
+	^ NeoJSONObject new
+		  at: 'extensionType' put: 'change';
+		  at: 'elementType' put: 'method';
+		  at: 'label' put: 'Move to another class';
+		  at: 'properties' put: (NeoJSONObject new
+				   at: 'type' put: self websideType;
+				   at: 'className' put: '{element.methodClass}';
+				   at: 'selector' put: '{element.selector}';
+				   at: 'newName' put: '{parameters.newName}';
+				   yourself);
+		  at: 'parameters' put: { (NeoJSONObject new
+			   at: 'name' put: 'newName';
+			   at: 'label' put: 'Target class name';
+			   at: 'type' put: 'text';
+			   at: 'options' put: '{classes}';
+			   yourself) };
+		  at: 'section' put: 'Refactorings';
+		  yourself
+]

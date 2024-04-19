@@ -23,3 +23,25 @@ ClyMoveClassToGroupCommand >> fromWebsideJson: json [
 		at: 'package'
 		ifPresent: [ :p | classGroup := environment packageNamed: p ]
 ]
+
+{ #category : #'*Webside' }
+ClyMoveClassToGroupCommand class >> websideExtension [
+
+	^ NeoJSONObject new
+		  at: 'extensionType' put: 'change';
+		  at: 'elementType' put: 'class';
+		  at: 'label' put: 'Move to package';
+		  at: 'properties' put: (NeoJSONObject new
+				   at: 'type' put: self websideType;
+				   at: 'className' put: '{element.name}';
+				   at: 'package' put: '{parameters.package}';
+				   yourself);
+		  at: 'parameters' put: { (NeoJSONObject new
+			   at: 'name' put: 'package';
+			   at: 'label' put: 'Target package';
+			   at: 'type' put: 'text';
+			   at: 'options' put: '{packages}';
+			   yourself) };
+		  at: 'section' put: 'Refactorings';
+		  yourself
+]
