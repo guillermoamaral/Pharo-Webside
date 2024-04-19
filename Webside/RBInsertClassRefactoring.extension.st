@@ -14,6 +14,7 @@ RBInsertClassRefactoring >> asWebsideJson [
 RBInsertClassRefactoring >> fromWebsideJson: json [
 
 	| target |
+	super fromWebsideJson: json.
 	comment := ''.
 	className := json at: 'newName' ifAbsent: nil.
 	json at: 'className' ifPresent: [ :name |

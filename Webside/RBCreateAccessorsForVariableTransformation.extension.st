@@ -31,6 +31,5 @@ RBCreateAccessorsForVariableTransformation class >> websideExtension [
 				   at: 'variable' put: '{element.name}';
 				   at: 'variableType' put: '{element.type}';
 				   yourself);
-		  at: 'section' put: 'Refactorings';
 		  yourself
 ]
