@@ -1,7 +1,7 @@
 Class {
 	#name : #WebsideChangeConfirmation,
 	#superclass : #WebsideChangeError,
-	#category : #Webside
+	#category : #'Webside-Base'
 }
 
 { #category : #'as yet unclassified' }

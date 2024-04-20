@@ -1,7 +1,7 @@
 Class {
 	#name : #WebsideCompilationError,
 	#superclass : #WebsideChangeError,
-	#category : #Webside
+	#category : #'Webside-Base'
 }
 
 { #category : #testing }
