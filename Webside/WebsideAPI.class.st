@@ -994,12 +994,19 @@ RPackageOrganizer default packageNamed: aString ifAbsent: nil
 
 { #category : #'code endpoints' }
 WebsideAPI >> packages [
-	|  packages names |
+
+	| packages names tree |
 	packages := RPackageOrganizer default packages.
 	names := self queryAt: 'names'.
-	names = 'true'
-    ifTrue: [ ^ (packages collect: [:p | p name]) sort ].
-    ^ packages collect: [:p | p asWebsideJson]
+	names = 'true' ifTrue: [ ^ (packages collect: [ :p | p name ]) sort ].
+	tree := self queryAt: 'tree'.
+	tree = 'true' ifTrue: [
+		^ (packages collect: [ :p |
+			   self newJsonObject
+				   at: 'name' put: p name;
+				   at: 'categories' put: (p classTags collect: #name);
+				   yourself ]) sort: #name ascending ].
+	^ packages collect: [ :p | p asWebsideJson ]
 ]
 
 { #category : #'objects endpoints' }
