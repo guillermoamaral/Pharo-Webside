@@ -222,10 +222,11 @@ WebsideAPI >> changes [
 
 { #category : #'code endpoints' }
 WebsideAPI >> classDefinition [
+
 	| class |
 	class := self requestedClass.
-	class ifNil: [^self notFound].
-	^class asWebsideJson
+	class ifNil: [ ^ self notFound ].
+	^ class asWebsideJson
 ]
 
 { #category : #private }
@@ -328,17 +329,19 @@ WebsideAPI >> classes [
 
 	| root tree classes names depth json |
 	root := self queryAt: 'root'.
-	root := root ifNil: [self defaultRootClass] ifNotNil: [ self classNamed: root ].
+	root := root
+		        ifNil: [ self defaultRootClass ]
+		        ifNotNil: [ self classNamed: root ].
 	root ifNil: [ ^ self notFound ].
 	tree := self queryAt: 'tree'.
-	tree = 'true' ifTrue: [ 
+	tree = 'true' ifTrue: [
 		depth := self queryAt: 'depth' ifPresent: [ :d | d asInteger ].
 		json := self classTreeFrom: root depth: depth.
 		^ Array with: json ].
-	classes := root withAllSubclasses reject: [:c | c isMeta ].
+	classes := root withAllSubclasses reject: [ :c | c isMeta ].
 	names := self queryAt: 'names'.
-    names = 'true' ifTrue: [ ^ (classes collect: [:c | c name ]) sort].
-    ^ classes collect: [:c | c asWebsideJson]
+	names = 'true' ifTrue: [ ^ (classes collect: [ :c | c name ]) sort ].
+	^ classes collect: [ :c | c asWebsideJson ]
 ]
 
 { #category : #'general endpoints' }
@@ -957,24 +960,26 @@ WebsideAPI >> package [
 { #category : #'code endpoints' }
 WebsideAPI >> packageClasses [
 
-	| package defined extended extensions tree names instance |
+	| package classes extended instance extensions category tree names |
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
-	defined := OrderedCollection withAll: package definedClasses.
+	classes := OrderedCollection withAll: package definedClasses.
 	extended := self queryAt: 'extended'.
 	extensions := extended = 'true'
-		              ifTrue: [ 
-						instance := package extendedClasses collect:  [ :c | c instanceSide  ].
-		              (OrderedCollection withAll: instance) removeDuplicates  ]
+		              ifTrue: [
+			              instance := package extendedClasses collect: [ :c |
+				                          c instanceSide ].
+			              (OrderedCollection withAll: instance)
+				              removeDuplicates ]
 		              ifFalse: [ #(  ) ].
+	classes addAll: extensions.
+	category := self queryAt: 'category'.
+	category ifNotNil: [ classes := classes select: [ :c | c tags notEmpty and: [c tags first asString = category ]]].
 	tree := self queryAt: 'tree'.
-	tree = 'true' ifTrue: [ 
-		^ (self classTreeFromClasses: defined)
-		  , (self classTreeFromClasses: extensions) ].
+	tree = 'true' ifTrue: [ ^ self classTreeFromClasses: classes ].
 	names := self queryAt: 'names'.
-	names = 'true' ifTrue: [ 
-    ^ (defined , extensions collect: [:c | c name]) sort ].
-    ^ defined , extensions collect: [:c | c asWebsideJson]
+	names = 'true' ifTrue: [ ^ (classes collect: [ :c | c name ]) sort ].
+	^ classes collect: [ :c | c asWebsideJson ]
 ]
 
 { #category : #'code endpoints' }
@@ -998,15 +1003,16 @@ WebsideAPI >> packages [
 	| packages names tree |
 	packages := RPackageOrganizer default packages.
 	names := self queryAt: 'names'.
-	names = 'true' ifTrue: [ ^ (packages collect: [ :p | p name ]) sort ].
+	names = 'true' ifTrue: [ ^ (packages collect: [ :p | p name ])  ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
 		^ (packages collect: [ :p |
 			   self newJsonObject
 				   at: 'name' put: p name;
 				   at: 'categories' put: (p classTags collect: #name);
-				   yourself ]) sort: #name ascending ].
+				   yourself ])  ].
 	^ packages collect: [ :p | p asWebsideJson ]
+
 ]
 
 { #category : #'objects endpoints' }
