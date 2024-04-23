@@ -960,21 +960,22 @@ WebsideAPI >> package [
 { #category : #'code endpoints' }
 WebsideAPI >> packageClasses [
 
-	| package classes extended instance extensions category tree names |
+	| package category classes extended instance tree names |
 	package := self requestedPackage.
 	package ifNil: [ ^ self notFound ].
-	classes := OrderedCollection withAll: package definedClasses.
-	extended := self queryAt: 'extended'.
-	extensions := extended = 'true'
-		              ifTrue: [
-			              instance := package extendedClasses collect: [ :c |
-				                          c instanceSide ].
-			              (OrderedCollection withAll: instance)
-				              removeDuplicates ]
-		              ifFalse: [ #(  ) ].
-	classes addAll: extensions.
 	category := self queryAt: 'category'.
-	category ifNotNil: [ classes := classes select: [ :c | c tags notEmpty and: [c tags first asString = category ]]].
+	classes := OrderedCollection new.
+	category ~= 'Extensions' ifTrue: [
+		classes addAll: package definedClasses ].
+	extended := self queryAt: 'extended'.
+	(category = 'Extensions' or: [
+		 extended = 'true' and: [ category isNil ] ]) ifTrue: [
+		instance := package extendedClasses collect: [ :c | c instanceSide ].
+		classes addAll:
+			(OrderedCollection withAll: instance) removeDuplicates ].
+	(category notNil and: [ category ~= 'Extensions' ]) ifTrue: [
+		classes := classes select: [ :c |
+			           c tags notEmpty and: [ c tags first asString = category ] ] ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [ ^ self classTreeFromClasses: classes ].
 	names := self queryAt: 'names'.
@@ -1003,16 +1004,15 @@ WebsideAPI >> packages [
 	| packages names tree |
 	packages := RPackageOrganizer default packages.
 	names := self queryAt: 'names'.
-	names = 'true' ifTrue: [ ^ (packages collect: [ :p | p name ])  ].
+	names = 'true' ifTrue: [ ^ packages collect: [ :p | p name ] ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
-		^ (packages collect: [ :p |
-			   self newJsonObject
-				   at: 'name' put: p name;
-				   at: 'categories' put: (p classTags collect: #name);
-				   yourself ])  ].
+		^ packages collect: [ :p |
+			  self newJsonObject
+				  at: 'name' put: p name;
+				  at: 'categories' put: p tagsForClasses;
+				  yourself ] ].
 	^ packages collect: [ :p | p asWebsideJson ]
-
 ]
 
 { #category : #'objects endpoints' }

@@ -981,7 +981,7 @@ WebsideAPITest >> testPackage [
 { #category : #'code endpoints' }
 WebsideAPITest >> testPackageClasses [
 
-	| classes |
+	| classes webside expected retrieved |
 	classes := self get: 'packages/Webside/classes'.
 	self
 		assert: (classes anySatisfy: [ :c | (c at: 'name') = 'WebsideAPI' ]);
@@ -989,7 +989,13 @@ WebsideAPITest >> testPackageClasses [
 	classes := self get: 'packages/Webside/classes?extended=true'.
 	self assert: (classes anySatisfy: [ :c | (c at: 'name') = 'Object' ]).
 	classes := self get: 'packages/Webside/classes?category=Base'.
-	self assert: (classes allSatisfy: [ :c | (c at: 'category') = 'Base' ]).
+	self assert:
+		(classes allSatisfy: [ :c | (c at: 'category') = 'Base' ]).
+	classes := self get: 'packages/Webside/classes?category=Extensions'.
+	webside := RPackageOrganizer default packageNamed: 'Webside'.
+	expected := webside extendedClassNames.
+	retrieved := classes collect: [ :c | c at: 'name' ].
+	self assertCollection: retrieved hasSameElements: expected
 ]
 
 { #category : #'code endpoints' }
