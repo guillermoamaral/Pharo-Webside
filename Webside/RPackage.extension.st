@@ -9,8 +9,15 @@ RPackage >> asWebsideJson [
 		methods at: c asString put: m ].
 	metaclassExtensionSelectors keysAndValuesDo: [ :c :m |
 		methods at: c asString , ' class' put: m ].
-	categories := self classTags reject: #isRoot thenCollect: #name.
-	(classExtensionSelectors notEmpty or: [metaclassExtensionSelectors notEmpty]) ifTrue: [ categories := categories , { 'Extensions' } ].
+	categories := self tagsForClasses.
+	(classExtensionSelectors notEmpty or: [
+		 metaclassExtensionSelectors notEmpty ]) ifTrue: [
+		categories := categories , { 'Extensions' } ].
+	categories := categories collect: [ :c |
+		              NeoJSONObject new
+			              at: 'name' put: c;
+			              at: 'package' put: name;
+			              yourself ].
 	^ super asWebsideJson
 		  at: 'name' put: name;
 		  at: 'classes' put: self definedClassNames;

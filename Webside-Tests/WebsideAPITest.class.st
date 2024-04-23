@@ -970,12 +970,14 @@ WebsideAPITest >> testObjectSlotContext [
 
 { #category : #'code endpoints' }
 WebsideAPITest >> testPackage [
+
 	| package |
 	package := self get: 'packages/Webside'.
 	self
 		assert: package notNil;
 		assert: (package at: 'classes') notEmpty;
-		assert: (package at: 'methods') notEmpty
+		assert: (package at: 'methods') notEmpty;
+		assert: (package at: 'categories') notEmpty; assert: ((package at: 'categories') allSatisfy: [ :c | (c includesKey: 'name') and: [ (c at: 'package' ifAbsent: [ '' ]) = 'Webside' ] ])
 ]
 
 { #category : #'code endpoints' }

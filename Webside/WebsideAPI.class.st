@@ -1001,16 +1001,21 @@ RPackageOrganizer default packageNamed: aString ifAbsent: nil
 { #category : #'code endpoints' }
 WebsideAPI >> packages [
 
-	| packages names tree |
+	| packages names tree categories |
 	packages := RPackageOrganizer default packages.
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [ ^ packages collect: [ :p | p name ] ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
 		^ packages collect: [ :p |
+				categories := p tagsForClasses collect: [ :c |
+		              NeoJSONObject new
+			              at: 'name' put: c;
+			              at: 'package' put: p name;
+			              yourself ].
 			  self newJsonObject
 				  at: 'name' put: p name;
-				  at: 'categories' put: p tagsForClasses;
+				  at: 'categories' put: categories;
 				  yourself ] ].
 	^ packages collect: [ :p | p asWebsideJson ]
 ]
