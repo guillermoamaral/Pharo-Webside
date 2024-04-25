@@ -185,10 +185,11 @@ WebsideAPI >> cancelEvaluation [
 
 { #category : #'code endpoints' }
 WebsideAPI >> categories [
+
 	| class |
 	class := self requestedClass.
-	class ifNil: [^self notFound].
-	^class protocols
+	class ifNil: [ ^ self notFound ].
+	^ class protocols
 ]
 
 { #category : #private }

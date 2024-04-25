@@ -2,11 +2,11 @@ Extension { #name : #ClyMoveClassToGroupCommand }
 
 { #category : #'*Webside' }
 ClyMoveClassToGroupCommand >> asWebsideJson [
-  "Used on just one class from Webside"
+	"Used on just one class from Webside"
 
 	^ super asWebsideJson
 		  at: 'className' put: classes first name;
-          at: 'package' put: classGroup name;
+		  at: 'package' put: classGroup name;
 		  yourself
 ]
 
@@ -17,8 +17,9 @@ ClyMoveClassToGroupCommand >> fromWebsideJson: json [
 	| environment |
 	super fromWebsideJson: json.
 	environment := ClySystemEnvironment currentImage.
-	json at: 'className' ifPresent: [ :c |
-		classes := { environment classNamed: c } ].
+	json
+		at: 'className'
+		ifPresent: [ :c | classes := { (environment classNamed: c) } ].
 	json
 		at: 'package'
 		ifPresent: [ :p | classGroup := environment packageNamed: p ]
