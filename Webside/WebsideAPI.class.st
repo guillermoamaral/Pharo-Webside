@@ -662,7 +662,7 @@ WebsideAPI >> extensions [
   For more information, check API documentation at https://github.com/guillermoamaral/Webside."
 
 	^ RBRefactoryChange allSubclasses , RBRefactoring allSubclasses
-	  , CmdCommand allSubclasses
+	  , CmdCommand allSubclasses , RBTransformation allSubclasses
 		  select: [ :c | c respondsTo: #websideExtension ]
 		  thenCollect: [ :c | c websideExtension ]
 ]
@@ -1211,6 +1211,7 @@ WebsideAPI >> requestedChange [
 	change := RBRefactoryChange fromWebsideJson: json.
 	change ifNil: [ change := RBRefactoring fromWebsideJson: json ].
 	change ifNil: [ change := CmdCommand fromWebsideJson: json ].
+	change ifNil: [ change := RBTransformation fromWebsideJson: json ].
 	^ change
 ]
 
