@@ -75,8 +75,10 @@ WebsideEvaluation >> id: idd [
 
 { #category : #initialization }
 WebsideEvaluation >> initialize [
+
 	super initialize.
-	id := UUID new
+	id := UUID new.
+	state := #pending
 ]
 
 { #category : #testing }

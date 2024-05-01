@@ -47,12 +47,17 @@ WebsideAPI >> activeDebuggers [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluation [
-	| id evaluation |
-	id := self requestedId .
-	evaluation := self evaluations at: id ifAbsent: [^self notFound].
-	^self newJsonObject
-				at: 'id' put: id asString;
-				yourself 
+
+	| id evaluation object state |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [  ].
+	object := self objects at: id ifAbsent: [  ].
+	(evaluation isNil and: [ object isNil ]) ifTrue: [ ^ self notFound ].
+	state := evaluation ifNil: [ 'finished' ] ifNotNil: [ 'pending' ].
+	^ self newJsonObject
+		  at: 'id' put: id asString;
+		  at: 'state' put: state;
+		  yourself
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -606,7 +611,7 @@ WebsideAPI >> evaluateExpression [
 	id := self newID.
 	semaphore := Semaphore new.
 	block := [
-	         [ object :=  self compiler evaluate: expression ]
+	         [ object := self compiler evaluate: expression ]
 		         on: Exception
 		         do: [ :exception |
 			         semaphore signal.
@@ -630,6 +635,7 @@ WebsideAPI >> evaluateExpression [
 	^ self newJsonObject
 		  at: 'id' put: id asString;
 		  at: 'expression' put: expression;
+		  at: 'state' put: 'pending';
 		  yourself
 ]
 

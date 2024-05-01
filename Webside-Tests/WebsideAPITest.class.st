@@ -278,40 +278,42 @@ WebsideAPITest >> testAst [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testAsynchronousEvaluation [
-	| evaluation result id |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + 4';
-		at: 'sync' put: false;
-		yourself.
-	result := self post: '/evaluations' with: evaluation.
-	[ | attempts object |
-	id := result at: 'id'.
-	self
-		assert: (result includesKey: 'id');
-		deny: (result at: 'printString' ifAbsent: '') equals: '7'.
+
+	| payload evaluation id attempts object |
+	payload := NeoJSONObject new
+		           at: 'expression' put: '3 + 4';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	[
 	attempts := 0.
-	object := nil.
-	[ attempts <= 3 and: [ object isNil ] ]
-		whileTrue: [ attempts := attempts + 1.
-			(Delay forMilliseconds: 200) wait.
-			object := self get: '/objects/' , id asString ].
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') = 'pending' ] ] whileTrue: [
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'finished'.
+	object := self get: '/objects/' , id.
 	self
 		assert: object notNil;
 		assert: (object at: 'id') equals: id;
 		assert: (object at: 'class') equals: 'SmallInteger';
-		assert: (object at: 'printString') equals: '7' ]
-		ensure: [ self delete: '/objects/' , id asString ]
+		assert: (object at: 'printString') equals: '7' ] ensure: [
+		self delete: '/objects/' , id asString ]
 ]
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testCancelEvaluation [
-	| evaluation result id active |
-	evaluation := NeoJSONObject new
+	| payload evaluation id active |
+	payload := NeoJSONObject new
 		at: 'expression' put: 'Delay wait: 10000';
 		at: 'sync' put: false;
 		yourself.
-	result := self post: '/evaluations' with: evaluation.
-	id := result at: 'id'.
+	evaluation := self post: '/evaluations' with: payload.
+	id := evaluation at: 'id'.
 	self delete: '/evaluations/' , id asString.
 	active := self get: '/evaluations'.
 	self assert: (active noneSatisfy: [ :e | (e at: 'id') = id ])
