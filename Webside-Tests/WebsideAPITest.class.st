@@ -373,6 +373,24 @@ WebsideAPITest >> testClassDefinition [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testClassFileOut [
+
+	| fileout |
+	fileout := self get: 'classes/Point/fileout'.
+	self
+		assert: (fileout includesSubstring: 'Object subclass: #Point
+	instanceVariableNames: ''x y''
+	classVariableNames: ''''
+	package: ''Kernel-BasicObjects''!');
+		assert:
+			(fileout includesSubstring: 'x
+	"Answer the x coordinate."
+	"(100@200) x >>> 100"
+
+	^ x! !')
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testClassVariables [
 	| variables |
 	variables := self get: 'classes/Float/class-variables'.
@@ -790,6 +808,21 @@ WebsideAPITest >> testMethodCount [
 	methods := self get: 'classes/Point/methods'.
 	count := self get: 'classes/Point/methods?count=true'.
 	self assert: count equals: methods size
+]
+
+{ #category : #'code endpoints' }
+WebsideAPITest >> testMethodFileOut [
+
+	| fileout |
+	fileout := self get: 'classes/Point/methods/x/fileout'.
+	self
+		assert: (fileout
+		includesSubstring:  '!Point methodsFor: ''accessing''!
+x
+	"Answer the x coordinate."
+	"(100@200) x >>> 100"
+
+	^ x! !')
 ]
 
 { #category : #'code endpoints' }

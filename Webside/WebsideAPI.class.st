@@ -235,6 +235,15 @@ WebsideAPI >> classDefinition [
 	^ class asWebsideJson
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> classFileOut [
+
+	| class |
+	class := self requestedClass.
+	class ifNil: [ ^ self notFound ].
+	^String streamContents: [ :s | class fileOutOn: s ]
+]
+
 { #category : #private }
 WebsideAPI >> classNamed: aString [
 	| name metaclass class |
@@ -667,10 +676,34 @@ WebsideAPI >> extensions [
 	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
   For more information, check API documentation at https://github.com/guillermoamaral/Webside."
 
-	^ RBRefactoryChange allSubclasses , RBRefactoring allSubclasses
-	  , CmdCommand allSubclasses , RBTransformation allSubclasses
-		  select: [ :c | c respondsTo: #websideExtension ]
-		  thenCollect: [ :c | c websideExtension ]
+	| change download |
+	change := RBRefactoryChange allSubclasses
+	          , RBRefactoring allSubclasses , CmdCommand allSubclasses
+	          , RBTransformation allSubclasses
+		          select: [ :c | c respondsTo: #websideExtension ]
+		          thenCollect: [ :c | c websideExtension ].
+
+	download := OrderedCollection new.
+	download
+		add: (self newJsonObject
+				 at: 'extensionType' put: 'download';
+				 at: 'elementType' put: 'method';
+				 at: 'label' put: 'File Out';
+				 at: 'get'
+				 put:
+					 '/classes/{element.methodClass}/methods/{element.selector}/fileout';
+				 at: 'defaultFilename' put: '{element.selector}.st';
+				 at: 'section' put: 'Extra';
+				 yourself);
+		add: (self newJsonObject
+				 at: 'extensionType' put: 'download';
+				 at: 'elementType' put: 'class';
+				 at: 'label' put: 'File Out';
+				 at: 'get' put: '/classes/{element.name}/fileout';
+				 at: 'defaultFilename' put: '{element.name}.st';
+				 at: 'section' put: 'Extra';
+				 yourself).
+	^ change , download
 ]
 
 { #category : #private }
@@ -839,6 +872,18 @@ WebsideAPI >> method [
 		ifFalse: [ ^ self notFound ].
 	json := self jsonFromMethods: {class >> selector}.
 	^ json first
+]
+
+{ #category : #'code endpoints' }
+WebsideAPI >> methodFileOut [
+
+	| class selector |
+	class := self requestedClass.
+	class ifNil: [ ^ self notFound ].
+	selector := self requestedSelector.
+	selector ifNil: [ ^ self notFound ].
+	(class includesSelector: selector) ifFalse: [ ^ self notFound ].
+	^String streamContents: [:s | class fileOutMethod: selector on: s].
 ]
 
 { #category : #'code endpoints' }
