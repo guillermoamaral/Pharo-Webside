@@ -285,7 +285,9 @@ WebsideAPITest >> testAsynchronousEvaluation [
 		           at: 'sync' put: false;
 		           yourself.
 	evaluation := self post: '/evaluations' with: payload.
-	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	self
+		assert: client response code equals: 201;
+		assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
 	id := evaluation at: 'id'.
 	[
 	attempts := 0.

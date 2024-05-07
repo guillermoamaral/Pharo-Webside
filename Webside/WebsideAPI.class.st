@@ -445,6 +445,15 @@ WebsideAPI >> createWorkspace [
 ]
 
 { #category : #private }
+WebsideAPI >> created: aNeoJSONObject [
+	| string |
+	string := (NeoJSONWriter toString: aNeoJSONObject) .
+	^ (ZnResponse statusLine: ZnStatusLine created)
+		  entity: (ZnEntity json: string);
+		  yourself
+]
+
+{ #category : #private }
 WebsideAPI >> customPresentationsOf: anObject [
 	^anObject websidePresentations
 ]
@@ -641,11 +650,12 @@ WebsideAPI >> evaluateExpression [
 		json := object asWebsideJson.
 		pin ifTrue: [ json at: 'id' put: id asString ].
 		^ json ].
-	^ self newJsonObject
-		  at: 'id' put: id asString;
-		  at: 'expression' put: expression;
-		  at: 'state' put: 'pending';
-		  yourself
+	json := self newJsonObject
+		        at: 'id' put: id asString;
+		        at: 'expression' put: expression;
+		        at: 'state' put: 'pending';
+		        yourself.
+	^ self created: json
 ]
 
 { #category : #private }
