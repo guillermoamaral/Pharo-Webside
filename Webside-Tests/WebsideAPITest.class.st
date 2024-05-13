@@ -30,6 +30,11 @@ WebsideAPITest >> get: uri [
 ]
 
 { #category : #private }
+WebsideAPITest >> newJsonObject [ 
+	^NeoJSONObject new
+]
+
+{ #category : #private }
 WebsideAPITest >> post: uri [
 	^ self post: uri with: ''
 ]
@@ -79,19 +84,21 @@ WebsideAPITest >> testAccessors [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testActiveEvaluations [
+
 	| evaluation result id |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '(Delay forSeconds: 1) wait';
-		at: 'sync' put: false;
-		yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: '(Delay forSeconds: 1) wait';
+		              at: 'sync' put: false;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
-	[ | active |
+	[
+	| active |
 	id := result at: 'id'.
 	active := self get: '/evaluations'.
 	self
 		assert: active notEmpty;
-		assert: (active anySatisfy: [ :e | (e at: 'id') = id ]) ]
-		ensure: [ self delete: '/evaluations/' , id asString ]
+		assert: (active anySatisfy: [ :e | (e at: 'id') = id ]) ] ensure: [
+		self delete: '/evaluations/' , id asString ]
 ]
 
 { #category : #'changes endpoints' }
@@ -280,7 +287,7 @@ WebsideAPITest >> testAst [
 WebsideAPITest >> testAsynchronousEvaluation [
 
 	| payload evaluation id attempts object |
-	payload := NeoJSONObject new
+	payload := self newJsonObject
 		           at: 'expression' put: '3 + 4';
 		           at: 'sync' put: false;
 		           yourself.
@@ -291,9 +298,11 @@ WebsideAPITest >> testAsynchronousEvaluation [
 	id := evaluation at: 'id'.
 	[
 	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
 	[
 	attempts <= 3 and: [
-		(evaluation at: 'state' ifAbsent: '') = 'pending' ] ] whileTrue: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'finished' ] ] whileTrue: [
+		self assert: (evaluation at: 'state') equals: 'evaluating'.
 		attempts := attempts + 1.
 		(Delay forMilliseconds: 200) wait.
 		evaluation := self get: '/evaluations/' , id ].
@@ -304,19 +313,57 @@ WebsideAPITest >> testAsynchronousEvaluation [
 		assert: (object at: 'id') equals: id;
 		assert: (object at: 'class') equals: 'SmallInteger';
 		assert: (object at: 'printString') equals: '7' ] ensure: [
-		self delete: '/objects/' , id asString ]
+		[ self delete: '/objects/' , id ]
+			on: Error
+			do: [  ] ]
 ]
 
 { #category : #'evaluation  endpoints' }
-WebsideAPITest >> testCancelEvaluation [
+WebsideAPITest >> testAsynchronousEvaluationError [
+
+	| payload evaluation id attempts description |
+	payload := self newJsonObject 
+		           at: 'expression' put: '3 + ';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self
+		assert: client response code equals: 201;
+		assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'failed' ] ] whileTrue: [
+		self assert: (evaluation at: 'state') equals: 'evaluating'.
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/evaluations/' , id ].
+	self
+		assert: (evaluation at: 'state') equals: 'failed';
+		assert: (evaluation includesKey: 'error').
+	description := (evaluation at: 'error')
+		               at: 'description'
+		               ifPresent: [ :d | d asLowercase ]
+		               ifAbsent: [  ].
+	self assert: (description includesSubstring: 'primary missing')
+		| (description includesSubstring: 'variable or expression expected') ]
+		ensure: [ self delete: '/evaluations/' , id ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testCancelAsynchronousEvaluation [
+
 	| payload evaluation id active |
-	payload := NeoJSONObject new
-		at: 'expression' put: 'Delay wait: 10000';
-		at: 'sync' put: false;
-		yourself.
+	payload := self newJsonObject 
+		           at: 'expression' put: '(Delay forSeconds: 10) wait';
+		           at: 'sync' put: false;
+		           yourself.
 	evaluation := self post: '/evaluations' with: payload.
 	id := evaluation at: 'id'.
-	self delete: '/evaluations/' , id asString.
+	self delete: '/evaluations/' , id.
 	active := self get: '/evaluations'.
 	self assert: (active noneSatisfy: [ :e | (e at: 'id') = id ])
 ]
@@ -577,14 +624,15 @@ WebsideAPITest >> testCreateDebugger [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testDebuggerContext [
+
 	| evaluation id debugger error |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 halt factorial';
-		at: 'sync' put: true;
-		yourself.
- 	[ self post: '/evaluations' with: evaluation ]
+	evaluation := self newJsonObject 
+		              at: 'expression' put: '3 halt factorial';
+		              at: 'sync' put: true;
+		              yourself.
+	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert:
@@ -592,28 +640,29 @@ WebsideAPITest >> testDebuggerContext [
 				assert: (error includesKey: 'evaluation').
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
-	[ | target context receiver |
-	target := NeoJSONObject new
-		at: 'evaluation' put: id;
-		yourself.
+	[
+	| target context receiver |
+	target := self newJsonObject 
+		          at: 'evaluation' put: id;
+		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	id := debugger at: 'id'.
 	self post: '/debuggers/' , id , '/frames/1/stepinto'.
-	context := NeoJSONObject new
-		at: 'debugger' put: id;
-		at: 'frame' put: 1;
-		yourself.
-	evaluation := NeoJSONObject new
-		at: 'expression' put: 'self';
-		at: 'sync' put: true;
-		at: 'pin' put: false;
-		at: 'context' put: context;
-		yourself.
+	context := self newJsonObject 
+		           at: 'debugger' put: id;
+		           at: 'frame' put: 1;
+		           yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: 'self';
+		              at: 'sync' put: true;
+		              at: 'pin' put: false;
+		              at: 'context' put: context;
+		              yourself.
 	receiver := self post: '/evaluations' with: evaluation.
 	self
 		assert: (receiver at: 'class') equals: 'SmallInteger';
-		assert: (receiver at: 'printString') equals: '3' ]
-		ensure: [ self delete: '/debuggers/' , id asString ]
+		assert: (receiver at: 'printString') equals: '3' ] ensure: [
+		self delete: '/debuggers/' , id asString ]
 ]
 
 { #category : #'debugging endpoints' }
@@ -652,23 +701,6 @@ WebsideAPITest >> testDialect [
 	| dialect |
 	dialect := self get: 'dialect'.
 	self assert: dialect equals: 'Pharo'
-]
-
-{ #category : #'evaluation  endpoints' }
-WebsideAPITest >> testEvaluationError [
-
-	| evaluation error description |
-	evaluation := NeoJSONObject new
-		              at: 'expression' put: '3 + '; 
-		              at: 'sync' put: true;
-		              yourself.
-	[ self post: '/evaluations' with: evaluation ]
-		on: Error
-		do: [ :e | error := NeoJSONObject fromString: client contents ].
-	self assert: error notNil.
-	description := (error at: 'description') asLowercase.
-	self assert: (description includesSubstring: 'primary missing')
-		| (description includesSubstring: 'variable or expression expected')
 ]
 
 { #category : #'debugging endpoints' }
@@ -955,54 +987,58 @@ WebsideAPITest >> testMoveUpInstanceVariable [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testObjectContext [
+
 	| evaluation object |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 @ 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: '3 @ 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	object := self post: '/evaluations' with: evaluation.
-	[ | context x |
-	context := NeoJSONObject new
-		at: 'object' put: (object at: 'id');
-		yourself.
-	evaluation := NeoJSONObject new
-		at: 'expression' put: 'x';
-		at: 'sync' put: true;
-		at: 'pin' put: false;
-		at: 'context' put: context;
-		yourself.
+	[
+	| context x |
+	context := self newJsonObject 
+		           at: 'object' put: (object at: 'id');
+		           yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: 'x';
+		              at: 'sync' put: true;
+		              at: 'pin' put: false;
+		              at: 'context' put: context;
+		              yourself.
 	x := self post: '/evaluations' with: evaluation.
 	self
 		assert: (x at: 'class') equals: 'SmallInteger';
-		assert: (x at: 'printString') equals: '3' ]
-		ensure: [ self delete: '/objects/' , (object at: 'id') asString ]
+		assert: (x at: 'printString') equals: '3' ] ensure: [
+		self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testObjectSlotContext [
+
 	| evaluation object |
-	evaluation := NeoJSONObject new 
-		at: 'expression' put: '3 @ 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: '3 @ 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	object := self post: '/evaluations' with: evaluation.
-	[| context x |
-		context := NeoJSONObject new
-			at: 'object' put: (object at: 'id') , '/x';
-			yourself.
-		evaluation := NeoJSONObject new
-			at: 'expression' put: 'self';
-			at: 'sync' put: true;
-			at: 'pin' put: false;
-			at: 'context' put: context;
-			yourself.
-		x := self post: '/evaluations' with: evaluation.
-		self
-			assert: (x at: 'class') = 'SmallInteger';
-			assert: (x at: 'printString') = '3']
-		ensure: [self delete: '/objects/' , (object at: 'id') asString]
+	[
+	| context x |
+	context := self newJsonObject 
+		           at: 'object' put: (object at: 'id') , '/x';
+		           yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: 'self';
+		              at: 'sync' put: true;
+		              at: 'pin' put: false;
+		              at: 'context' put: context;
+		              yourself.
+	x := self post: '/evaluations' with: evaluation.
+	self
+		assert: (x at: 'class') = 'SmallInteger';
+		assert: (x at: 'printString') = '3' ] ensure: [
+		self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
 { #category : #'code endpoints' }
@@ -1057,6 +1093,167 @@ WebsideAPITest >> testPackages [
 		detect: [ :p | p name = 'Webside' ]
 		ifNone: [ self assert: false ].
 	self assert: ((package at: 'classes') includes: 'WebsideAPI'); assert: ((package at: 'methods') includesKey: 'Object'); assert: (((package at: 'methods') at: 'Object') includes: 'asWebsideJson')
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testPauseAndDebugAsynchronousEvaluation [
+
+	| payload evaluation id attempts target debugger |
+	payload := self newJsonObject 
+		           at: 'expression' put: '(Delay forSeconds: 30) wait';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'evaluating' ] ]
+		whileTrue: [
+			attempts := attempts + 1.
+			(Delay forMilliseconds: 200) wait.
+			evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'evaluating'.
+	self post: '/evaluations/' , id , '/pause'.
+	evaluation := self get: '/evaluations/' , id.
+	self assert: (evaluation at: 'state') equals: 'paused'.
+	target := self newJsonObject 
+		          at: 'evaluation' put: id;
+		          yourself.
+	debugger := self post: '/debuggers' with: target.
+	self assert: debugger notNil ] ensure: [
+		debugger ifNotNil: [
+			self delete: '/debuggers/' , (debugger at: 'id') ].
+		[ self delete: '/objects/' , id ]
+			on: Error
+			do: [  ] ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testPauseAndResumeAsynchronousEvaluation [
+
+	| payload evaluation id attempts |
+	payload := self newJsonObject 
+		           at: 'expression' put: '(Delay forSeconds: 30) wait';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'evaluating' ] ]
+		whileTrue: [
+			attempts := attempts + 1.
+			(Delay forMilliseconds: 200) wait.
+			evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'evaluating'.
+	self post: '/evaluations/' , id , '/pause'.
+	evaluation := self get: '/evaluations/' , id.
+	self assert: (evaluation at: 'state') equals: 'paused'.
+	self post: '/evaluations/' , id , '/resume'.
+	attempts := 0.
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'finished' ] ] whileTrue: [
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'finished' ] ensure: [
+		[ self delete: '/objects/' , id ]
+			on: Error
+			do: [  ] ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testPauseDebugAndResumeAsynchronousEvaluation [
+
+	| payload evaluation id attempts target debugger |
+	payload := self newJsonObject 
+		           at: 'expression' put: '| m |
+							m := DateAndTime now minute + 3.
+							[DateAndTime now minute < m] whileTrue: [(Delay forSeconds: 1) wait]';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'evaluating' ] ]
+		whileTrue: [
+			attempts := attempts + 1.
+			(Delay forMilliseconds: 200) wait.
+			evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'evaluating'.
+	self post: '/evaluations/' , id , '/pause'.
+	evaluation := self get: '/evaluations/' , id.
+	self assert: (evaluation at: 'state') equals: 'paused'.
+	target := self newJsonObject 
+		          at: 'evaluation' put: id;
+		          yourself.
+	debugger := self post: '/debuggers' with: target.
+	self post: '/debuggers/' , (debugger at: 'id') , '/resume'.
+	evaluation := self get: '/evaluations/' , id.
+	self assert: (evaluation at: 'state') equals: 'evaluating' ] ensure: [
+		[
+		self
+			delete: '/evaluations/' , id;
+			delete: '/objects/' , id ]
+			on: Error
+			do: [  ] ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testPauseDebugAndTerminateAsynchronousEvaluation [
+
+	| payload evaluation id attempts target debugger active |
+	payload := self newJsonObject
+		           at: 'expression' put: '| m |
+							m := DateAndTime now minutes + 3.
+							[DateAndTime now minutes < m] whileTrue: [(Delay forSeconds: 1) wait]';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'evaluating' ] ]
+		whileTrue: [
+			attempts := attempts + 1.
+			(Delay forMilliseconds: 200) wait.
+			evaluation := self get: '/evaluations/' , id ].
+	self assert: (evaluation at: 'state') equals: 'evaluating'.
+	self post: '/evaluations/' , id , '/pause'.
+	evaluation := self get: '/evaluations/' , id.
+	self assert: (evaluation at: 'state') equals: 'paused'.
+	target := self newJsonObject
+		          at: 'evaluation' put: id;
+		          yourself.
+	debugger := self post: '/debuggers' with: target.
+	self post: '/debuggers/' , (debugger at: 'id') , '/terminate'.
+	active := self get: '/evaluations'.
+	self assert: (active noneSatisfy: [ :e | (e at: 'id') = id ]) ]
+		ensure: [
+			[
+			self
+				delete: '/evaluations/' , id;
+				delete: '/objects/' , id ]
+				on: Error
+				do: [  ] ]
 ]
 
 { #category : #'evaluation  endpoints' }
@@ -1748,15 +1945,33 @@ WebsideAPITest >> testSubclasses [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testSynchronousEvaluation [
+
 	| evaluation result |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + 4';
-		at: 'sync' put: true;
-		yourself.
+	evaluation := self newJsonObject 
+		              at: 'expression' put: '3 + 4';
+		              at: 'sync' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	self
 		assert: (result at: 'class') equals: 'SmallInteger';
 		assert: (result at: 'printString') equals: '7'
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testSynchronousEvaluationError [
+
+	| synchronous error description |
+	synchronous := self newJsonObject 
+		               at: 'expression' put: '3 + ';
+		               at: 'sync' put: true;
+		               yourself.
+	[ self post: '/evaluations' with: synchronous ]
+		on: Error
+		do: [ :e | error := NeoJSONObject fromString: client contents ].
+	self assert: error notNil.
+	description := (error at: 'description') asLowercase.
+	self assert: (description includesSubstring: 'primary missing')
+		| (description includesSubstring: 'variable or expression expected')
 ]
 
 { #category : #'objects endpoints' }

@@ -183,11 +183,14 @@ WebsideServer >> initializeDebuggingRoutes [
 
 { #category : #initialization }
 WebsideServer >> initializeEvaluationRoutes [
+
 	self
 		routePOST: '/evaluations' to: #evaluateExpression;
 		routeGET: '/evaluations' to: #activeEvaluations;
 		routeGET: '/evaluations/<id>' to: #activeEvaluation;
-		routeDELETE: '/evaluations/<id>' to: #cancelEvaluation
+		routeDELETE: '/evaluations/<id>' to: #cancelEvaluation;
+		routePOST: '/evaluations/<id>/pause' to: #pauseEvaluation;
+		routePOST: '/evaluations/<id>/resume' to: #resumeEvaluation
 ]
 
 { #category : #initialization }

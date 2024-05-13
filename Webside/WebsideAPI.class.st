@@ -48,22 +48,22 @@ WebsideAPI >> activeDebuggers [
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluation [
 
-	| id evaluation object state |
+	| id object fake |
 	id := self requestedId.
-	evaluation := self evaluations at: id ifAbsent: [  ].
-	object := self objects at: id ifAbsent: [  ].
-	(evaluation isNil and: [ object isNil ]) ifTrue: [ ^ self notFound ].
-	state := evaluation ifNil: [ 'finished' ] ifNotNil: [ 'pending' ].
-	^ self newJsonObject
-		  at: 'id' put: id asString;
-		  at: 'state' put: state;
-		  yourself
+	self evaluations at: id ifPresent: [ :e | ^ e asWebsideJson ].
+	object := self objects at: id ifAbsent: [ ^ self notFound ].
+	fake := WebsideEvaluation new.
+	^ fake
+		  id: id;
+		  result: object;
+		  finished;
+		  asWebsideJson
 ]
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> activeEvaluations [
-	^ self evaluations associations
-		collect: [ :a | self newJsonObject at: 'id' put: a key asString ; yourself ]
+
+	^ self evaluations values collect: [ :e | e asWebsideJson ]
 ]
 
 { #category : #'testing endpoints' }
@@ -180,12 +180,13 @@ WebsideAPI >> buildTestSuiteForPackage: package [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> cancelEvaluation [
+
 	| id evaluation |
 	id := self requestedId.
 	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
-	evaluation terminate.
+	evaluation cancel.
 	self evaluations removeKey: id.
-	^ nil
+	^ evaluation asWebsideJson
 ]
 
 { #category : #'code endpoints' }
@@ -408,19 +409,23 @@ WebsideAPI >> compilerRequestor [
 { #category : #'debugging endpoints' }
 WebsideAPI >> createDebugger [
 
-	| id process exception context debugger |
+	| id evaluation context description debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [ ^ self notFound ].
 	id := UUID fromString: id.
-	process := self evaluations at: id ifAbsent: [ ^ self notFound ].
-	exception := process suspendedContext exception.
-	context := exception signalerContext.
+	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	context := evaluation hasFailed
+		           ifTrue: [ evaluation error signalerContext ]
+		           ifFalse: [ evaluation process suspendedContext ].
+	description := evaluation hasFailed
+		               ifTrue: [ evaluation error description ]
+		               ifFalse: [ 'Suspended process' ].
 	"process suspendedContext: context."
-	context selector == #doesNotUnderstand: ifTrue: [ 
+	context selector == #doesNotUnderstand: ifTrue: [
 		context := context sender ].
-	debugger := process
-		            newDebugSessionNamed: exception description
+	debugger := evaluation process
+		            newDebugSessionNamed: description
 		            startedAt: context.
-	context selector == #halt ifTrue: [ 
+	context selector == #halt ifTrue: [
 		debugger restart: context.
 		debugger
 			stepOver;
@@ -430,6 +435,19 @@ WebsideAPI >> createDebugger [
 		  at: 'id' put: id asString;
 		  at: 'description' put: debugger name;
 		  yourself
+]
+
+{ #category : #private }
+WebsideAPI >> createEvaluation [
+
+	| expression evaluation |
+	expression := self bodyAt: 'expression' ifAbsent: [ '' ].
+	expression isEmpty ifTrue: [ ^ nil ].
+	evaluation := WebsideEvaluation new.
+	evaluation
+		expression: expression;
+		context: self requestedContext.
+	^ self evaluations at: evaluation id put: evaluation
 ]
 
 { #category : #'workspaces endpoints' }
@@ -458,7 +476,7 @@ WebsideAPI >> customPresentationsOf: anObject [
 	^anObject websidePresentations
 ]
 
-{ #category : #private }
+{ #category : #'evaluation  endpoints' }
 WebsideAPI >> debugExpression [
 	| expression method receiver process context debugger id |
 	expression := self bodyAt: 'expression' ifAbsent: [''].
@@ -620,54 +638,35 @@ WebsideAPI >> doesMethod: aCompiledMethod accessVariable: variable for: aSymbol 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> evaluateExpression [
 
-	| debug expression sync pin id semaphore object process block json |
-	debug := self bodyAt: 'debug'.
-	debug == true ifTrue: [ ^ self debugExpression ].
-	expression := self bodyAt: 'expression'.
-	sync := (self bodyAt: 'sync') ifNil: [ true ].
-	pin := (self bodyAt: 'pin') ifNil: [ false ].
-	id := self newID.
-	semaphore := Semaphore new.
-	block := [
-	         [ object := self compiler evaluate: expression ]
-		         on: Exception
-		         do: [ :exception |
-			         semaphore signal.
-			         process
-				         suspendedContext: exception signalerContext;
-				         suspend ].
-	         self evaluations removeKey: id ifAbsent: nil.
-	         (sync not or: [ pin ]) ifTrue: [
-		         self objects at: id put: object ].
-	         semaphore signal.
-	         object ].
-	process := block newProcess.
-	self evaluations at: id put: process.
-	process resume.
-	sync ifTrue: [
-		semaphore wait.
-		object ifNil: [ ^ self evaluationError: id ].
-		json := object asWebsideJson.
-		pin ifTrue: [ json at: 'id' put: id asString ].
-		^ json ].
-	json := self newJsonObject
-		        at: 'id' put: id asString;
-		        at: 'expression' put: expression;
-		        at: 'state' put: 'pending';
-		        yourself.
-	^ self created: json
+	| evaluation |
+	(self bodyAt: 'debug' ifAbsent: [ false ]) ifTrue: [
+		^ self debugExpression ].
+	(self bodyAt: 'profile' ifAbsent: [ false ]) ifTrue: [
+		^ self profileExpression ].
+	evaluation := self createEvaluation.
+	evaluation ifNil: [ ^ nil ].
+	evaluation
+		when: #finished evaluate: [
+			self objects at: evaluation id put: evaluation result.
+			self evaluations removeKey: evaluation id ];
+		evaluate.
+	(self bodyAt: 'sync' ifAbsent: [ false ]) ifFalse: [
+		^ self created: evaluation asWebsideJson ].
+	evaluation waitForResult.
+	evaluation hasFailed ifTrue: [ ^ self evaluationError: evaluation ].
+	(self bodyAt: 'pin' ifAbsent: [ false ]) ifFalse: [
+		self objects removeKey: evaluation id ].
+	^ evaluation result asWebsideJson
+		  at: 'id' put: evaluation id asString;
+		  yourself
 ]
 
 { #category : #private }
-WebsideAPI >> evaluationError: id [
+WebsideAPI >> evaluationError: aWebsideEvaluation [
 
-	| process json entity |
-	process := self evaluations at: id.
-	json := self newJsonObject
-		        at: 'description'
-		        put: process suspendedContext exception description;
-		        at: 'evaluation' put: id asString;
-		        yourself.
+	| json entity |
+	json := aWebsideEvaluation error asWebsideJson.
+	json at: 'evaluation' put: aWebsideEvaluation id asString.
 	entity := ZnStringEntity
 		          with: (NeoJSONWriter toString: json)
 		          type: (ZnMimeType applicationJson
@@ -1082,6 +1081,16 @@ WebsideAPI >> packages [
 	^ packages collect: [ :p | p asWebsideJson ]
 ]
 
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> pauseEvaluation [
+
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	evaluation pause.
+	^ evaluation asWebsideJson
+]
+
 { #category : #'objects endpoints' }
 WebsideAPI >> pinObjectSlot [
 	| slot id |
@@ -1098,10 +1107,7 @@ WebsideAPI >> pinObjectSlot [
 WebsideAPI >> pinnedObject [
 
 	| id object |
-
 	id := self requestedId.
-	self evaluations at: id ifPresent: [ :process |
-		process isSuspended ifTrue: [ ^ self evaluationError: id ] ].
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 		  at: 'id' put: id asString;
@@ -1112,19 +1118,19 @@ WebsideAPI >> pinnedObject [
 WebsideAPI >> pinnedObjectSlots [
 
 	| id object path index last |
-
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [ ^ self notFound ].
 	path := request url segments.
 	index := path indexOf: 'objects'.
-	path from: index + 2 to: path size - 1 do: [ :s | 
+	path from: index + 2 to: path size - 1 do: [ :s |
 		object := self slot: s of: object ifAbsent: [ ^ self notFound ] ].
 	last := path last.
-	last = 'instance-variables' ifTrue: [ 
+	last = 'instance-variables' ifTrue: [
 		^ self instanceVariablesOf: object ].
 	last = 'named-slots' ifTrue: [ ^ self namedSlotsOf: object ].
 	last = 'indexed-slots' ifTrue: [ ^ self indexedSlotsOf: object ].
-    last = 'custom-presentations' ifTrue: [^self customPresentationsOf: object].
+	last = 'custom-presentations' ifTrue: [
+		^ self customPresentationsOf: object ].
 	object := self slot: last of: object ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 ]
@@ -1136,6 +1142,12 @@ WebsideAPI >> pinnedObjects [
 			a value asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> profileExpression [
+
+	self notYetImplemented
 ]
 
 { #category : #private }
@@ -1285,23 +1297,24 @@ WebsideAPI >> requestedClass [
 
 { #category : #private }
 WebsideAPI >> requestedContext [
-	| context name path id debugger index |
-	context := self bodyAt: 'context' ifAbsent: [ ^nil ].
+
+	| context name path id debugger index frame |
+	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
 	name := context at: 'class' ifAbsent: nil.
 	name ifNotNil: [ ^ self classNamed: name ].
 	path := context at: 'object' ifAbsent: nil.
-	path
-		ifNotNil: [ ^ self objectFromPath: path ].
+	path ifNotNil: [ ^ self objectFromPath: path ].
 	id := context at: 'workspace' ifAbsent: nil.
-	id
-		ifNotNil: [ id := UUID fromString: id.
-			^ self workspaces at: id ifAbsent: nil ].
+	id ifNotNil: [
+		id := UUID fromString: id.
+		^ self workspaces at: id ifAbsent: nil ].
 	id := context at: 'debugger' ifAbsent: nil.
-	id
-		ifNotNil: [ id := UUID fromString: id.
-			debugger := self debuggers at: id ifAbsent: [ ^ nil ].
-			index := context at: 'frame' ifAbsent: [ ^ nil ].
-			^ debugger stack at: index asInteger ifAbsent: [ ^ nil ] ].
+	id ifNotNil: [
+		id := UUID fromString: id.
+		debugger := self debuggers at: id ifAbsent: [ ^ nil ].
+		index := context at: 'frame' ifAbsent: [ ^ nil ].
+		frame := debugger stack at: index asInteger ifAbsent: nil.
+		^ frame ifNotNil: [ frame receiver ] ].
 	^ nil
 ]
 
@@ -1394,12 +1407,28 @@ WebsideAPI >> restartDebugger [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> resumeDebugger [
-	| id debugger |
+
+	| id debugger evaluation |
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
 	self debuggers removeKey: id.
+	evaluation := self evaluations
+		              detect: [ :e | e process == debugger process ]
+		              ifNone: [  ].
+	evaluation ifNotNil: [
+		evaluation resumed. ].
 	debugger resume.
 	^ nil
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPI >> resumeEvaluation [
+
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [ ^ self notFound ].
+	evaluation resume.
+	^ evaluation asWebsideJson
 ]
 
 { #category : #'testing endpoints' }
@@ -1590,11 +1619,17 @@ WebsideAPI >> subclasses [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> terminateDebugger [
-	| id debugger |
+
+	| id debugger evaluation |
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
-	self debuggers removeKey: id.
+	evaluation := self evaluations
+		              detect: [ :e | e process == debugger process ]
+		              ifNone: [  ].
 	debugger terminate.
+	self debuggers removeKey: id.
+	evaluation ifNotNil: [
+		self evaluations removeKey: evaluation id ifAbsent: [  ] ].
 	^ nil
 ]
 

@@ -8,25 +8,39 @@ Class {
 		'priority',
 		'process',
 		'state',
-		'result'
+		'result',
+		'error'
 	],
 	#category : #'Webside-Base'
 }
 
 { #category : #json }
 WebsideEvaluation >> asWebsideJson [
-	^super asWebsideJson
-        at: 'id' put: id asString; 
+
+	| json |
+	json := super asWebsideJson.
+	json
+		at: 'id' put: id asString;
 		at: 'expression' put: expression;
-		at: 'state' put: state;
-		yourself
+		at: 'state' put: state.
+	error ifNotNil: [ json at: 'error' put: error asWebsideJson ].
+	^ json
 ]
 
 { #category : #actions }
 WebsideEvaluation >> cancel [
+
 	process terminate.
+	self cancelled
+]
+
+{ #category : #private }
+WebsideEvaluation >> cancelled [
+
 	state := #cancelled.
-	self triggerEvent: #finished
+	self
+		triggerEvent: #cancelled;
+		triggerEvent: #finalized
 ]
 
 { #category : #private }
@@ -47,6 +61,32 @@ WebsideEvaluation >> context: anObject [
 	context := anObject
 ]
 
+{ #category : #accessing }
+WebsideEvaluation >> error [
+
+	^ error
+]
+
+{ #category : #actions }
+WebsideEvaluation >> evaluate [
+
+	process := [
+	           state := #evaluating.
+	           [ result := self compiler evaluate: expression ]
+		           on: Exception
+		           do: [ :exception |
+			           error := exception.
+			           self failed.
+			           process
+				           suspendedContext: exception signalerContext;
+				           suspend ].
+	           self finished ] newProcess.
+	process
+		priority: priority;
+		name: 'Webside evaluation ' , id asString;
+		resume
+]
+
 { #category : #actions }
 WebsideEvaluation >> evaluate: aString [
 	expression := aString.
@@ -54,13 +94,45 @@ WebsideEvaluation >> evaluate: aString [
 ]
 
 { #category : #accessing }
+WebsideEvaluation >> expression [
+
+	^expression
+]
+
+{ #category : #accessing }
 WebsideEvaluation >> expression: aString [
+
 	expression := aString
+]
+
+{ #category : #private }
+WebsideEvaluation >> failed [
+
+	state := #failed.
+	self
+		triggerEvent: #failed;
+		triggerEvent: #finalized
+]
+
+{ #category : #private }
+WebsideEvaluation >> finished [
+
+	state := #finished.
+	self
+		triggerEvent: #finished;
+		triggerEvent: #finalized
+]
+
+{ #category : #testing }
+WebsideEvaluation >> hasFailed [
+
+	^ state == #failed
 ]
 
 { #category : #testing }
 WebsideEvaluation >> hasFinished [
-	^state == #finished
+
+	^ state == #finished
 ]
 
 { #category : #accessing }
@@ -69,8 +141,9 @@ WebsideEvaluation >> id [
 ]
 
 { #category : #accessing }
-WebsideEvaluation >> id: idd [
-	id := idd
+WebsideEvaluation >> id: uuid [
+
+	id := uuid
 ]
 
 { #category : #initialization }
@@ -78,12 +151,46 @@ WebsideEvaluation >> initialize [
 
 	super initialize.
 	id := UUID new.
-	state := #pending
+	state := #pending.
+	priority := Processor userSchedulingPriority
+]
+
+{ #category : #testing }
+WebsideEvaluation >> isEvaluating [
+
+	^ state == #evaluating
+]
+
+{ #category : #testing }
+WebsideEvaluation >> isFinalized [
+
+	^ self hasFinished or: [ self hasFailed or: [ self wasCancelled ] ]
+]
+
+{ #category : #testing }
+WebsideEvaluation >> isPaused [
+
+	^ state == #paused
 ]
 
 { #category : #testing }
 WebsideEvaluation >> isPending [
-	^state == #pending
+
+	^ state == #pending
+]
+
+{ #category : #actions }
+WebsideEvaluation >> pause [
+
+	process suspend.
+	self paused
+]
+
+{ #category : #private }
+WebsideEvaluation >> paused [
+
+	state := #paused.
+	self triggerEvent: #paused
 ]
 
 { #category : #accessing }
@@ -108,39 +215,43 @@ WebsideEvaluation >> requestor [
 
 { #category : #accessing }
 WebsideEvaluation >> result [
-	self isPending ifTrue: [^self].
-	^result
+
+	self hasFinished ifTrue: [ ^ result ]
+]
+
+{ #category : #accessing }
+WebsideEvaluation >> result: anObject [
+
+	result := anObject
+]
+
+{ #category : #actions }
+WebsideEvaluation >> resume [
+	self resumed.
+	process resume.
+
 ]
 
 { #category : #private }
 WebsideEvaluation >> resumed [
-	state := #pending.
+
+	state := #evaluating.
 	self triggerEvent: #resumed
 ]
 
 { #category : #actions }
-WebsideEvaluation >> suspend [
-	process suspend.
-	self suspended
-]
-
-{ #category : #private }
-WebsideEvaluation >> suspended [
-	state := #suspended.
-	self triggerEvent: #suspended
-]
-
-{ #category : #actions }
 WebsideEvaluation >> waitForResult [
+
 	| semaphore |
-	self isPending ifTrue: [
+	self isFinalized ifFalse: [
 		semaphore := Semaphore new.
-		self when: #finished evaluate: [semaphore signal].
-		semaphore wait].
-	^self result
+		self when: #finalized evaluate: [ semaphore signal ].
+		semaphore wait ].
+	^ self result
 ]
 
 { #category : #testing }
 WebsideEvaluation >> wasCancelled [
-	^state == #cancelled
+
+	^ state == #cancelled
 ]
