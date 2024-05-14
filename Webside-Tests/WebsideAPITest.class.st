@@ -764,6 +764,34 @@ WebsideAPITest >> testInstanceVariables [
 ]
 
 { #category : #'code endpoints' }
+WebsideAPITest >> testLocalImplementors [
+
+	| methods hierarchy retrieved |
+	methods := self get: 'methods?hierarchy=Collection&selector=select:'.
+	self assert: methods notEmpty.
+	hierarchy := Collection withAllSuperAndSubclasses collect: [ :c |
+		             c name ].
+	retrieved := (methods collect: [ :m | m at: 'methodClass' ]) asSet.
+	self
+		assert: retrieved size > 1;
+		assert: (retrieved allSatisfy: [ :n | hierarchy includes: n ])
+]
+
+{ #category : #'code endpoints' }
+WebsideAPITest >> testLocalSenders [
+
+	| methods hierarchy retrieved |
+	methods := self get: 'methods?hierarchy=Collection&sending=notEmpty'.
+	self assert: methods notEmpty.
+	hierarchy := Collection withAllSuperAndSubclasses collect: [ :c |
+		             c name ].
+	retrieved := (methods collect: [ :m | m at: 'methodClass' ]) asSet.
+	self
+		assert: retrieved size > 1;
+		assert: (retrieved allSatisfy: [ :n | hierarchy includes: n ])
+]
+
+{ #category : #'code endpoints' }
 WebsideAPITest >> testMatchingSelectors [
 	| matching |
 	matching := self get: 'methods?selectorMatching=testMa*'.
@@ -1865,16 +1893,6 @@ WebsideAPITest >> testRunTests [
 				and: [ (results first at: 'selector') = 'testAdd' 
 				and: [ (results first at: 'type') = 'passed' ]]) ]
 		ensure: [ self delete: '/test-runs/' , id asString ]
-]
-
-{ #category : #'code endpoints' }
-WebsideAPITest >> testScope [
-	| methods hierarchy retrieved |
-	methods := self get: 'methods?scope=Collection&sending=notEmpty'.
-	self assert: methods notEmpty.
-	hierarchy := Collection withAllSuperAndSubclasses collect: [ :c | c name ].
-	retrieved := (methods collect: [ :m | m at: 'class' ]) asSet.
-	self assert: retrieved size > 1; assert: (retrieved allSatisfy: [:n |  hierarchy includes: n]) 
 ]
 
 { #category : #'code endpoints' }

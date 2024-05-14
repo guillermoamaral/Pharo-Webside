@@ -799,11 +799,12 @@ WebsideAPI >> frameBindings [
 
 { #category : #private }
 WebsideAPI >> implementorsOf: aSymbol [
+
 	| scope |
 	scope := self queriedScope.
 	^ scope
-		ifNotNil: [ scope implementorsOf: aSymbol ]
-		ifNil: [ SystemNavigation default allImplementorsOf: aSymbol ]
+		  ifNotNil: [ (scope implementorsOf: aSymbol) methods ]
+		  ifNil: [ SystemNavigation default allImplementorsOf: aSymbol ]
 ]
 
 { #category : #private }
@@ -1182,7 +1183,13 @@ WebsideAPI >> queriedReferencingString [
 
 { #category : #private }
 WebsideAPI >> queriedScope [
-	^self queryAt: 'scope' ifPresent: [:s | self classNamed: s ]
+
+	| class |
+	self queryAt: 'scope' ifPresent: [ :s | ^ self classNamed: s ].
+	^ self queryAt: 'hierarchy' ifPresent: [ :h |
+		  class := self classNamed: h.
+		  class ifNotNil: [
+			  RBBrowserEnvironment new forClassHierarchy: class ] ]
 ]
 
 { #category : #private }
@@ -1528,13 +1535,11 @@ WebsideAPI >> sendersOf: aSymbol [
 
 { #category : #private }
 WebsideAPI >> sendersOf: aSymbol among: aCollection [
-		
-	
+
 	| index |
 	index := Smalltalk specialSelectorIndexOrNil: aSymbol.
-	^ aCollection
-		select:
-			[ :m | m hasSelector: aSymbol specialSelectorIndex: index ]
+	^ aCollection select: [ :m |
+		  m hasSelector: aSymbol specialSelectorIndex: index ]
 ]
 
 { #category : #accessing }
