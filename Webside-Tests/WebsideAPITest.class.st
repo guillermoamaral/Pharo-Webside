@@ -595,13 +595,13 @@ WebsideAPITest >> testCommentClass [
 WebsideAPITest >> testCreateDebugger [
 
 	| evaluation id debugger error |
-	evaluation := NeoJSONObject new
+	evaluation := self newJsonObject 
 		              at: 'expression' put: '1 halt factorial';
 		              at: 'sync' put: true;
 		              yourself.
 	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert:
@@ -609,17 +609,34 @@ WebsideAPITest >> testCreateDebugger [
 				assert: (error includesKey: 'evaluation').
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
-	[ 
+	[
 	| target frames |
-	target := NeoJSONObject new
+	target := self newJsonObject 
 		          at: 'evaluation' put: id;
 		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	self assert: debugger notNil.
 	id := debugger at: 'id'.
 	frames := self get: '/debuggers/' , id , '/frames'.
-	self assert: frames notEmpty ] ensure: [ 
+	self assert: frames notEmpty ] ensure: [
 		debugger notNil ifTrue: [ self delete: '/debuggers/' , id ] ]
+]
+
+{ #category : #'evaluation  endpoints' }
+WebsideAPITest >> testDebugExpression [
+
+	| evaluation id debuggers |
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 factorial';
+		              at: 'debug' put: true;
+		              yourself.
+	id := self post: '/evaluations' with: evaluation.
+	self assert: id notNil.
+	[
+	self post: '/debuggers/' , id , '/terminate'.
+	debuggers := self get: '/debuggers'.
+	self assert: (debuggers noneSatisfy: [:d | (d at: 'id') = id])] ensure: [
+		(debuggers anySatisfy: [:d | (d at: 'id') = id]) ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
 { #category : #'evaluation  endpoints' }

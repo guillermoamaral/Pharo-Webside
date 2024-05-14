@@ -203,6 +203,12 @@ WebsideEvaluation >> process [
 	^process
 ]
 
+{ #category : #accessing }
+WebsideEvaluation >> process: aProcess [
+
+	process := aProcess
+]
+
 { #category : #private }
 WebsideEvaluation >> receiver [
   ^context class == Workspace ifFalse: [context]

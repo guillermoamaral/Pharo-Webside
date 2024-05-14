@@ -478,21 +478,21 @@ WebsideAPI >> customPresentationsOf: anObject [
 
 { #category : #'evaluation  endpoints' }
 WebsideAPI >> debugExpression [
-	| expression method receiver process context debugger id |
-	expression := self bodyAt: 'expression' ifAbsent: [''].
-	method := self compiler compile: expression.
+
+	| evaluation method receiver process debugger |
+	evaluation := self createEvaluation.
+	method := self compiler compile: evaluation expression.
 	receiver := self compilerReceiver.
-	process := [ method valueWithReceiver: receiver arguments: #() ]
-		newProcess.
-	context := process suspendedContext.
+	process := [ method valueWithReceiver: receiver arguments: #(  ) ]
+		           newProcess.
+	evaluation process: process.
 	debugger := process
-		newDebugSessionNamed: 'debug it'
-		startedAt: context.
+		            newDebugSessionNamed: 'debug expression'
+		            startedAt: process suspendedContext.
 	debugger stepIntoUntil: [ :c | c method == method ].
-	id := self newID.
-	self evaluations at: id put: process.
-	self debuggers at: id put: debugger.
-	^ id asString
+	self evaluations at: evaluation id put: evaluation.
+	self debuggers at: evaluation id put: debugger.
+	^ evaluation id asString
 ]
 
 { #category : #'testing endpoints' }
@@ -593,13 +593,17 @@ WebsideAPI >> defaultRootClass [
 
 { #category : #'debugging endpoints' }
 WebsideAPI >> deleteDebugger [
-	| id debugger |
+
+	| id debugger evaluation |
 	id := self requestedId.
-	debugger := self debuggers at: id ifAbsent: nil.
-	debugger notNil
-		ifTrue: [ debugger terminate.
-			self debuggers removeKey: id ifAbsent: nil.
-			self evaluations removeKey: id ifAbsent: nil ].
+	debugger := self debuggers at: id ifAbsent: [ ^ self notFound ].
+	evaluation := self evaluations
+		              detect: [ :e | e process == debugger process ]
+		              ifNone: [  ].
+	debugger terminate.
+	self debuggers removeKey: id.
+	evaluation ifNotNil: [
+		self evaluations removeKey: evaluation id ifAbsent: [  ] ].
 	^ id
 ]
 
