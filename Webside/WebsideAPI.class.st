@@ -1626,6 +1626,15 @@ WebsideAPI >> subclasses [
     ^ class subclasses collect: [:c | c asWebsideJson] 
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> superclasses [
+
+	| class |
+	class := self requestedClass.
+	class ifNil: [ ^ self notFound ].
+	^ class allSuperclasses  collect: [ :c | c asWebsideJson ]
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPI >> terminateDebugger [
 

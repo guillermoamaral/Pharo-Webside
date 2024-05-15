@@ -137,6 +137,7 @@ WebsideServer >> initializeCodeRoutes [
 		routeGET: '/classes' to: #classes;
 		routeGET: '/classes/<name>' to: #classDefinition;
 		routeGET: '/classes/<name>/subclasses' to: #subclasses;
+		routeGET: '/classes/<name>/superclasses' to: #superclasses;
 		routeGET: '/classes/<name>/variables' to: #variables;
 		routeGET: '/classes/<name>/instance-variables'
 		to: #instanceVariables;

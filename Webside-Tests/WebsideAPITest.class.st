@@ -1978,6 +1978,15 @@ WebsideAPITest >> testSubclasses [
 		assert: (subclasses anySatisfy: [ :c | c name = 'Number' ])
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPITest >> testSuperclasses [
+
+	| superclasses |
+	superclasses := self get: 'classes/Number/superclasses'.
+	self
+		assert: (Number allSuperclasses allSatisfy: [ :c | superclasses anySatisfy: [:sc | c name = (sc at: 'name')]])
+]
+
 { #category : #'evaluation  endpoints' }
 WebsideAPITest >> testSynchronousEvaluation [
 
