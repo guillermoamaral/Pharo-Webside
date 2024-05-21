@@ -233,6 +233,18 @@ WebsideServer >> initializePreflightRoutes [
 ]
 
 { #category : #initialization }
+WebsideServer >> initializeProfilingRoutes [
+
+	self
+		routePOST: '/profilers' to: #profileExpression;
+		routeGET: '/profilers' to: #activeProfilers;
+		routeGET: '/profilers/<id>' to: #activeProfiler;
+		routeGET: '/profilers/<id>/tree' to: #profilerTreeResults;
+		routeGET: '/profilers/<id>/ranking' to: #profilerRankingResults;
+		routeDELETE: '/profilers/<id>' to: #deleteProfiler
+]
+
+{ #category : #initialization }
 WebsideServer >> initializeResources [
 
 	resources := Dictionary new.
@@ -244,7 +256,9 @@ WebsideServer >> initializeResources [
 		at: #debuggers put: Dictionary new;
 		at: #testRuns put: Dictionary new;
 		"Temporary changes store until a better way to gather system changes is implemented"
-		at: #changes put: OrderedCollection new
+		at: #changes
+		put: OrderedCollection new;
+		at: #profilers put: Dictionary new
 ]
 
 { #category : #initialization }
@@ -259,7 +273,9 @@ WebsideServer >> initializeRoutes [
 		initializeObjectsRoutes;
 		initializeWorkspacesRoutes;
 		initializeDebuggingRoutes;
-		initializeTestsRoutes; initializeExtensionsRoutes
+		initializeTestsRoutes;
+		initializeProfilingRoutes;
+		initializeExtensionsRoutes
 ]
 
 { #category : #initialization }
@@ -318,6 +334,12 @@ WebsideServer >> port [
 { #category : #accessing }
 WebsideServer >> port: anInteger [
 	port := anInteger
+]
+
+{ #category : #accessing }
+WebsideServer >> profilers [
+
+	^ self resourcesAt: #profilers
 ]
 
 { #category : #actions }

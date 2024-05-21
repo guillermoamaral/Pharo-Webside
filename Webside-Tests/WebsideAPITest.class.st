@@ -322,14 +322,15 @@ WebsideAPITest >> testAsynchronousEvaluation [
 WebsideAPITest >> testAsynchronousEvaluationError [
 
 	| payload evaluation id attempts description |
-	payload := self newJsonObject 
+	payload := self newJsonObject
 		           at: 'expression' put: '3 + ';
 		           at: 'sync' put: false;
 		           yourself.
 	evaluation := self post: '/evaluations' with: payload.
 	self
 		assert: client response code equals: 201;
-		assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+		assert: (#( 'pending' 'failed' ) includes:
+					 (evaluation at: 'state' ifAbsent: '')) description: 'Non-compilable expression might fail immediately'.
 	id := evaluation at: 'id'.
 	attempts := 0.
 	evaluation := self get: '/evaluations/' , id.
@@ -612,6 +613,47 @@ WebsideAPITest >> testCreateDebugger [
 	[
 	| target frames |
 	target := self newJsonObject 
+		          at: 'evaluation' put: id;
+		          yourself.
+	debugger := self post: '/debuggers' with: target.
+	self assert: debugger notNil.
+	id := debugger at: 'id'.
+	frames := self get: '/debuggers/' , id , '/frames'.
+	self assert: frames notEmpty ] ensure: [
+		debugger notNil ifTrue: [ self delete: '/debuggers/' , id ] ]
+]
+
+{ #category : #'debugging endpoints' }
+WebsideAPITest >> testCreateDebugger2 [
+
+	| payload evaluation id attempts description debugger |
+	payload := self newJsonObject
+		           at: 'expression' put: '3 + ';
+		           at: 'sync' put: false;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	id := evaluation at: 'id'.
+	attempts := 0.
+	evaluation := self get: '/evaluations/' , id.
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'failed' ] ] whileTrue: [
+		self assert: (evaluation at: 'state') equals: 'evaluating'.
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/evaluations/' , id ].
+	self
+		assert: (evaluation at: 'state') equals: 'failed';
+		assert: (evaluation includesKey: 'error').
+	description := (evaluation at: 'error')
+		               at: 'description'
+		               ifPresent: [ :d | d asLowercase ]
+		               ifAbsent: [  ].
+	self assert: (description includesSubstring: 'primary missing')
+		| (description includesSubstring: 'variable or expression expected').
+	[
+	| target frames |
+	target := self newJsonObject
 		          at: 'evaluation' put: id;
 		          yourself.
 	debugger := self post: '/debuggers' with: target.
@@ -1483,6 +1525,79 @@ WebsideAPITest >> testPinnedObjects [
 						and: [ (o at: 'class') = 'SmallInteger' 
 						and: [ (o at: 'printString') = '7' ]] ]) ]
 		ensure: [ self delete: '/objects/' , id asString ]
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPITest >> testProfileExpression [
+
+	| payload evaluation id attempts tree |
+	payload := self newJsonObject
+		           at: 'expression'
+		           put:
+			           '10 timesRepeat: [Object allSubclasses do: [:c | c name size factorial]]';
+		           at: 'profile' put: true;
+		           yourself.
+	evaluation := self post: '/evaluations' with: payload.
+	self
+		assert: client response code equals: 201;
+		assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	[
+	attempts := 0.
+	evaluation := self get: '/profilers/' , id.
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'finished' ] ] whileTrue: [
+		self assert: (evaluation at: 'state') equals: 'evaluating'.
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/profilers/' , id ].
+	self assert: (evaluation at: 'state') equals: 'finished'.
+	tree := self get: '/profilers/' , id , '/tree'.
+	self
+		assert: tree notNil;
+		assert: (tree at: 'value') equals: 100;
+		assert: (tree at: 'children') isCollection;
+		assert: (tree at: 'children') notEmpty ] ensure: [
+		[ self delete: '/profilers/' , id ]
+			on: Error
+			do: [  ] ]
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPITest >> testProfileExpression2 [
+
+	| payload evaluation id attempts tree |
+	payload := self newJsonObject
+		           at: 'expression'
+		           put:
+			           '10 timesRepeat: [Object allSubclasses do: [:c | c name size factorial]]';
+		           yourself.
+	evaluation := self post: '/profilers' with: payload.
+	self
+		assert: client response code equals: 201;
+		assert: (evaluation at: 'state' ifAbsent: '') equals: 'pending'.
+	id := evaluation at: 'id'.
+	[
+	attempts := 0.
+	evaluation := self get: '/profilers/' , id.
+	[
+	attempts <= 3 and: [
+		(evaluation at: 'state' ifAbsent: '') ~= 'finished' ] ] whileTrue: [
+		self assert: (evaluation at: 'state') equals: 'evaluating'.
+		attempts := attempts + 1.
+		(Delay forMilliseconds: 200) wait.
+		evaluation := self get: '/profilers/' , id ].
+	self assert: (evaluation at: 'state') equals: 'finished'.
+	tree := self get: '/profilers/' , id , '/tree'.
+	self
+		assert: tree notNil;
+		assert: (tree at: 'value') equals: 100;
+		assert: (tree at: 'children') isCollection;
+		assert: (tree at: 'children') notEmpty ] ensure: [
+		[ self delete: '/profilers/' , id ]
+			on: Error
+			do: [  ] ]
 ]
 
 { #category : #'code endpoints' }

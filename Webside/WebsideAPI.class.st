@@ -66,6 +66,22 @@ WebsideAPI >> activeEvaluations [
 	^ self evaluations values collect: [ :e | e asWebsideJson ]
 ]
 
+{ #category : #'profiling endpoints' }
+WebsideAPI >> activeProfiler [
+
+	| evaluation |
+	evaluation := self profilers
+		              at: self requestedId
+		              ifAbsent: [ ^ self notFound ].
+	^ evaluation asWebsideJson
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPI >> activeProfilers [
+
+	^ self profilers values collect: [ :e | e asWebsideJson ]
+]
+
 { #category : #'testing endpoints' }
 WebsideAPI >> activeTestRuns [
 	^ self testRuns associations
@@ -605,6 +621,12 @@ WebsideAPI >> deleteDebugger [
 	evaluation ifNotNil: [
 		self evaluations removeKey: evaluation id ifAbsent: [  ] ].
 	^ id
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPI >> deleteProfiler [
+	self profilers removeKey: self requestedId ifAbsent: [^self notFound].
+	^nil
 ]
 
 { #category : #'testing endpoints' }
@@ -1149,10 +1171,46 @@ WebsideAPI >> pinnedObjects [
 				yourself ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : #'profiling endpoints' }
 WebsideAPI >> profileExpression [
 
-	self notYetImplemented
+	| evaluation |
+	evaluation := self createEvaluation.
+	evaluation ifNil: [ ^ nil ].
+	self profilers at: evaluation id put: evaluation.
+	evaluation profile.
+	^ self created: evaluation asWebsideJson
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPI >> profilerRankingResults [
+
+	| evaluation root dict |
+	evaluation := self profilers
+		              at: self requestedId
+		              ifAbsent: [ ^ self notFound ].
+	evaluation hasFinished ifFalse: [ ^ nil ].
+	root := evaluation result.
+	dict := IdentityDictionary new: 100.
+	root leavesInto: dict fromSender: nil.
+	^ dict asOrderedCollection collect: #asWebsideJson
+]
+
+{ #category : #'profiling endpoints' }
+WebsideAPI >> profilerTreeResults [
+
+	| evaluation |
+	evaluation := self profilers
+		              at: self requestedId
+		              ifAbsent: [ ^ self notFound ].
+			evaluation hasFinished ifFalse: [ ^nil ].
+	^ evaluation result asWebsideJson
+]
+
+{ #category : #private }
+WebsideAPI >> profilers [
+
+	^ server profilers
 ]
 
 { #category : #private }

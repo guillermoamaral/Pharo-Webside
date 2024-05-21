@@ -30,7 +30,7 @@ WebsideEvaluation >> asWebsideJson [
 { #category : #actions }
 WebsideEvaluation >> cancel [
 
-	process terminate.
+	process ifNotNil: [process terminate].
 	self cancelled
 ]
 
@@ -70,9 +70,22 @@ WebsideEvaluation >> error [
 { #category : #actions }
 WebsideEvaluation >> evaluate [
 
+	self evaluateBlock: [
+		result := self compiler evaluate: expression ]
+]
+
+{ #category : #actions }
+WebsideEvaluation >> evaluate: aString [
+	expression := aString.
+	self evaluate
+]
+
+{ #category : #private }
+WebsideEvaluation >> evaluateBlock: aBlock [
+
 	process := [
 	           state := #evaluating.
-	           [ result := self compiler evaluate: expression ]
+	           aBlock
 		           on: Exception
 		           do: [ :exception |
 			           error := exception.
@@ -87,10 +100,21 @@ WebsideEvaluation >> evaluate [
 		resume
 ]
 
-{ #category : #actions }
-WebsideEvaluation >> evaluate: aString [
-	expression := aString.
-	self evaluate
+{ #category : #private }
+WebsideEvaluation >> evaluateWithOutOfProcessCompilation [
+
+	| compiler method |
+	compiler := self compiler.
+	compiler
+		noPattern: true;
+		source: expression.
+	method := [ compiler compile ]
+		          on: Exception
+		          do: [ :exception |
+			          error := exception.
+			          ^ self failed ].
+	self evaluateBlock: [
+		result := self receiver withArgs: #(  ) executeMethod: method ]
 ]
 
 { #category : #accessing }
@@ -207,6 +231,33 @@ WebsideEvaluation >> process [
 WebsideEvaluation >> process: aProcess [
 
 	process := aProcess
+]
+
+{ #category : #actions }
+WebsideEvaluation >> profile [
+
+	| compiler method doIt |
+	compiler := self compiler.
+	compiler
+		noPattern: true;
+		source: expression.
+	method := [ compiler compile ]
+		          on: Exception
+		          do: [ :exception |
+			          error := exception.
+			          ^ self failed ].
+	result := MessageTally new.
+	self evaluateBlock: [
+		result
+			spyEvery: MessageTally defaultPollPeriod
+			on: [ self receiver withArgs: #(  ) executeMethod: method ].
+		doIt := result receivers
+			        detect: [ :t | t method == method ]
+			        ifNone: nil.
+		doIt ifNotNil: [ doIt
+				instVarNamed: 'time'
+				put: result time "(doIt tally asFloat / result tally * result time) rounded".
+			result := doIt ] ]
 ]
 
 { #category : #private }
