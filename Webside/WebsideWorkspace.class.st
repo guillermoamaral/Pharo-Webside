@@ -14,8 +14,7 @@ WebsideWorkspace >> asWebsideJson [
 
 	| json |
 	json := super asWebsideJson.
-	json
-		at: 'id' put: id asString.
+	json at: 'id' put: id asString;   at: 'source' put: contents.
 	^ json
 ]
 
