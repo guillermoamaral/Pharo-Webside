@@ -93,11 +93,8 @@ WebsideAPI >> activeTestRuns [
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> activeWorkspaces [
-	^ self workspaces associations
-		collect: [ :a | 
-			a value asWebsideJson
-				at: 'id' put: a key asString;
-				yourself ]
+
+	^ self workspaces values collect: #asWebsideJson
 ]
 
 { #category : #'changes endpoints' }
@@ -469,13 +466,10 @@ WebsideAPI >> createEvaluation [
 { #category : #'workspaces endpoints' }
 WebsideAPI >> createWorkspace [
 
-	| id workspace |
-	id := self newID.
-	workspace := Workspace new.
-	self workspaces at: id put: workspace.
+	|  workspace |
+	workspace := WebsideWorkspace new.
+	self workspaces at: workspace id put: workspace.
 	^ workspace asWebsideJson
-		  at: 'id' put: id asString;
-		  yourself
 ]
 
 { #category : #private }
@@ -1769,14 +1763,11 @@ WebsideAPI >> unpinObject [
 { #category : #'workspaces endpoints' }
 WebsideAPI >> updateWorkspace [
 
-	| id workspace source |
-	id := self requestedId.
-	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
+	| workspace source |
+	workspace := self workspaces at: self requestedId ifAbsent: [ ^ self notFound ].
 	source := self bodyAt: 'source' ifAbsent: ''.
 	workspace contents: source.
 	^ workspace asWebsideJson
-		  at: 'id' put: id asString;
-		  yourself
 ]
 
 { #category : #private }
@@ -1806,25 +1797,21 @@ WebsideAPI >> variables [
 { #category : #'workspaces endpoints' }
 WebsideAPI >> workspace [
 
-	| id workspace |
-	id := self requestedId.
-	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
+	|  workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [ ^ self notFound ].
 	^ workspace asWebsideJson
-		  at: 'id' put: id asString;
-		  yourself
 ]
 
 { #category : #'workspaces endpoints' }
 WebsideAPI >> workspaceBindings [
 
-	| id workspace |
-	id := self requestedId.
-	workspace := self workspaces at: id ifAbsent: [ ^ self notFound ].
-	^workspace bindings associations collect: [:a | 
-		self newJsonObject
-			at: 'name' put: a key;
-			at: 'value' put: a value printString;
-			yourself]
+	| workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [ ^ self notFound ].
+	^ workspace bindings associations collect: [ :a |
+		  self newJsonObject
+			  at: 'name' put: a key;
+			  at: 'value' put: a value printString;
+			  yourself ]
 ]
 
 { #category : #private }

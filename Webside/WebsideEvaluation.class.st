@@ -262,12 +262,14 @@ WebsideEvaluation >> profile [
 
 { #category : #private }
 WebsideEvaluation >> receiver [
-  ^context class == Workspace ifFalse: [context]
+
+	^ context class == WebsideWorkspace ifFalse: [ context ]
 ]
 
 { #category : #private }
 WebsideEvaluation >> requestor [
-  ^context class == Workspace ifTrue: [context]
+
+	^ context class == WebsideWorkspace ifTrue: [ context ]
 ]
 
 { #category : #accessing }

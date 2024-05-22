@@ -2167,16 +2167,16 @@ WebsideAPITest >> testWorkspace [
 	id := response at: 'id'.
 	[
 	| context assignment evaluation result |
-	context := NeoJSONObject new
+	context := self newJsonObject 
 		           at: 'workspace' put: id;
 		           yourself.
-	assignment := NeoJSONObject new
+	assignment := self newJsonObject 
 		              at: 'expression' put: 'a := 1';
 		              at: 'sync' put: true;
 		              context: context;
 		              yourself.
 	self post: '/evaluations' with: assignment.
-	evaluation := NeoJSONObject new
+	evaluation := self newJsonObject 
 		              at: 'expression' put: 'a';
 		              at: 'sync' put: true;
 		              context: context;
@@ -2212,6 +2212,32 @@ WebsideAPITest >> testWorkspaceBindings [
 		assert: (bindings first at: 'name') equals: 'a';
         assert: (bindings first at: 'value') equals: 1 printString] ensure: [
 		self delete: '/workspaces/' , id ]
+]
+
+{ #category : #'workspaces endpoints' }
+WebsideAPITest >> testWorkspaceEvaluationError [
+
+	| response id error description |
+	response := self post: '/workspaces'.
+	id := response at: 'id'.
+	[
+	| context evaluation |
+	context := self newJsonObject
+		           at: 'workspace' put: id;
+		           yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '1 + ';
+		              at: 'sync' put: true;
+		              context: context;
+		              yourself.
+	[ self post: '/evaluations' with: evaluation ]
+		on: Error
+		do: [ :e | error := NeoJSONObject fromString: client contents ].
+	self assert: error notNil.
+	description := (error at: 'description') asLowercase.
+	self assert: (description includesSubstring: 'primary missing')
+		| (description includesSubstring: 'variable or expression expected') ]
+		ensure: [ self delete: '/workspaces/' , id ]
 ]
 
 { #category : #'workspaces endpoints' }
