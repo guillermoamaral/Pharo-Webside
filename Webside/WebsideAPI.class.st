@@ -830,18 +830,19 @@ WebsideAPI >> implementorsOf: aSymbol [
 { #category : #private }
 WebsideAPI >> indexedSlotsOf: anObject [
 
-	| from to slot |
+	| accessor from to slot |
 	anObject class isVariable ifFalse: [ ^ self notFound ].
+	accessor := anObject websideIndexAccessor.
 	from := self
 		        queryAt: 'from'
-		        ifPresent: [ :f | f asInteger ]
-		        ifAbsent: [ 1 ].
+		        ifPresent: [ :f | f asInteger max: accessor start ]
+		        ifAbsent: [ accessor start ].
 	to := self
 		      queryAt: 'to'
-		      ifPresent: [ :t | t asInteger ]
-		      ifAbsent: [ anObject size ].
-	^ (from to: to) collect: [ :i | 
-		  slot := anObject basicAt: i.
+		      ifPresent: [ :t | t asInteger min: accessor end ]
+		      ifAbsent: [ accessor end ].
+	^ (from to: to) collect: [ :i |
+		  slot := accessor at: i.
 		  slot asWebsideJson
 			  at: 'slot' put: i;
 			  yourself ]

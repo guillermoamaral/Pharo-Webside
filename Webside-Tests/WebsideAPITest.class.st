@@ -592,6 +592,25 @@ WebsideAPITest >> testCommentClass [
 		self post: '/changes' with: remotion ]
 ]
 
+{ #category : #'objects endpoints' }
+WebsideAPITest >> testCompiledMethodSlots [
+
+	| evaluation result id slots |
+	evaluation := self newJsonObject
+		              at: 'expression'
+		              put: 'WebsideAPITest >> #testCompiledMethodSlots';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
+	result := self post: '/evaluations' with: evaluation.
+	id := result at: 'id'.
+	self
+		assert: (result at: 'class') equals: 'CompiledMethod';
+		assert: (result at: 'hasIndexedSlots') equals: true.
+	slots := self get: '/objects/' , id asString , '/indexed-slots'.
+	self assert: slots notEmpty
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger [
 

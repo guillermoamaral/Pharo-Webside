@@ -29,20 +29,3 @@ CompiledMethod >> asWebsideJson [
 		json at: 'status' put: status ].
 	^ json
 ]
-
-{ #category : #'*Webside' }
-CompiledMethod >> websidePresentations [
-	| source ast |
-	source := NeoJSONObject new
-		at: 'type' put: 'source';
-		at: 'title' put: 'Source';
-		at: 'code' put: self sourceCode;
-		yourself.
-	ast := NeoJSONObject new
-		at: 'type' put: 'tree';
-		at: 'title' put: 'AST';
-		at: 'nodeLabel' put: 'printString';
-		at: 'roots' put: {self ast asWebsideJson};
-		yourself.
-	^{source. ast}
-]
