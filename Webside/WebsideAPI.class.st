@@ -1621,6 +1621,22 @@ WebsideAPI >> slot: aString of: anObject ifAbsent: aBlock [
 			ifTrue:[anObject instVarNamed: aString] ifFalse: [ aBlock value ]
 ]
 
+{ #category : #'general endpoints' }
+WebsideAPI >> stats [
+
+	| vm value |
+	vm := SmalltalkImage current vm.
+	^ #( #( 'Old Space' #oldSpace 'mb' ) #( 'Young Space' #youngSpaceSize 'mb' )
+	     #( 'Total Space' #memorySize 'mb' ) #( 'Free Space' #freeSize 'mb' ) ) collect: [ :register |
+		  value := vm perform: register second.
+		  register third = 'mb' ifTrue: [ value := value / 1024.0 / 1024.0 ].
+		  self newJsonObject
+			  at: 'label' put: register first;
+			  at: 'value' put: value;
+			  at: 'unit' put: register third;
+			  yourself ]
+]
+
 { #category : #'debugging endpoints' }
 WebsideAPI >> stepIntoDebugger [
 	| debugger context |
