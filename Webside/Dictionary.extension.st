@@ -1,9 +1,9 @@
 Extension { #name : #Dictionary }
 
 { #category : #'*Webside' }
-Dictionary >> websidePresentations [ 
+Dictionary >> websidePresentations [
 
-	| columns rows presentation  presentations |
+	| columns rows presentation presentations |
 	columns := OrderedCollection new.
 	columns
 		add: (NeoJSONObject new
@@ -16,17 +16,19 @@ Dictionary >> websidePresentations [
 				 at: 'label' put: 'Value';
 				 at: 'align' put: 'left';
 				 yourself).
-	rows := self keysSortedSafely collect: [ :k | 
+	rows := self keysSortedSafely collect: [ :k |
 		        NeoJSONObject new
 			        at: 'key' put: k asString;
 			        at: 'value' put: (self at: k) asString;
 			        yourself ].
 	presentation := NeoJSONObject new
 		                at: 'type' put: 'table';
-		                at: 'title' put: 'Items';
+		                at: 'title'
+		                put: 'Items (' , self size asString , ')';
 		                at: 'columns' put: columns;
 		                at: 'rows' put: rows;
 		                yourself.
-    presentations := super websidePresentations reject: [:p | (p at: 'type') = 'table'].
+	presentations := super websidePresentations reject: [ :p |
+		                 (p at: 'type') = 'table' ].
 	^ presentations , { presentation }
 ]

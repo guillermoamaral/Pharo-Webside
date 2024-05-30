@@ -18,18 +18,18 @@ ClassDescription >> asWebsideJson [
 { #category : #'*Webside' }
 ClassDescription >> websidePresentations [
 
-	| definition comment |
-	definition := NeoJSONObject new
-		              at: 'type' put: 'source';
-		              at: 'title' put: 'Definition';
-		              at: 'code' put: self definitionString;
-		              yourself.
+	| comment definition |
 	comment := NeoJSONObject new
 		           at: 'type' put: 'markdown';
 		           at: 'title' put: 'Comment';
 		           at: 'code' put: self comment;
 		           yourself.
+	definition := NeoJSONObject new
+		              at: 'type' put: 'source';
+		              at: 'title' put: 'Definition';
+		              at: 'code' put: self definitionString;
+		              yourself.
 	^ {
-		  definition.
-		  comment }
+		  comment.
+		  definition } , super websidePresentations
 ]

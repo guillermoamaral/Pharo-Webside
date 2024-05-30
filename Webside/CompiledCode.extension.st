@@ -42,5 +42,5 @@ CompiledCode >> websidePresentations [
 	^ {
 		  source.
 		  ast.
-		  bytecodes }
+		  bytecodes } , super websidePresentations
 ]
