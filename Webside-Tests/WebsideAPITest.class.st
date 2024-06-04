@@ -104,25 +104,19 @@ WebsideAPITest >> testActiveEvaluations [
 { #category : #'changes endpoints' }
 WebsideAPITest >> testAddCass [
 
-	| definition  class remotion|
+	| definition class remotion |
 	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestCassDefinition';
-		              at: 'definition' put: 'Object
-	subclass: #TestCassDefinition
-	instanceVariableNames: ''x''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
 	[
-
 	self post: '/changes' with: definition.
 	class := self get: '/classes/TestCassDefinition'.
 	self
 		assert: class notNil;
 		assert: class name equals: 'TestCassDefinition' ] ensure: [
-	
 		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestCassDefinition';
@@ -137,11 +131,7 @@ WebsideAPITest >> testAddClassVariable [
 	definition := NeoJSONObject new
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestClassVariableAddition';
-		              definition: 'Object
-	subclass: #TestClassVariableAddition
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
 	addition := self newJsonObject
@@ -150,7 +140,6 @@ WebsideAPITest >> testAddClassVariable [
 		            at: 'variable' put: 'X';
 		            yourself.
 	[
-	
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: addition.
@@ -158,7 +147,6 @@ WebsideAPITest >> testAddClassVariable [
 		             '/classes/TestClassVariableAddition/class-variables'.
 	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'X' ]) ]
 		ensure: [
-		
 			remotion := self newJsonObject
 				            at: 'type' put: 'RemoveClass';
 				            at: 'className' put: 'TestClassVariableAddition';
@@ -173,11 +161,7 @@ WebsideAPITest >> testAddInstanceVariable [
 	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestInstanceVariableAddition';
-		              definition: 'Object
-	subclass: #TestInstanceVariableAddition
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
 	addition := self newJsonObject
@@ -186,7 +170,6 @@ WebsideAPITest >> testAddInstanceVariable [
 		            at: 'variable' put: 'x';
 		            yourself.
 	[
-
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: addition.
@@ -195,7 +178,6 @@ WebsideAPITest >> testAddInstanceVariable [
 	self
 		assert: variables size equals: 1;
 		assert: variables first name equals: 'x' ] ensure: [
-
 		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestInstanceVariableAddition';
@@ -378,7 +360,7 @@ WebsideAPITest >> testCategories [
   
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : #'evaluation  endpoints' }
 WebsideAPITest >> testChanges [
 
 	| change changes retrieved remotion |
@@ -553,17 +535,13 @@ WebsideAPITest >> testCodeSuggestion [
 WebsideAPITest >> testCommentClass [
 
 	| definition comment class remotion |
-	definition := self newJsonObject 
+	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestClassCommentDefinition';
-		              at: 'definition' put: 'Object
-	subclass: #TestClassCommentDefinition
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
-	comment := self newJsonObject 
+	comment := self newJsonObject
 		           at: 'type' put: 'CommentClass';
 		           at: 'className' put: 'TestClassCommentDefinition';
 		           at: 'comment' put: 'Testing class comment';
@@ -576,7 +554,7 @@ WebsideAPITest >> testCommentClass [
 	self
 		assert: class notNil;
 		assert: class comment equals: 'Testing class comment' ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestClassCommentDefinition';
 			            yourself.
@@ -970,27 +948,20 @@ WebsideAPITest >> testMethods [
 WebsideAPITest >> testMoveDownInstanceVariable [
 
 	| superclass class movement remotion variables |
-	superclass := self newJsonObject 
+	superclass := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestMoveDownInstanceVariable';
-		              at: 'definition' put: 'Object
-	subclass: #TestMoveDownInstanceVariable
-	instanceVariableNames: ''x''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
+							at: 'instanceVariables' put: #( 'x' );
 		              at: 'author' put: self class name;
 		              yourself.
-	class := self newJsonObject 
+	class := self newJsonObject
 		         at: 'type' put: 'AddClass';
 		         at: 'className' put: 'TestMoveDownInstanceVariable2';
-		         at: 'definition' put: 'TestMoveDownInstanceVariable
-	subclass: #TestMoveDownInstanceVariable2
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		         at: 'superclass' put: 'TestMoveDownInstanceVariable';
 		         at: 'author' put: self class name;
 		         yourself.
-	movement := self newJsonObject 
+	movement := self newJsonObject
 		            at: 'type' put: 'MoveDownInstanceVariable';
 		            at: 'className' put: 'TestMoveDownInstanceVariable';
 		            at: 'variable' put: 'x';
@@ -1009,12 +980,12 @@ WebsideAPITest >> testMoveDownInstanceVariable [
 	self
 		assert: variables size equals: 1;
 		assert: variables first name equals: 'x' ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestMoveDownInstanceVariable2';
 			            yourself.
 		self post: '/changes' with: remotion.
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestMoveDownInstanceVariable';
 			            yourself.
@@ -1643,29 +1614,25 @@ WebsideAPITest >> testReferencesToString [
 WebsideAPITest >> testRemoveCategory [
 
 	| class method methodRemotion categoryRemotion categories remotion |
-	class := self newJsonObject 
+	class := self newJsonObject
 		         at: 'type' put: 'AddClass';
 		         at: 'className' put: 'TestRemoveCategory';
-		         at: 'definition' put: 'Object
-	subclass: #TestRemoveCategory
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		         at: 'superclass' put: 'Object';
 		         at: 'author' put: self class name;
 		         yourself.
-	method := self newJsonObject 
+	method := self newJsonObject
 		          at: 'type' put: 'AddMethod';
 		          at: 'className' put: 'TestRemoveCategory';
 		          at: 'category' put: 'testRemoveCategory';
 		          at: 'sourceCode' put: 'x';
 		          at: 'author' put: self class name;
 		          yourself.
-	methodRemotion := self newJsonObject 
+	methodRemotion := self newJsonObject
 		                  at: 'type' put: 'RemoveMethod';
 		                  at: 'className' put: 'TestRemoveCategory';
 		                  at: 'selector' put: 'x';
 		                  yourself.
-	categoryRemotion := self newJsonObject 
+	categoryRemotion := self newJsonObject
 		                    at: 'type' put: 'RemoveCategory';
 		                    at: 'className' put: 'TestRemoveCategory';
 		                    at: 'category' put: 'testRemoveCategory';
@@ -1682,7 +1649,7 @@ WebsideAPITest >> testRemoveCategory [
 		post: '/changes' with: categoryRemotion.
 	categories := self get: '/classes/TestRemoveCategory/categories'.
 	self deny: (categories includes: 'testRemoveCategory') ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestRemoveCategory';
 			            yourself.
@@ -1693,24 +1660,20 @@ WebsideAPITest >> testRemoveCategory [
 WebsideAPITest >> testRemoveCategoryWithMethods [
 
 	| class method categories remotion error suggestions |
-	class := self newJsonObject 
+	class := self newJsonObject
 		         at: 'type' put: 'AddClass';
 		         at: 'className' put: 'TestRemoveCategory';
-		         at: 'definition' put: 'Object
-	subclass: #TestRemoveCategory
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		         at: 'superclass' put: 'Object';
 		         at: 'author' put: self class name;
 		         yourself.
-	method := self newJsonObject 
+	method := self newJsonObject
 		          at: 'type' put: 'AddMethod';
 		          at: 'className' put: 'TestRemoveCategory';
 		          at: 'category' put: 'testRemoveCategory';
 		          at: 'sourceCode' put: 'x';
 		          at: 'author' put: self class name;
 		          yourself.
-	remotion := self newJsonObject 
+	remotion := self newJsonObject
 		            at: 'type' put: 'RemoveCategory';
 		            at: 'className' put: 'TestRemoveCategory';
 		            at: 'category' put: 'testRemoveCategory';
@@ -1738,7 +1701,7 @@ WebsideAPITest >> testRemoveCategoryWithMethods [
 		self post: '/changes' with: ch ].
 	categories := self get: '/classes/TestRemoveCategory/categories'.
 	self deny: (categories includes: 'testRemoveCategory') ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestRemoveCategory';
 			            yourself.
@@ -1749,17 +1712,13 @@ WebsideAPITest >> testRemoveCategoryWithMethods [
 WebsideAPITest >> testRemoveClass [
 
 	| definition remotion class |
-	definition := self newJsonObject 
+	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestClassRemove';
-		              definition: 'Object
-	subclass: #TestClassRemove
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
-	remotion := self newJsonObject 
+	remotion := self newJsonObject
 		            at: 'type' put: 'RemoveClass';
 		            at: 'className' put: 'TestClassRemove';
 		            yourself.
@@ -1773,31 +1732,27 @@ WebsideAPITest >> testRemoveClass [
 { #category : #'changes endpoints' }
 WebsideAPITest >> testRemoveInstanceVariable [
 
-	| definition remotion |
-	definition := self newJsonObject 
+	| definition remotion variables |
+	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestInstanceVariableRemove';
-		              at: 'definition' put: 'Object
-	subclass: #TestInstanceVariableRemove
-	instanceVariableNames: ''x''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
+		at: 'instanceVariables' put: #('x');
 		              at: 'author' put: self class name;
 		              yourself.
-	remotion := self newJsonObject 
+	remotion := self newJsonObject
 		            at: 'type' put: 'RemoveInstanceVariable';
 		            at: 'className' put: 'TestInstanceVariableRemove';
 		            at: 'variable' put: 'x';
 		            yourself.
 	[
-	| variables |
 	self
 		post: '/changes' with: definition;
 		post: '/changes' with: remotion.
 	variables := self get:
 		             '/classes/TestInstanceVariableRemove/instance-variables'.
 	self assert: variables isEmpty ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestInstanceVariableRemove';
 			            yourself.
@@ -1832,24 +1787,20 @@ WebsideAPITest >> testRemoveMethod [
 WebsideAPITest >> testRenameCategory [
 
 	| class method renaming categories remotion |
-	class := self newJsonObject 
+	class := self newJsonObject
 		         at: 'type' put: 'AddClass';
 		         at: 'className' put: 'TestCategoryRename';
-		         at: 'definition' put: 'Object
-	subclass: #TestCategoryRename
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		         at: 'superclass' put: 'Object';
 		         at: 'author' put: self class name;
 		         yourself.
-	method := self newJsonObject 
+	method := self newJsonObject
 		          at: 'type' put: 'AddMethod';
 		          at: 'className' put: 'TestCategoryRename';
 		          at: 'category' put: 'x';
 		          at: 'sourceCode' put: 'testCategoryRename';
 		          at: 'author' put: self class name;
 		          yourself.
-	renaming := self newJsonObject 
+	renaming := self newJsonObject
 		            at: 'type' put: 'RenameCategory';
 		            at: 'className' put: 'TestCategoryRename';
 		            at: 'category' put: 'x';
@@ -1864,7 +1815,7 @@ WebsideAPITest >> testRenameCategory [
 	self
 		assert: categories size equals: 1;
 		assert: categories first equals: 'y' ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
 			            at: 'className' put: 'TestCategoryRename';
 			            yourself.
@@ -1875,20 +1826,16 @@ WebsideAPITest >> testRenameCategory [
 WebsideAPITest >> testRenameClass [
 
 	| definition renaming class remotion |
-	definition := self newJsonObject 
+	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestRenameClass';
-		              definition: 'Object
-	subclass: #TestRenameClass
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
 		              at: 'author' put: self class name;
 		              yourself.
-	renaming := self newJsonObject 
+	renaming := self newJsonObject
 		            at: 'type' put: 'RenameClass';
 		            at: 'className' put: 'TestRenameClass';
-		            at: 'newName' put: 'TestRenameClass22';
+		            at: 'newName' put: 'TestRenameClass2';
 		            yourself.
 	[
 	self
@@ -1896,11 +1843,11 @@ WebsideAPITest >> testRenameClass [
 		post: '/changes' with: renaming.
 	class := self get: '/classes/TestRenameClass'.
 	self assert: class isNil.
-	class := self get: '/classes/TestRenameClass22'.
+	class := self get: '/classes/TestRenameClass2'.
 	self assert: class notNil ] ensure: [
-		remotion := self newJsonObject 
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveClass';
-			            at: 'className' put: 'TestRenameClass22';
+			            at: 'className' put: 'TestRenameClass2';
 			            yourself.
 		self post: '/changes' with: remotion ]
 ]
@@ -1912,11 +1859,8 @@ WebsideAPITest >> testRenameInstanceVariable [
 	definition := self newJsonObject
 		              at: 'type' put: 'AddClass';
 		              at: 'className' put: 'TestInstanceVariableRename';
-		              at: 'definition' put: 'Object
-	subclass: #TestInstanceVariableRename
-	instanceVariableNames: ''x''
-	classVariableNames: ''''
-	package: ''Unclassified''';
+		              at: 'superclass' put: 'Object';
+	at: 'instanceVariables' put: #('x');
 		              at: 'author' put: self class name;
 		              yourself.
 	renaming := self newJsonObject
