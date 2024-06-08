@@ -360,7 +360,7 @@ WebsideAPITest >> testCategories [
   
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : #'changes endpoints' }
 WebsideAPITest >> testChanges [
 
 	| change changes retrieved remotion |
