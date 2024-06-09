@@ -1240,10 +1240,10 @@ WebsideAPITest >> testPauseAndResumeAsynchronousEvaluation [
 WebsideAPITest >> testPauseDebugAndResumeAsynchronousEvaluation [
 
 	| payload evaluation id attempts target debugger |
-	payload := self newJsonObject 
+	payload := self newJsonObject
 		           at: 'expression' put: '| m |
-							m := DateAndTime now minute + 3.
-							[DateAndTime now minute < m] whileTrue: [(Delay forSeconds: 1) wait]';
+							m := 0.
+							[m < 180] whileTrue: [(Delay forSeconds: 1) wait. m := m + 1]';
 		           at: 'sync' put: false;
 		           yourself.
 	evaluation := self post: '/evaluations' with: payload.
@@ -1263,7 +1263,7 @@ WebsideAPITest >> testPauseDebugAndResumeAsynchronousEvaluation [
 	self post: '/evaluations/' , id , '/pause'.
 	evaluation := self get: '/evaluations/' , id.
 	self assert: (evaluation at: 'state') equals: 'paused'.
-	target := self newJsonObject 
+	target := self newJsonObject
 		          at: 'evaluation' put: id;
 		          yourself.
 	debugger := self post: '/debuggers' with: target.
@@ -1284,8 +1284,8 @@ WebsideAPITest >> testPauseDebugAndTerminateAsynchronousEvaluation [
 	| payload evaluation id attempts target debugger active |
 	payload := self newJsonObject
 		           at: 'expression' put: '| m |
-							m := DateAndTime now minutes + 3.
-							[DateAndTime now minutes < m] whileTrue: [(Delay forSeconds: 1) wait]';
+							m := 0.
+							[m < 180] whileTrue: [(Delay forSeconds: 1) wait. m := m +1]';
 		           at: 'sync' put: false;
 		           yourself.
 	evaluation := self post: '/evaluations' with: payload.
@@ -1364,31 +1364,34 @@ WebsideAPITest >> testPinObjectSlot [
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObject [
+
 	| evaluation result id |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 + 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
-	[ | pinned |
+	[
+	| pinned |
 	id := result at: 'id'.
 	pinned := self get: '/objects/' , id asString.
 	self
 		assert: (pinned at: 'id') equals: id;
 		assert: (pinned at: 'class') equals: 'SmallInteger';
-		assert: (pinned at: 'printString') equals: '7' ]
-		ensure: [ self delete: '/objects/' , id asString ]
+		assert: (pinned at: 'printString') equals: '7' ] ensure: [
+		self delete: '/objects/' , id asString ]
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjectIndexedSlots [
+
 	| evaluation result id slots slot |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '#(true 2 nil)';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '#(true 2 nil)';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	id := result at: 'id'.
 	self
@@ -1397,59 +1400,56 @@ WebsideAPITest >> testPinnedObjectIndexedSlots [
 	slots := self get: '/objects/' , id asString , '/indexed-slots'.
 	self
 		assert: slots size equals: 3;
-		assert:
-			(slots
-				anySatisfy: [ :s | (s at: 'slot') = 1 and: [ (s at: 'printString') = 'true' ] ]);
-				assert:
-			(slots
-				anySatisfy: [ :s | (s at: 'slot') = 2 and: [ (s at: 'printString') = '2' ] ]);
-				assert:
-			(slots
-				anySatisfy: [ :s | (s at: 'slot') = 3 and: [ (s at: 'printString') = 'nil' ] ]).
-	slot := self get: '/objects/', id asString , '/3'.
-	self assert: (slot at: 'printString') equals: 'nil'.			
-slots := self get: '/objects/' , id asString , '/indexed-slots?from=2&to=2'.
+		assert: (slots anySatisfy: [ :s |
+					 (s at: 'slot') = 1 and: [ (s at: 'printString') = 'true' ] ]);
+		assert: (slots anySatisfy: [ :s |
+					 (s at: 'slot') = 2 and: [ (s at: 'printString') = '2' ] ]);
+		assert: (slots anySatisfy: [ :s |
+					 (s at: 'slot') = 3 and: [ (s at: 'printString') = 'nil' ] ]).
+	slot := self get: '/objects/' , id asString , '/3'.
+	self assert: (slot at: 'printString') equals: 'nil'.
+	slots := self get:
+		         '/objects/' , id asString , '/indexed-slots?from=2&to=2'.
 	self
 		assert: slots size equals: 1;
-		assert:
-			((slots first at: 'slot') = 2 and: [ (slots first at: 'printString') = '2' ])
+		assert: ((slots first at: 'slot') = 2 and: [
+					 (slots first at: 'printString') = '2' ])
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjectInstanceVariables [
+
 	| evaluation result id vars |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 @ 4 extent: 1 @ 1';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 @ 4 extent: 1 @ 1';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	id := result at: 'id'.
 	self assert: (result at: 'class') equals: 'Rectangle'.
 	vars := self get: '/objects/' , id asString , '/instance-variables'.
 	self
 		assert: vars size equals: Rectangle allInstVarNames size;
-		assert:
-			(Rectangle allInstVarNames
-				allSatisfy: [ :n | vars anySatisfy: [ :v | (v at: 'name') = n ] ]).
-	vars := self
-		get: '/objects/' , id asString , '/corner/instance-variables'.
+		assert: (Rectangle allInstVarNames allSatisfy: [ :n |
+					 vars anySatisfy: [ :v | (v at: 'name') = n ] ]).
+	vars := self get:
+		        '/objects/' , id asString , '/corner/instance-variables'.
 	self
 		assert: vars size equals: Point allInstVarNames size;
-		assert:
-			(Point allInstVarNames
-				allSatisfy: [ :n | vars anySatisfy: [ :v | (v at: 'name') = n ] ])
+		assert: (Point allInstVarNames allSatisfy: [ :n |
+					 vars anySatisfy: [ :v | (v at: 'name') = n ] ])
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjectNamedSlots [
 
 	| evaluation result id slots |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 @ 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 @ 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	id := result at: 'id'.
 	self
@@ -1458,22 +1458,21 @@ WebsideAPITest >> testPinnedObjectNamedSlots [
 	slots := self get: '/objects/' , id asString , '/named-slots'.
 	self
 		assert: slots size equals: 2;
-		assert:
-			(slots
-				anySatisfy: [ :s | (s at: 'slot') = 'x' and: [ (s at: 'printString') = '3' ] ]);
-		assert:
-			(slots
-				anySatisfy: [ :s | (s at: 'slot') = 'y' and: [ (s at: 'printString') = '4' ] ])
+		assert: (slots anySatisfy: [ :s |
+					 (s at: 'slot') = 'x' and: [ (s at: 'printString') = '3' ] ]);
+		assert: (slots anySatisfy: [ :s |
+					 (s at: 'slot') = 'y' and: [ (s at: 'printString') = '4' ] ])
 ]
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjectSlot [
+
 	| evaluation result id x |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 @ 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 @ 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	id := result at: 'id'.
 	self assert: (result at: 'class') equals: 'Point'.
@@ -1485,24 +1484,23 @@ WebsideAPITest >> testPinnedObjectSlot [
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testPinnedObjects [
+
 	| evaluation result id |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 + 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
-	[ | pinned |
+	[
+	| pinned |
 	id := result at: 'id'.
 	pinned := self get: '/objects'.
-	self
-		assert:
-			(pinned
-				anySatisfy: [ :o | 
-					(o at: 'id') = id
-						and: [ (o at: 'class') = 'SmallInteger' 
-						and: [ (o at: 'printString') = '7' ]] ]) ]
-		ensure: [ self delete: '/objects/' , id asString ]
+	self assert: (pinned anySatisfy: [ :o |
+			 (o at: 'id') = id and: [
+				 (o at: 'class') = 'SmallInteger' and: [
+					 (o at: 'printString') = '7' ] ] ]) ] ensure: [
+		self delete: '/objects/' , id asString ]
 ]
 
 { #category : #'profiling endpoints' }
@@ -2081,12 +2079,13 @@ WebsideAPITest >> testSynchronousEvaluationError [
 
 { #category : #'objects endpoints' }
 WebsideAPITest >> testUnpinObject [
+
 	| evaluation result id pinned |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '3 + 4';
-		at: 'sync' put: true;
-		at: 'pin' put: true;
-		yourself.
+	evaluation := self newJsonObject
+		              at: 'expression' put: '3 + 4';
+		              at: 'sync' put: true;
+		              at: 'pin' put: true;
+		              yourself.
 	result := self post: '/evaluations' with: evaluation.
 	id := result at: 'id'.
 	self delete: '/objects/' , id asString.
