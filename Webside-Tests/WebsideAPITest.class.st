@@ -583,8 +583,8 @@ WebsideAPITest >> testCompiledMethodSlots [
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger [
 
-	| evaluation id debugger error |
-	evaluation := self newJsonObject 
+	| evaluation error id target debugger frames |
+	evaluation := self newJsonObject
 		              at: 'expression' put: '1 halt factorial';
 		              at: 'sync' put: true;
 		              yourself.
@@ -599,8 +599,7 @@ WebsideAPITest >> testCreateDebugger [
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[
-	| target frames |
-	target := self newJsonObject 
+	target := self newJsonObject
 		          at: 'evaluation' put: id;
 		          yourself.
 	debugger := self post: '/debuggers' with: target.
@@ -614,7 +613,7 @@ WebsideAPITest >> testCreateDebugger [
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger2 [
 
-	| payload evaluation id attempts description debugger |
+	| payload evaluation id attempts description target debugger frames |
 	payload := self newJsonObject
 		           at: 'expression' put: '3 + ';
 		           at: 'sync' put: false;
@@ -640,7 +639,6 @@ WebsideAPITest >> testCreateDebugger2 [
 	self assert: (description includesSubstring: 'primary missing')
 		| (description includesSubstring: 'variable or expression expected').
 	[
-	| target frames |
 	target := self newJsonObject
 		          at: 'evaluation' put: id;
 		          yourself.
@@ -714,14 +712,15 @@ WebsideAPITest >> testDebuggerContext [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testDebuggerFrames [
-	| evaluation error id debugger |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '1 halt factorial';
-		at: 'sync' put: true;
-		yourself.
+
+	| evaluation error id target debugger frames |
+	evaluation := self newJsonObject
+		              at: 'expression' put: '1 halt factorial';
+		              at: 'sync' put: true;
+		              yourself.
 	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert:
@@ -730,10 +729,10 @@ WebsideAPITest >> testDebuggerFrames [
 			id := error at: 'evaluation' ].
 	id := error at: 'evaluation'.
 	self assert: id notNil.
-	[ | target frames |
-	target := NeoJSONObject new
-		at: 'evaluation' put: id;
-		yourself.
+	[
+	target := self newJsonObject
+		          at: 'evaluation' put: id;
+		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	id := debugger at: 'id'.
 	frames := self get: '/debuggers/' , id , '/frames'.
@@ -752,14 +751,15 @@ WebsideAPITest >> testDialect [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testFrameBindings [
-	| evaluation error id debugger |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '1 halt factorial';
-		at: 'sync' put: true;
-		yourself.
+
+	| evaluation error id target debugger frames bindings |
+	evaluation := self newJsonObject
+		              at: 'expression' put: '1 halt factorial';
+		              at: 'sync' put: true;
+		              yourself.
 	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert:
@@ -767,10 +767,10 @@ WebsideAPITest >> testFrameBindings [
 				assert: (error includesKey: 'evaluation').
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
-	[ | target frames bindings |
-	target := NeoJSONObject new
-		at: 'evaluation' put: id;
-		yourself.
+	[
+	target := self newJsonObject
+		          at: 'evaluation' put: id;
+		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	id := debugger at: 'id'.
 	frames := self get: '/debuggers/' , id , '/frames'.
@@ -852,7 +852,7 @@ WebsideAPITest >> testMatchingSelectors [
 WebsideAPITest >> testMessageNotUnderstood [
 
 	| change method evaluation error id debugger target frame remotion |
-	change := NeoJSONObject new
+	change := self newJsonObject
 		          at: 'type' put: 'AddMethod';
 		          at: 'className' put: 'Object';
 		          at: 'category' put: self class name;
@@ -862,17 +862,17 @@ WebsideAPITest >> testMessageNotUnderstood [
 3 blahblahblah';
 		          at: 'author' put: self class name;
 		          yourself.
-	[ 
+	[
 	self post: '/changes' with: change.
 	method := self get: '/classes/Object/methods/blah'.
 	self assert: method notNil.
-	evaluation := NeoJSONObject new
+	evaluation := self newJsonObject
 		              at: 'expression' put: 'Object new blah';
 		              at: 'sync' put: true;
 		              yourself.
 	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert: ((error at: 'description') asLowercase includesSubstring:
@@ -881,7 +881,7 @@ WebsideAPITest >> testMessageNotUnderstood [
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
 	[
-	target := NeoJSONObject new
+	target := self newJsonObject
 		          at: 'evaluation' put: id;
 		          yourself.
 	debugger := self post: '/debuggers' with: target.
@@ -889,9 +889,9 @@ WebsideAPITest >> testMessageNotUnderstood [
 	frame := self get: '/debuggers/' , id , '/frames/1'.
 	self
 		assert: ((frame at: 'method') at: 'selector') equals: 'blah';
-		assert: ((frame at: 'interval') at: 'start') > 10 ] ensure: [ 
-		self delete: '/debuggers/' , id asString ] ] ensure: [ 
-		remotion := NeoJSONObject new
+		assert: ((frame at: 'interval') at: 'start') > 10 ] ensure: [
+		self delete: '/debuggers/' , id asString ] ] ensure: [
+		remotion := self newJsonObject
 			            at: 'type' put: 'RemoveMethod';
 			            at: 'className' put: 'Object';
 			            at: 'selector' put: 'blah';
@@ -1999,14 +1999,15 @@ WebsideAPITest >> testSenders [
 
 { #category : #'debugging endpoints' }
 WebsideAPITest >> testStepInto [
-	| evaluation error id debugger |
-	evaluation := NeoJSONObject new
-		at: 'expression' put: '1 halt factorial';
-		at: 'sync' put: true;
-		yourself.
+
+	| evaluation error id target debugger frame |
+	evaluation := self newJsonObject
+		              at: 'expression' put: '1 halt factorial';
+		              at: 'sync' put: true;
+		              yourself.
 	[ self post: '/evaluations' with: evaluation ]
 		on: Error
-		do: [ :e | 
+		do: [ :e |
 			error := NeoJSONObject fromString: client contents.
 			self
 				assert:
@@ -2014,18 +2015,18 @@ WebsideAPITest >> testStepInto [
 				assert: (error includesKey: 'evaluation').
 			id := error at: 'evaluation' ].
 	self assert: id notNil.
-	[ | target frame |
-	target := NeoJSONObject new
-		at: 'evaluation' put: id;
-		yourself.
+	[
+	target := self newJsonObject
+		          at: 'evaluation' put: id;
+		          yourself.
 	debugger := self post: '/debuggers' with: target.
 	id := debugger at: 'id'.
 	self post: '/debuggers/' , id , '/frames/1/stepinto'.
 	frame := self get: '/debuggers/' , id , '/frames/1'.
 	self
 		assert: ((frame at: 'method') at: 'selector')
-		equals: 'factorial' ]
-		ensure: [ self delete: '/debuggers/' , id asString ]
+		equals: 'factorial' ] ensure: [
+		self delete: '/debuggers/' , id asString ]
 ]
 
 { #category : #'code endpoints' }
