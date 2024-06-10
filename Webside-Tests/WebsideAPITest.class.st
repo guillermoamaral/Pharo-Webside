@@ -1950,25 +1950,26 @@ WebsideAPITest >> testRenameSelector2 [
 
 { #category : #'testing endpoints' }
 WebsideAPITest >> testRunTests [
+
 	| test suite run id results |
-	test := NeoJSONObject new
-		at: 'class' put: 'DateTest';
-		at: 'selector' put: 'testAddDays';
-		yourself.
-	suite := NeoJSONObject new
-		at: 'methods' put: {test};
-		yourself.
+	test := self newJsonObject
+		        at: 'class' put: 'DateTest';
+		        at: 'selector' put: 'testAddDays';
+		        yourself.
+	suite := self newJsonObject
+		         at: 'methods' put: { test };
+		         yourself.
 	run := self post: '/test-runs' with: suite.
 	self assert: run notNil.
 	id := run at: 'id'.
-	[ results := self get: 'test-runs/' , id , '/results'.
+	[
+	results := self get: 'test-runs/' , id , '/results'.
 	self
 		assert: results size equals: 1;
-		assert:
-			((results first at: 'class') = 'DateTest'
-				and: [ (results first at: 'selector') = 'testAdd' 
-				and: [ (results first at: 'type') = 'passed' ]]) ]
-		ensure: [ self delete: '/test-runs/' , id asString ]
+		assert: ((results first at: 'class') = 'DateTest' and: [
+					 (results first at: 'selector') = 'testAdd' and: [
+							 (results first at: 'type') = 'passed' ] ]) ] ensure: [
+		self delete: '/test-runs/' , id asString ]
 ]
 
 { #category : #'code endpoints' }
@@ -2108,21 +2109,20 @@ WebsideAPITest >> testVariables [
 { #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspace [
 
-	| response id |
+	| response id context assignment evaluation result |
 	response := self post: '/workspaces'.
 	id := response at: 'id'.
 	[
-	| context assignment evaluation result |
-	context := self newJsonObject 
+	context := self newJsonObject
 		           at: 'workspace' put: id;
 		           yourself.
-	assignment := self newJsonObject 
+	assignment := self newJsonObject
 		              at: 'expression' put: 'a := 1';
 		              at: 'sync' put: true;
 		              context: context;
 		              yourself.
 	self post: '/evaluations' with: assignment.
-	evaluation := self newJsonObject 
+	evaluation := self newJsonObject
 		              at: 'expression' put: 'a';
 		              at: 'sync' put: true;
 		              context: context;
@@ -2137,37 +2137,34 @@ WebsideAPITest >> testWorkspace [
 { #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspaceBindings [
 
-	| response id bindings |
+	| response id bindings context assignment |
 	response := self post: '/workspaces'.
 	id := response at: 'id'.
 	[
-	| context assignment |
-	context := NeoJSONObject new
+	context := self newJsonObject
 		           at: 'workspace' put: id;
 		           yourself.
-	assignment := NeoJSONObject new
+	assignment := self newJsonObject
 		              at: 'expression' put: 'a := 1';
 		              at: 'sync' put: true;
 		              context: context;
 		              yourself.
 	self post: '/evaluations' with: assignment.
-
 	bindings := self get: '/workspaces/' , id , '/bindings'.
 	self
 		assert: bindings size equals: 1;
 		assert: (bindings first at: 'name') equals: 'a';
-        assert: (bindings first at: 'value') equals: 1 printString] ensure: [
-		self delete: '/workspaces/' , id ]
+		assert: (bindings first at: 'value') equals: 1 printString ]
+		ensure: [ self delete: '/workspaces/' , id ]
 ]
 
 { #category : #'workspaces endpoints' }
 WebsideAPITest >> testWorkspaceEvaluationError [
 
-	| response id error description |
+	| response id context evaluation error description |
 	response := self post: '/workspaces'.
 	id := response at: 'id'.
 	[
-	| context evaluation |
 	context := self newJsonObject
 		           at: 'workspace' put: id;
 		           yourself.

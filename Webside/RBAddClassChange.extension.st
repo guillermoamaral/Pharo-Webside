@@ -30,7 +30,7 @@ RBAddClassChange >> fromWebsideJson: json [
 				              do: [ :n | s nextPutAll: n ]
 				              separatedBy: [ s space ].
 			              s nextPutAll: ''' poolDictionaries: '''.
-			              classVariableNames
+			              poolDictionaryNames
 				              do: [ :n | s nextPutAll: n ]
 				              separatedBy: [ s space ].
 			              s
