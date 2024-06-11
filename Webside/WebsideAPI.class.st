@@ -1581,6 +1581,15 @@ WebsideAPI >> selectorInSource [
 		  extractor extractSelectorFromSource: source atPosition: position ]
 ]
 
+{ #category : #'code endpoints' }
+WebsideAPI >> selectors [
+
+	| class |
+	class := self requestedClass.
+	class ifNil: [ ^ self notFound ].
+	^ class selectors asArray
+]
+
 { #category : #private }
 WebsideAPI >> sendersOf: aSymbol [
 	| scope |

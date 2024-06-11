@@ -145,6 +145,7 @@ WebsideServer >> initializeCodeRoutes [
 		routeGET: '/classes/<name>/categories' to: #categories;
 		routeGET: '/classes/<name>/used-categories' to: #usedCategories;
 		routeGET: '/classes/<name>/fileout' to: #classFileOut;
+		routeGET: '/classes/<name>/selectors' to: #selectors;
 		routeGET: '/classes/<name>/methods' to: #methods;
 		routeGET: '/classes/<name>/methods/<selector>' to: #method;
 		routeGET: '/classes/<name>/methods/<selector>/fileout'
