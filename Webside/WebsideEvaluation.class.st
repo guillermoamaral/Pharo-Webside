@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'id',
 		'expression',
+		'receiver',
 		'context',
+		'requestor',
 		'priority',
 		'process',
 		'state',
@@ -45,10 +47,12 @@ WebsideEvaluation >> cancelled [
 
 { #category : #private }
 WebsideEvaluation >> compiler [
+
 	^ OpalCompiler new
-		noPattern: true;
-		receiver: self receiver;
-		requestor: self requestor
+		  noPattern: true;
+		  receiver: receiver;
+		  requestor: requestor;
+		  context: context
 ]
 
 { #category : #accessing }
@@ -263,13 +267,25 @@ WebsideEvaluation >> profile [
 { #category : #private }
 WebsideEvaluation >> receiver [
 
-	^ context class == WebsideWorkspace ifFalse: [ context ]
+	^ receiver
+]
+
+{ #category : #private }
+WebsideEvaluation >> receiver: anObject [
+
+	receiver := anObject
 ]
 
 { #category : #private }
 WebsideEvaluation >> requestor [
 
-	^ context class == WebsideWorkspace ifTrue: [ context ]
+	^ requestor
+]
+
+{ #category : #private }
+WebsideEvaluation >> requestor: anObject [
+
+	requestor := anObject
 ]
 
 { #category : #accessing }

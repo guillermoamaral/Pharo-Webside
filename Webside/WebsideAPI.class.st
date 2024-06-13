@@ -459,7 +459,9 @@ WebsideAPI >> createEvaluation [
 	evaluation := WebsideEvaluation new.
 	evaluation
 		expression: expression;
-		context: self requestedContext.
+		receiver: self requestedEvaluationReceiver;
+		requestor: self requestedEvaluationRequestor;
+		context: self requestedEvaluationContext.
 	^ self evaluations at: evaluation id put: evaluation
 ]
 
@@ -1360,7 +1362,21 @@ WebsideAPI >> requestedClass [
 ]
 
 { #category : #private }
-WebsideAPI >> requestedContext [
+WebsideAPI >> requestedEvaluationContext [
+
+	| context id debugger index |
+	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
+	id := context at: 'debugger' ifAbsent: nil.
+	id ifNotNil: [
+		id := UUID fromString: id.
+		debugger := self debuggers at: id ifAbsent: [ ^ nil ].
+		index := context at: 'frame' ifAbsent: [ ^ nil ].
+		^ debugger stack at: index asInteger ifAbsent: nil ].
+	^ nil
+]
+
+{ #category : #private }
+WebsideAPI >> requestedEvaluationReceiver [
 
 	| context name path id debugger index frame |
 	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
@@ -1368,10 +1384,6 @@ WebsideAPI >> requestedContext [
 	name ifNotNil: [ ^ self classNamed: name ].
 	path := context at: 'object' ifAbsent: nil.
 	path ifNotNil: [ ^ self objectFromPath: path ].
-	id := context at: 'workspace' ifAbsent: nil.
-	id ifNotNil: [
-		id := UUID fromString: id.
-		^ self workspaces at: id ifAbsent: nil ].
 	id := context at: 'debugger' ifAbsent: nil.
 	id ifNotNil: [
 		id := UUID fromString: id.
@@ -1379,6 +1391,17 @@ WebsideAPI >> requestedContext [
 		index := context at: 'frame' ifAbsent: [ ^ nil ].
 		frame := debugger stack at: index asInteger ifAbsent: nil.
 		^ frame ifNotNil: [ frame receiver ] ].
+	^ nil
+]
+
+{ #category : #private }
+WebsideAPI >> requestedEvaluationRequestor [
+
+	| context id |
+	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
+	id ifNotNil: [
+		id := UUID fromString: id.
+		^ self workspaces at: id ifAbsent: nil ].
 	^ nil
 ]
 
