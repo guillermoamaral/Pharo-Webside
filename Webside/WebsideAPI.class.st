@@ -1795,6 +1795,68 @@ WebsideAPI >> testRuns [
 	^ server testRuns
 ]
 
+{ #category : #'general endpoints' }
+WebsideAPI >> themes [
+
+	^ Array with: (self newJsonObject
+			   at: 'name' put: 'Tango';
+			   at: 'light' put: (self newJsonObject
+					    at: 'commentStyle' put: (self newJsonObject
+							     at: 'color' put: '#888a85';
+							     yourself);
+					    at: 'returnStyle' put: (self newJsonObject
+						     at: 'color' put: '#000000';
+						     at: 'bold' put: true;
+						     yourself);
+					    at: 'variableStyle' put: (self newJsonObject
+						     at: 'color' put: '#204a87';
+						     yourself);
+					    at: 'temporaryStyle' put: (self newJsonObject
+						     at: 'color' put: '#888a85';
+						     at: 'italic' put: true;
+						     yourself);
+					    at: 'argumentStyle' put: (self newJsonObject
+						     at: 'color' put: '#555753';
+						     at: 'italic' put: true;
+						     yourself);
+					    at: 'symbolStyle' put: (self newJsonObject
+						     at: 'color' put: '#c4a000';
+						     yourself);
+					    at: 'stringStyle' put: (self newJsonObject
+						     at: 'color' put: '#ce5c00';
+						     yourself);
+					    at: 'globalStyle' put: (self newJsonObject
+						     at: 'color' put: '#5c3566';
+						     at: 'bold' put: true;
+						     yourself);
+					    at: 'numberStyle' put: (self newJsonObject
+						     at: 'color' put: '#8f5902';
+						     yourself);
+					    at: 'selector' put: (self newJsonObject
+						     at: 'color' put: '#000000'; at: 'bold' put: true;
+						     yourself);
+					    at: 'trueStyle' put: (self newJsonObject
+						     at: 'color' put: '#8F5902';
+						     yourself);
+					    at: 'falseStyle' put: (self newJsonObject
+						     at: 'color' put: '#8F5902';
+						     yourself);
+					    at: 'nilStyle' put: (self newJsonObject
+						     at: 'color' put: '#8F5902';
+						     yourself);
+					    at: 'selfStyle' put: (self newJsonObject
+						     at: 'color' put: '#4d9a06';
+						     yourself);
+					    at: 'superStyle' put: (self newJsonObject
+						     at: 'color' put: '#4d9a06';
+						     yourself);
+					    at: 'thisContextStyle' put: (self newJsonObject
+						     at: 'color' put: '#4d9a06';
+						     yourself);
+					    yourself);
+			   yourself)
+]
+
 { #category : #'objects endpoints' }
 WebsideAPI >> unpinAllObjects [
 
