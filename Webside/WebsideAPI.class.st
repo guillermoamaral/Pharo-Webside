@@ -1399,6 +1399,7 @@ WebsideAPI >> requestedEvaluationRequestor [
 
 	| context id |
 	context := self bodyAt: 'context' ifAbsent: [ ^ nil ].
+		id := context at: 'workspace' ifAbsent: nil.
 	id ifNotNil: [
 		id := UUID fromString: id.
 		^ self workspaces at: id ifAbsent: nil ].
