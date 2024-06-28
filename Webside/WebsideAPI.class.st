@@ -707,17 +707,17 @@ WebsideAPI >> extensions [
 	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
   For more information, check API documentation at https://github.com/guillermoamaral/Webside."
 
-	| change download |
+	| change export |
 	change := RBRefactoryChange allSubclasses
 	          , RBRefactoring allSubclasses , CmdCommand allSubclasses
 	          , RBTransformation allSubclasses
 		          select: [ :c | c respondsTo: #websideExtension ]
 		          thenCollect: [ :c | c websideExtension ].
 
-	download := OrderedCollection new.
-	download
+	export := OrderedCollection new.
+	export
 		add: (self newJsonObject
-				 at: 'extensionType' put: 'download';
+				 at: 'extensionType' put: 'export';
 				 at: 'elementType' put: 'method';
 				 at: 'label' put: 'File Out';
 				 at: 'get'
@@ -727,14 +727,14 @@ WebsideAPI >> extensions [
 				 at: 'section' put: 'Extra';
 				 yourself);
 		add: (self newJsonObject
-				 at: 'extensionType' put: 'download';
+				 at: 'extensionType' put: 'export';
 				 at: 'elementType' put: 'class';
 				 at: 'label' put: 'File Out';
 				 at: 'get' put: '/classes/{element.name}/fileout';
 				 at: 'defaultFilename' put: '{element.name}.st';
 				 at: 'section' put: 'Extra';
 				 yourself).
-	^ change , download
+	^ change , export
 ]
 
 { #category : #private }
