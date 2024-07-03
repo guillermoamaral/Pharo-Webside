@@ -1,6 +1,6 @@
-Extension { #name : #RBRenamePackageChange }
+Extension { #name : 'RBRenamePackageChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRenamePackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -9,7 +9,7 @@ RBRenamePackageChange >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRenamePackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

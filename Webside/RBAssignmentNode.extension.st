@@ -1,6 +1,6 @@
-Extension { #name : #RBAssignmentNode }
+Extension { #name : 'RBAssignmentNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAssignmentNode >> asWebsideJson [
 
 	^ super asWebsideJson at: 'children' put: { 

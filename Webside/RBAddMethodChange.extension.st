@@ -1,6 +1,6 @@
-Extension { #name : #RBAddMethodChange }
+Extension { #name : 'RBAddMethodChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddMethodChange >> asWebsideJson [
 	| json |
 	json := super asWebsideJson.
@@ -11,7 +11,7 @@ RBAddMethodChange >> asWebsideJson [
 		yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddMethodChange >> fromWebsideJson: json [
 
 	| category ast |

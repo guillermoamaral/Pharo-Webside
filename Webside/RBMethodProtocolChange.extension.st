@@ -1,6 +1,6 @@
-Extension { #name : #RBMethodProtocolChange }
+Extension { #name : 'RBMethodProtocolChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMethodProtocolChange >> fromWebsideJson: json [
 
 	| method |
@@ -10,7 +10,7 @@ RBMethodProtocolChange >> fromWebsideJson: json [
 		method ifNotNil: [ source := method sourceCode ] ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMethodProtocolChange class >> websideType [
 
 	^ 'ClassifyMethod'

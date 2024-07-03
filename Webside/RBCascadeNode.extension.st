@@ -1,6 +1,6 @@
-Extension { #name : #RBCascadeNode }
+Extension { #name : 'RBCascadeNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCascadeNode >> asWebsideJson [ 
 | children |
 children := messages collect: [ :n | n asWebsideJson  ].

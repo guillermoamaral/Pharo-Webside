@@ -1,12 +1,12 @@
-Extension { #name : #MessageTally }
+Extension { #name : 'MessageTally' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 MessageTally >> asWebsideJson [
 
 	^ self asWebsideJson: tally totalTime: time
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 MessageTally >> asWebsideJson: total totalTime: totalTime [
 
 	| percent label signature |

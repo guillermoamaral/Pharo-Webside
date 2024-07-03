@@ -1,6 +1,6 @@
-Extension { #name : #StPackageEntry }
+Extension { #name : 'StPackageEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 StPackageEntry >> websideType [
 
 	^ 'package'

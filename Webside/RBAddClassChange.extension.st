@@ -1,44 +1,29 @@
-Extension { #name : #RBAddClassChange }
+Extension { #name : 'RBAddClassChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddClassChange >> fromWebsideJson: json [
 
 	| doit |
 	super fromWebsideJson: json.
-	category := json at: 'package' ifAbsent: [ 'Undefined' ].
-	json at: 'superclass' ifPresent: [ :n | superclassName := n ].
-	instanceVariableNames := json
-		                         at: 'instanceVariables'
-		                         ifAbsent: [ #(  ) ].
-	classVariableNames := json at: 'classVariables' ifAbsent: [ #(  ) ].
-	poolDictionaryNames := json
-		                       at: 'poolDictionaries'
-		                       ifAbsent: [ #(  ) ].
-	definition := json at: 'definition' ifAbsent: nil.
-	(definition isNil and: [ superclassName notNil ]) ifTrue: [
-		definition := String streamContents: [ :s |
-			              s
-				              nextPutAll: superclassName;
-				              nextPutAll: ' subclass: ';
-				              nextPutAll: className printString;
-				              nextPutAll: ' instanceVariableNames: '''.
-			              instanceVariableNames
-				              do: [ :n | s nextPutAll: n ]
-				              separatedBy: [ s space ].
-			              s nextPutAll: ''' classVariableNames: '''.
-			              classVariableNames
-				              do: [ :n | s nextPutAll: n ]
-				              separatedBy: [ s space ].
-			              s nextPutAll: ''' poolDictionaries: '''.
-			              poolDictionaryNames
-				              do: [ :n | s nextPutAll: n ]
-				              separatedBy: [ s space ].
-			              s
-				              nextPutAll: ''' category: #';
-				              nextPutAll: category ] ].
-	doit := OpalCompiler new
-		        noPattern: true;
-		        parse: definition.
-	className := doit body statements first value arguments first value
-		             asString
+	builder := ShiftClassBuilder new.
+	json at: 'package' ifPresent: [ :package | builder package: package ].
+	json
+		at: 'superclass'
+		ifPresent: [ :superclass | builder superclassName: superclass ].
+	json
+		at: 'instanceVariables'
+		ifPresent: [ :slots | builder slots: slots ].
+	json
+		at: 'classVariables'
+		ifPresent: [ :slots | builder sharedVariables: slots ].
+	json
+		at: 'poolDictionaries'
+		ifPresent: [ :pools | builder sharedPools: pools ].
+	json at: 'definition' ifPresent: [:definition |
+		doit := OpalCompiler new
+			        isScripting: true;
+			        parse: definition.
+		className := doit body statements first value receiver arguments first value
+			             asString ].
+	builder name: className
 ]

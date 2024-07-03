@@ -1,6 +1,6 @@
-Extension { #name : #RGMethodDefinition }
+Extension { #name : 'RGMethodDefinition' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RGMethodDefinition >> asWebsideJson [
 	^ self compiledMethod asWebsideJson 
 ]

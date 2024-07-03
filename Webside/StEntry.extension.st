@@ -1,6 +1,6 @@
-Extension { #name : #StEntry }
+Extension { #name : 'StEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 StEntry >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -9,7 +9,7 @@ StEntry >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 StEntry >> websideType [
 
 	^ nil

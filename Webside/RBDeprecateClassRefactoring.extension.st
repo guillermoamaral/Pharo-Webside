@@ -1,6 +1,6 @@
-Extension { #name : #RBDeprecateClassRefactoring }
+Extension { #name : 'RBDeprecateClassRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBDeprecateClassRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -8,14 +8,14 @@ RBDeprecateClassRefactoring >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBDeprecateClassRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
 	self className: (json at: 'className' ifAbsent: nil) newName: (json at: 'newName' ifAbsent: nil) 
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBDeprecateClassRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new

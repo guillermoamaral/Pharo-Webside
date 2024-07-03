@@ -1,6 +1,6 @@
-Extension { #name : #RBNode }
+Extension { #name : 'RBNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBNode >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -10,12 +10,12 @@ RBNode >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
-RBNode >> websideType [
-	^self class websideType
-]
-
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBNode class >> websideType [ 
 	^(self name withoutPrefix: 'RB') withoutSuffix: 'Node'.
+]
+
+{ #category : '*Webside' }
+RBNode >> websideType [
+	^self class websideType
 ]

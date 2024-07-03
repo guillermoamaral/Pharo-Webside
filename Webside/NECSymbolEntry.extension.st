@@ -1,6 +1,6 @@
-Extension { #name : #NECSymbolEntry }
+Extension { #name : 'NECSymbolEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 NECSymbolEntry >> websideType [
 	| global |
 	global := Smalltalk at: contents ifAbsent: [].

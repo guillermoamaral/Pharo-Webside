@@ -1,6 +1,6 @@
-Extension { #name : #ClyMoveClassToGroupCommand }
+Extension { #name : 'ClyMoveClassToGroupCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyMoveClassToGroupCommand >> asWebsideJson [
 	"Used on just one class from Webside"
 
@@ -10,7 +10,7 @@ ClyMoveClassToGroupCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyMoveClassToGroupCommand >> fromWebsideJson: json [
 	"Used on just one class from Webside"
 
@@ -25,7 +25,7 @@ ClyMoveClassToGroupCommand >> fromWebsideJson: json [
 		ifPresent: [ :p | classGroup := environment packageNamed: p ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyMoveClassToGroupCommand class >> websideExtension [
 
 	^ NeoJSONObject new

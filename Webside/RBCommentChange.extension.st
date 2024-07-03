@@ -1,18 +1,18 @@
-Extension { #name : #RBCommentChange }
+Extension { #name : 'RBCommentChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCommentChange >> asWebsideJson [
 	^super asWebsideJson
 		at: 'comment' put: comment; yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCommentChange >> fromWebsideJson: json [
 	super fromWebsideJson: json.
 	comment := json at: 'comment' ifAbsent: ''
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCommentChange class >> websideType [
 
 	^ 'CommentClass'

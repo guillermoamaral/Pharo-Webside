@@ -1,9 +1,10 @@
-Extension { #name : #OCSemanticWarning }
+Extension { #name : 'OCUndeclaredVariableWarning' }
 
-{ #category : #'*Webside' }
-OCSemanticWarning >> asWebsideJson [
+{ #category : '*Webside' }
+OCUndeclaredVariableWarning >> asWebsideJson [
 
-	| interval |
+	| node interval |
+	node := self node.
 	interval := NeoJSONObject new
 		            at: 'start' put: node start;
 		            at: 'end' put: node stop;

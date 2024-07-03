@@ -1,13 +1,13 @@
-Extension { #name : #RBRefactoryChange }
+Extension { #name : 'RBRefactoryChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange class >> acceptsWebsideJson: json [
 	| type |
 	type := json at: 'type' ifAbsent: nil.
 	^ self websideType = type
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange >> asWebsideJson [
 	^ NeoJSONObject new
 		at: 'type' put: self class websideType asString;
@@ -18,31 +18,31 @@ RBRefactoryChange >> asWebsideJson [
 		yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange class >> classForWebsideJson: json [
 	^ self allSubclasses
 		detect: [ :c | c acceptsWebsideJson: json ]
 		ifNone: nil
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange class >> fromWebsideJson: json [
 	| class |
 	class := self classForWebsideJson: json.
 	^ class ifNotNil: [ class new fromWebsideJson: json ] 
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange >> fromWebsideJson: json [
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange >> websideExecute [
 
 	^ self execute
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryChange class >> websideType [
 
 	^ (self name withoutPrefix: 'RB') withoutSuffix: 'Change' 

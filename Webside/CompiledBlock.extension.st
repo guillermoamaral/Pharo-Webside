@@ -1,6 +1,6 @@
-Extension { #name : #CompiledBlock }
+Extension { #name : 'CompiledBlock' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 CompiledBlock >> asWebsideJson [
 
 	^ super asWebsideJson

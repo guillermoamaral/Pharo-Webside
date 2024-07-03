@@ -1,13 +1,13 @@
-Extension { #name : #RBPushDownMethodRefactoring }
+Extension { #name : 'RBPushDownMethodRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPushDownMethodRefactoring >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'selectors' put: selectors;
 		yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPushDownMethodRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -17,7 +17,7 @@ RBPushDownMethodRefactoring >> fromWebsideJson: json [
 	json at: 'selector' ifPresent: [ :s | selectors := { s asSymbol } ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPushDownMethodRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new

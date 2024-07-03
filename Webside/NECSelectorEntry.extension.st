@@ -1,6 +1,6 @@
-Extension { #name : #NECSelectorEntry }
+Extension { #name : 'NECSelectorEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 NECSelectorEntry >> websideType [
 	^'method'
 ]

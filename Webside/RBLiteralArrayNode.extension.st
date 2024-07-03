@@ -1,6 +1,6 @@
-Extension { #name : #RBLiteralArrayNode }
+Extension { #name : 'RBLiteralArrayNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBLiteralArrayNode >> asWebsideJson [ 
 	| children |
 	children := contents collect: [ :n | n asWebsideJson  ].

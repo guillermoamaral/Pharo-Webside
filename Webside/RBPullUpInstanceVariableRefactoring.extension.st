@@ -1,13 +1,13 @@
-Extension { #name : #RBPullUpInstanceVariableRefactoring }
+Extension { #name : 'RBPullUpInstanceVariableRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPullUpInstanceVariableRefactoring >> fromWebsideJson: json [
 	super fromWebsideJson: json.
 	class notNil
 		ifTrue: [ class := class superclass ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPullUpInstanceVariableRefactoring class >> websideType [
 
 	^ 'MoveUpInstanceVariable'

@@ -1,6 +1,6 @@
-Extension { #name : #RBSequenceNode }
+Extension { #name : 'RBSequenceNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBSequenceNode >> asWebsideJson [ 
 	| children |
 	children := OrderedCollection new.

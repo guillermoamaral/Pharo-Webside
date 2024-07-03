@@ -1,10 +1,10 @@
-Extension { #name : #RBRemoveProtocolChange }
+Extension { #name : 'RBRemoveProtocolChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRemoveProtocolChange >> websideExecute [
 
 	| category remotions changes |
-	category := self changeClass organization protocolNamed: protocol.
+	category := self changeClass protocolNamed: protocol.
 	category isEmpty ifTrue: [ ^ super websideExecute ].
 	remotions := category methodSelectors collect: [ :s |
 		             RBRemoveMethodChange remove: s from: self changeClass ].
@@ -18,7 +18,7 @@ RBRemoveProtocolChange >> websideExecute [
 		signal
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRemoveProtocolChange class >> websideType [
 
 	^ 'RemoveCategory'

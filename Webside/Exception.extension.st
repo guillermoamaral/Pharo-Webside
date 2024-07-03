@@ -1,6 +1,6 @@
-Extension { #name : #Exception }
+Extension { #name : 'Exception' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 Exception >> asWebsideJson [ 
 	^super asWebsideJson at: 'description' put: self description; yourself
 ]

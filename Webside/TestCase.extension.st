@@ -1,6 +1,6 @@
-Extension { #name : #TestCase }
+Extension { #name : 'TestCase' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 TestCase >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'class' put: self class name;

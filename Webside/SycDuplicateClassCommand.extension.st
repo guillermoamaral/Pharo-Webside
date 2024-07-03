@@ -1,7 +1,7 @@
-Extension { #name : #SycCopyClassCommand }
+Extension { #name : 'SycDuplicateClassCommand' }
 
-{ #category : #'*Webside' }
-SycCopyClassCommand >> asWebsideJson [
+{ #category : '*Webside' }
+SycDuplicateClassCommand >> asWebsideJson [
 
 	^ super asWebsideJson
 		  at: 'className' put: originalClass name;
@@ -9,8 +9,8 @@ SycCopyClassCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
-SycCopyClassCommand >> fromWebsideJson: json [
+{ #category : '*Webside' }
+SycDuplicateClassCommand >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
 	newClassName := json at: 'newName'.
@@ -18,13 +18,13 @@ SycCopyClassCommand >> fromWebsideJson: json [
 		originalClass := ClySystemEnvironment currentImage classNamed: c ]
 ]
 
-{ #category : #'*Webside' }
-SycCopyClassCommand class >> websideExtension [
+{ #category : '*Webside' }
+SycDuplicateClassCommand class >> websideExtension [
 
 	^ NeoJSONObject new
 		  at: 'extensionType' put: 'change';
 		  at: 'elementType' put: 'class';
-		  at: 'label' put: 'Copy';
+		  at: 'label' put: 'Duplicate';
 		  at: 'properties' put: (NeoJSONObject new
 				   at: 'type' put: self websideType;
 				   at: 'className' put: '{element.name}';
@@ -36,12 +36,6 @@ SycCopyClassCommand class >> websideExtension [
 			   at: 'type' put: 'text';
 			   at: 'defaultValue' put: '{element.name}Copy';
 			   yourself) };
-		  at: 'section' put: 'Refactorings';
+			at: 'section' put: 'Refactorings';
 		  yourself
-]
-
-{ #category : #'*Webside' }
-SycCopyClassCommand class >> websideType [
-
-	^ 'CloneClass'
 ]

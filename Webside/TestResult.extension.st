@@ -1,6 +1,6 @@
-Extension { #name : #TestResult }
+Extension { #name : 'TestResult' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 TestResult >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'passed' put: (passed collect: #asWebsideJson);

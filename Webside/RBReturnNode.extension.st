@@ -1,6 +1,6 @@
-Extension { #name : #RBReturnNode }
+Extension { #name : 'RBReturnNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBReturnNode >> asWebsideJson [ 
 	^super asWebsideJson at: 'children' put: { value asWebsideJson  }; yourself
 ]

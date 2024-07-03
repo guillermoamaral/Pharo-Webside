@@ -1,6 +1,6 @@
-Extension { #name : #RBRenameClassChange }
+Extension { #name : 'RBRenameClassChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRenameClassChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

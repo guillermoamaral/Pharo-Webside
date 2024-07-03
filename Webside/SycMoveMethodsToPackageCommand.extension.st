@@ -1,6 +1,6 @@
-Extension { #name : #SycMoveMethodsToPackageCommand }
+Extension { #name : 'SycMoveMethodsToPackageCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMoveMethodsToPackageCommand >> asWebsideJson [
   "Used on just one method from Webside"
 
@@ -11,7 +11,7 @@ SycMoveMethodsToPackageCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMoveMethodsToPackageCommand >> fromWebsideJson: json [
 	"Used on just one method from Webside"
 
@@ -29,7 +29,7 @@ SycMoveMethodsToPackageCommand >> fromWebsideJson: json [
 		ifPresent: [ :p | package := environment packageNamed: p ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMoveMethodsToPackageCommand class >> websideExtension [
 
 	^ NeoJSONObject new

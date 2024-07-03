@@ -1,6 +1,6 @@
-Extension { #name : #RBMessageNode }
+Extension { #name : 'RBMessageNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMessageNode >> asWebsideJson [
 
 	| children |

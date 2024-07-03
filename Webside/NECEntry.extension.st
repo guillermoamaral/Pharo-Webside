@@ -1,6 +1,6 @@
-Extension { #name : #NECEntry }
+Extension { #name : 'NECEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 NECEntry >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -12,7 +12,7 @@ NECEntry >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 NECEntry >> websideType [
 	^nil
 ]

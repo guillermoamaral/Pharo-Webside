@@ -1,6 +1,6 @@
-Extension { #name : #SycMigrateReferencesOfClassCommand }
+Extension { #name : 'SycMigrateReferencesOfClassCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMigrateReferencesOfClassCommand >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -9,7 +9,7 @@ SycMigrateReferencesOfClassCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMigrateReferencesOfClassCommand >> fromWebsideJson: json [
 
 	| environment |
@@ -23,7 +23,7 @@ SycMigrateReferencesOfClassCommand >> fromWebsideJson: json [
 		ifPresent: [ :c | newName := environment classNamed: c ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycMigrateReferencesOfClassCommand class >> websideExtension [
 
 	^ NeoJSONObject new

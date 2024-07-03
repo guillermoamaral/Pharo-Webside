@@ -1,6 +1,6 @@
-Extension { #name : #SycGenerateAllInstVarAccessorsCommand }
+Extension { #name : 'SycGenerateAllInstVarAccessorsCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycGenerateAllInstVarAccessorsCommand >> asWebsideJson [
 	"Used on just one class from Webside"
 
@@ -9,7 +9,7 @@ SycGenerateAllInstVarAccessorsCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycGenerateAllInstVarAccessorsCommand >> fromWebsideJson: json [
 	"Used on just one class from Webside"
 
@@ -18,7 +18,7 @@ SycGenerateAllInstVarAccessorsCommand >> fromWebsideJson: json [
 		classes := { (ClySystemEnvironment currentImage classNamed: c) } ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycGenerateAllInstVarAccessorsCommand class >> websideExtension [
 
 	^ NeoJSONObject new

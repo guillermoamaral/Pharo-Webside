@@ -1,1 +1,1 @@
-Package { #name : #'Webside-Tests' }
+Package { #name : 'Webside-Tests' }

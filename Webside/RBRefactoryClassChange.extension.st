@@ -1,6 +1,6 @@
-Extension { #name : #RBRefactoryClassChange }
+Extension { #name : 'RBRefactoryClassChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryClassChange >> asWebsideJson [
 
 	| moniker |
@@ -13,7 +13,7 @@ RBRefactoryClassChange >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRefactoryClassChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

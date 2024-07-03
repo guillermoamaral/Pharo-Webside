@@ -1,6 +1,6 @@
-Extension { #name : #RBRemovePackageChange }
+Extension { #name : 'RBRemovePackageChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRemovePackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -8,7 +8,7 @@ RBRemovePackageChange >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRemovePackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

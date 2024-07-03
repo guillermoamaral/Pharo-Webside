@@ -1,38 +1,40 @@
 Class {
-	#name : #WebsideChangeError,
-	#superclass : #Error,
+	#name : 'WebsideChangeError',
+	#superclass : 'Error',
 	#instVars : [
 		'change',
 		'error',
 		'suggestions'
 	],
-	#category : #'Webside-Base'
+	#category : 'Webside-Base',
+	#package : 'Webside',
+	#tag : 'Base'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WebsideChangeError class >> canWrap: anException [
     ^false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideChangeError class >> classFor: anException [
 
 	^ self allSubclasses detect: [:c | c canWrap: anException] ifNone: [ WebsideChangeError ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WebsideChangeError class >> from: change [
 
 	^ self new from: change
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WebsideChangeError class >> on: anException from: change [
 
 	^ (self classFor: anException) new on: anException from: change
 ]
 
-{ #category : #json }
+{ #category : 'json' }
 WebsideChangeError >> asWebsideJson [
 
 	| json todo |
@@ -49,25 +51,25 @@ WebsideChangeError >> asWebsideJson [
 	^ json
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WebsideChangeError >> from: originalChange [
 
 	change := originalChange
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WebsideChangeError >> initialize [
 	super initialize.
 	suggestions := OrderedDictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WebsideChangeError >> on: anException from: originalChange [
   change := originalChange.
   error := anException
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WebsideChangeError >> suggest: aString withChanges: aCollection [
 
 	suggestions at: aString put: aCollection

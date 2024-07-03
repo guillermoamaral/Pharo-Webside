@@ -1,6 +1,6 @@
-Extension { #name : #RBRenameVariableChange }
+Extension { #name : 'RBRenameVariableChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRenameVariableChange >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -10,7 +10,7 @@ RBRenameVariableChange >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBRenameVariableChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

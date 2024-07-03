@@ -1,13 +1,13 @@
-Extension { #name : #RBPullUpMethodRefactoring }
+Extension { #name : 'RBPullUpMethodRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPullUpMethodRefactoring >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'selectors' put: selectors;
 		yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPullUpMethodRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -19,7 +19,7 @@ RBPullUpMethodRefactoring >> fromWebsideJson: json [
 	self pullUp:  selectors from: class  to: class superclass 
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPullUpMethodRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new

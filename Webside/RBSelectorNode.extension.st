@@ -1,6 +1,6 @@
-Extension { #name : #RBSelectorNode }
+Extension { #name : 'RBSelectorNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBSelectorNode >> asWebsideJson [
 
 	^ super asWebsideJson

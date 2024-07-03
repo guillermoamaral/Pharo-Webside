@@ -1,6 +1,6 @@
-Extension { #name : #Context }
+Extension { #name : 'Context' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 Context >> asWebsideJson [
 
 	^ NeoJSONObject new

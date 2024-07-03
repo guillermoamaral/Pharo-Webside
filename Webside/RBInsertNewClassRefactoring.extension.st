@@ -1,7 +1,7 @@
-Extension { #name : #RBInsertClassRefactoring }
+Extension { #name : 'RBInsertNewClassRefactoring' }
 
-{ #category : #'*Webside' }
-RBInsertClassRefactoring >> asWebsideJson [
+{ #category : '*Webside' }
+RBInsertNewClassRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
 		  at: 'newName' put: className asString;
@@ -10,8 +10,8 @@ RBInsertClassRefactoring >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
-RBInsertClassRefactoring >> fromWebsideJson: json [
+{ #category : '*Webside' }
+RBInsertNewClassRefactoring >> fromWebsideJson: json [
 
 	| target |
 	super fromWebsideJson: json.
@@ -20,13 +20,14 @@ RBInsertClassRefactoring >> fromWebsideJson: json [
 	json at: 'className' ifPresent: [ :name |
 		target := self classObjectFor: name asSymbol.
 		target ifNotNil: [
-			category := target category.
+			packageName := target packageName.
+			tagName := target tagName.
 			superclass := target superclass.
 			subclasses := { target } ] ]
 ]
 
-{ #category : #'*Webside' }
-RBInsertClassRefactoring class >> websideExtension [
+{ #category : '*Webside' }
+RBInsertNewClassRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
 		  at: 'extensionType' put: 'change';

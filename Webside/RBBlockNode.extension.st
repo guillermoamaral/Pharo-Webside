@@ -1,6 +1,6 @@
-Extension { #name : #RBBlockNode }
+Extension { #name : 'RBBlockNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBBlockNode >> asWebsideJson [
 
 	| children |

@@ -1,6 +1,6 @@
-Extension { #name : #CompiledMethod }
+Extension { #name : 'CompiledMethod' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 CompiledMethod >> asWebsideJson [
 
 	| json status |
@@ -8,7 +8,7 @@ CompiledMethod >> asWebsideJson [
 	json
 		at: 'selector' put: self selector;
 		at: 'methodClass' put: (self methodClass ifNotNil: [ :c | c name ]);
-		at: 'category' put: self category;
+		at: 'category' put: self protocolName;
 		at: 'package' put: (self package ifNotNil: [ :p | p name ]);
 		at: 'source' put: self sourceCode;
 		at: 'author' put: self author;

@@ -1,6 +1,6 @@
-Extension { #name : #RBLiteralValueNode }
+Extension { #name : 'RBLiteralValueNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBLiteralValueNode >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'value' put: value asString;

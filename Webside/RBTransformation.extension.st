@@ -1,6 +1,6 @@
-Extension { #name : #RBTransformation }
+Extension { #name : 'RBTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation class >> acceptsWebsideJson: json [
 
 	| type |
@@ -8,7 +8,7 @@ RBTransformation class >> acceptsWebsideJson: json [
 	^ self websideType = type
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation >> asWebsideJson [
 
 	^ NeoJSONObject new
@@ -20,7 +20,7 @@ RBTransformation >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation class >> classForWebsideJson: json [
 
 	^ self allSubclasses
@@ -28,7 +28,7 @@ RBTransformation class >> classForWebsideJson: json [
 		  ifNone: nil
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation class >> fromWebsideJson: json [
 
 	| class |
@@ -36,19 +36,19 @@ RBTransformation class >> fromWebsideJson: json [
 	^ class ifNotNil: [ class new fromWebsideJson: json ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation >> fromWebsideJson: json [
 
 	
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation >> websideExecute [
 
 	^ self execute
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBTransformation class >> websideType [
 
 	^ (self name withoutPrefix: 'RB') withoutSuffix: 'Transformation'

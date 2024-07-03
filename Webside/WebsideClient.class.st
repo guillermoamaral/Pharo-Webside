@@ -2,38 +2,40 @@
 (WebsideClient to: 'http://localhost:9001/pharo') evaluate: '3 + 4'
 "
 Class {
-	#name : #WebsideClient,
-	#superclass : #Object,
+	#name : 'WebsideClient',
+	#superclass : 'Object',
 	#instVars : [
 		'url',
 		'client'
 	],
-	#category : #'Webside-Base'
+	#category : 'Webside-Base',
+	#package : 'Webside',
+	#tag : 'Base'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WebsideClient class >> new [
 
 	^ super new initialize 
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WebsideClient class >> to: url [
 	^self new url: url
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 WebsideClient >> dialect [
 
 	^ client get: url , '/dialect'
 ]
 
-{ #category : #evaluations }
+{ #category : 'evaluations' }
 WebsideClient >> evaluate: aString [
 	^self evaluate: aString sync: true
 ]
 
-{ #category : #evaluations }
+{ #category : 'evaluations' }
 WebsideClient >> evaluate: aString sync: aBoolean [
 
 	| evaluation json error |
@@ -52,7 +54,7 @@ WebsideClient >> evaluate: aString sync: aBoolean [
 	^ json
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WebsideClient >> initialize [
 
 	super initialize.
@@ -60,7 +62,7 @@ WebsideClient >> initialize [
 	client forJsonREST 
 ]
 
-{ #category : #evaluations }
+{ #category : 'evaluations' }
 WebsideClient >> url: aString [
 	url := aString
 ]

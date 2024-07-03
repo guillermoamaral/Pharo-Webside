@@ -1,6 +1,6 @@
-Extension { #name : #RBClassRefactoring }
+Extension { #name : 'RBClassRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBClassRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -8,7 +8,7 @@ RBClassRefactoring >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBClassRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.

@@ -1,6 +1,6 @@
-Extension { #name : #Object }
+Extension { #name : 'Object' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 Object >> asWebsideJson [
 
 	| printed |
@@ -19,7 +19,7 @@ Object >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 Object >> websideIndexAccessor [
 
 	^ WebsideIndexAccessor new
@@ -27,7 +27,7 @@ Object >> websideIndexAccessor [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 Object >> websidePresentations [
 
 	^#()

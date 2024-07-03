@@ -1,6 +1,6 @@
-Extension { #name : #RBCreateAccessorsForVariableTransformation }
+Extension { #name : 'RBCreateAccessorsForVariableTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCreateAccessorsForVariableTransformation >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -10,7 +10,7 @@ RBCreateAccessorsForVariableTransformation >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCreateAccessorsForVariableTransformation >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -18,7 +18,7 @@ RBCreateAccessorsForVariableTransformation >> fromWebsideJson: json [
 	                 = 'class'
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCreateAccessorsForVariableTransformation class >> websideExtension [
 
 	^ NeoJSONObject new

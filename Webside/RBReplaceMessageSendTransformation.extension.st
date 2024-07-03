@@ -1,6 +1,6 @@
-Extension { #name : #RBReplaceMessageSendTransformation }
+Extension { #name : 'RBReplaceMessageSendTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBReplaceMessageSendTransformation >> asWebsideJson [
 
 	| json |
@@ -12,7 +12,7 @@ RBReplaceMessageSendTransformation >> asWebsideJson [
 	^ json	
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBReplaceMessageSendTransformation >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -26,7 +26,7 @@ RBReplaceMessageSendTransformation >> fromWebsideJson: json [
 	permutation := 1 to: oldSelector numArgs
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBReplaceMessageSendTransformation class >> websideExtension [
 
 	^ NeoJSONObject new

@@ -1,6 +1,6 @@
-Extension { #name : #ClyRemoveClassGroupCommand }
+Extension { #name : 'ClyRemoveClassGroupCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyRemoveClassGroupCommand >> asWebsideJson [
 	"To review: we are using here RPackage and RPackageTag (instead of ClyTaggedClassGroup),
 	since it was easier/faster to implement."
@@ -13,7 +13,7 @@ ClyRemoveClassGroupCommand >> asWebsideJson [
 	^ json
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyRemoveClassGroupCommand >> fromWebsideJson: json [
 	"To review: we are using here RPackage and RPackageTag (instead of ClyTaggedClassGroup),
 	since it was easier/faster to implement."
@@ -21,14 +21,14 @@ ClyRemoveClassGroupCommand >> fromWebsideJson: json [
 	| package |
 	super fromWebsideJson: json.
 	json at: 'package' ifPresent: [ :p |
-		package := RPackageOrganizer default packageNamed: p.
+		package := PackageOrganizer default packageNamed: p.
 		json
 			at: 'category'
 			ifPresent: [ :c |
 			classGroup := package classTagNamed: c ifAbsent: nil ] ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyRemoveClassGroupCommand >> websideExecute [
 	"To review: we are using here RPackage and RPackageTag (instead of ClyTaggedClassGroup),
 	since it was easier/faster to implement."
@@ -50,7 +50,7 @@ ClyRemoveClassGroupCommand >> websideExecute [
 		signal
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 ClyRemoveClassGroupCommand class >> websideType [ 
 	^'RemoveClassCategory'
 ]

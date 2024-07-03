@@ -1,6 +1,6 @@
-Extension { #name : #SycAddNewClassTagCommand }
+Extension { #name : 'SycAddNewClassTagCommand' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycAddNewClassTagCommand >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -9,19 +9,16 @@ SycAddNewClassTagCommand >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycAddNewClassTagCommand >> fromWebsideJson: json [
-
 
 	super fromWebsideJson: json.
 	json at: 'package' ifPresent: [ :p |
-		package := 
-	RPackageOrganizer default packageNamed: p ifAbsent: nil].
-	tagName := json
-			at: 'category' ifAbsent: nil
+		package := PackageOrganizer default packageNamed: p ifAbsent: nil ].
+	tagName := json at: 'category' ifAbsent: nil
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 SycAddNewClassTagCommand class >> websideType [
 
 	^ 'AddClassCategory'

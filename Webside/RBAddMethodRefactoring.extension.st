@@ -1,6 +1,6 @@
-Extension { #name : #RBAddMethodRefactoring }
+Extension { #name : 'RBAddMethodRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddMethodRefactoring class >> acceptsWebsideJson: json [
 	| classname class method selector |
 	(super acceptsWebsideJson: json)

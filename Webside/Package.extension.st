@@ -1,17 +1,14 @@
-Extension { #name : #RPackage }
+Extension { #name : 'Package' }
 
-{ #category : #'*Webside' }
-RPackage >> asWebsideJson [
+{ #category : '*Webside' }
+Package >> asWebsideJson [
 
 	| methods categories |
 	methods := NeoJSONObject new.
-	classExtensionSelectors keysAndValuesDo: [ :c :m |
+	extensionSelectors keysAndValuesDo: [ :c :m |
 		methods at: c asString put: m ].
-	metaclassExtensionSelectors keysAndValuesDo: [ :c :m |
-		methods at: c asString , ' class' put: m ].
 	categories := self tagsForClasses.
-	(classExtensionSelectors notEmpty or: [
-		 metaclassExtensionSelectors notEmpty ]) ifTrue: [
+	(extensionSelectors notEmpty ) ifTrue: [
 		categories := categories , { 'Extensions' } ].
 	categories := categories collect: [ :c |
 		              NeoJSONObject new

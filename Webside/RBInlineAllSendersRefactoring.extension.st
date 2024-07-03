@@ -1,6 +1,6 @@
-Extension { #name : #RBInlineAllSendersRefactoring }
+Extension { #name : 'RBInlineAllSendersRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBInlineAllSendersRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -9,7 +9,7 @@ RBInlineAllSendersRefactoring >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBInlineAllSendersRefactoring >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -19,7 +19,7 @@ RBInlineAllSendersRefactoring >> fromWebsideJson: json [
 	numberReplaced := numberNotReplaced := 0
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBInlineAllSendersRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new

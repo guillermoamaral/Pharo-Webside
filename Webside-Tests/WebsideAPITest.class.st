@@ -1,21 +1,22 @@
 Class {
-	#name : #WebsideAPITest,
-	#superclass : #TestCase,
+	#name : 'WebsideAPITest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'server',
 		'client'
 	],
-	#category : #'Webside-Tests'
+	#category : 'Webside-Tests',
+	#package : 'Webside-Tests'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideAPITest >> delete: uri [
 	| data |
 	data := client delete: server baseUrl / uri.
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideAPITest >> get: uri [
 	| url data |
 	url := server baseUrl asString.
@@ -29,17 +30,17 @@ WebsideAPITest >> get: uri [
 	^ data ifNotNil: [ NeoJSONObject fromString: data ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideAPITest >> newJsonObject [ 
 	^NeoJSONObject new
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideAPITest >> post: uri [
 	^ self post: uri with: ''
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WebsideAPITest >> post: uri with: body [
 	| data |
 	data := client post: server baseUrl / uri contents: body asString.
@@ -47,7 +48,7 @@ WebsideAPITest >> post: uri with: body [
 	^ NeoJSONObject fromString: data
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 WebsideAPITest >> setUp [
 	super setUp.
 	server := WebsideServer new.
@@ -59,13 +60,13 @@ WebsideAPITest >> setUp [
 		accept: ZnMimeType applicationJson
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 WebsideAPITest >> tearDown [
 	super tearDown.
 	server stop.
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testAccessors [
 	| accessors |
 	accessors := self get: 'methods?class=Fraction&accessing=numerator'.
@@ -82,7 +83,7 @@ WebsideAPITest >> testAccessors [
 				allSatisfy: [ :m | m source includesSubstring: 'numerator :=' ])
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testActiveEvaluations [
 
 	| evaluation result id |
@@ -101,7 +102,7 @@ WebsideAPITest >> testActiveEvaluations [
 		self delete: '/evaluations/' , id asString ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testAddCass [
 
 	| definition class remotion |
@@ -124,7 +125,7 @@ WebsideAPITest >> testAddCass [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testAddClassVariable [
 
 	| definition addition variables remotion |
@@ -154,7 +155,7 @@ WebsideAPITest >> testAddClassVariable [
 			self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testAddInstanceVariable [
 
 	| definition addition variables remotion |
@@ -185,7 +186,7 @@ WebsideAPITest >> testAddInstanceVariable [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testAddMethod [
 
 	| change method remotion |
@@ -215,7 +216,7 @@ WebsideAPITest >> testAddMethod [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testAddPackage [
 
 	| creation package remotion |
@@ -237,7 +238,7 @@ WebsideAPITest >> testAddPackage [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testAst [
 	| method ast traverse return x |
 	method := self get: 'classes/Point/methods/x?ast=true'.
@@ -262,7 +263,7 @@ WebsideAPITest >> testAst [
 	self assert: x notNil
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testAsynchronousEvaluation [
 
 	| payload evaluation id attempts object |
@@ -297,7 +298,7 @@ WebsideAPITest >> testAsynchronousEvaluation [
 			do: [  ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testAsynchronousEvaluationError [
 
 	| payload evaluation id attempts description |
@@ -333,7 +334,7 @@ WebsideAPITest >> testAsynchronousEvaluationError [
 		ensure: [ self delete: '/evaluations/' , id ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testCancelAsynchronousEvaluation [
 
 	| payload evaluation id active |
@@ -348,7 +349,7 @@ WebsideAPITest >> testCancelAsynchronousEvaluation [
 	self assert: (active noneSatisfy: [ :e | (e at: 'id') = id ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testCategories [
 	| categories |
 	categories := self get: 'classes/Point/categories'.
@@ -360,7 +361,7 @@ WebsideAPITest >> testCategories [
   
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testChanges [
 
 	| change changes retrieved remotion |
@@ -389,7 +390,7 @@ WebsideAPITest >> testChanges [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testClassDefinition [
 	| definition |
 	definition := self get: 'classes/Point'.
@@ -399,7 +400,7 @@ WebsideAPITest >> testClassDefinition [
 		assert: (definition definition includesSubstring: 'y')
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testClassFileOut [
 
 	| fileout |
@@ -417,14 +418,14 @@ WebsideAPITest >> testClassFileOut [
 	^ x! !')
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testClassVariables [
 	| variables |
 	variables := self get: 'classes/Float/class-variables'.
 	self assert: (variables anySatisfy: [ :v | (v at: 'name') = 'Infinity' and: [(v at: 'type') = 'class']])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testClasses [
 	| classes names tree root integer |
 	classes := self get: 'classes?root=Magnitude'.
@@ -452,7 +453,7 @@ WebsideAPITest >> testClasses [
 		assert: (integer subclasses anySatisfy: [ :c | c name = 'SmallInteger' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testClassifyMethod [
 
 	| definition classification method methodRemotion categoryRemotion |
@@ -495,7 +496,7 @@ WebsideAPITest >> testClassifyMethod [
 				post: '/changes' with: categoryRemotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testCodeSuggestion [
 
 	| change method error suggestions remotion |
@@ -531,7 +532,7 @@ WebsideAPITest >> testCodeSuggestion [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testCommentClass [
 
 	| definition comment class remotion |
@@ -561,7 +562,7 @@ WebsideAPITest >> testCommentClass [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testCompiledMethodSlots [
 
 	| evaluation result id slots |
@@ -580,7 +581,7 @@ WebsideAPITest >> testCompiledMethodSlots [
 	self assert: slots notEmpty
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger [
 
 	| evaluation error id target debugger frames |
@@ -610,7 +611,7 @@ WebsideAPITest >> testCreateDebugger [
 		debugger notNil ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testCreateDebugger2 [
 
 	| payload evaluation id attempts description target debugger frames |
@@ -650,7 +651,7 @@ WebsideAPITest >> testCreateDebugger2 [
 		debugger notNil ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testDebugExpression [
 
 	| evaluation id debuggers |
@@ -667,7 +668,7 @@ WebsideAPITest >> testDebugExpression [
 		(debuggers anySatisfy: [:d | (d at: 'id') = id]) ifTrue: [ self delete: '/debuggers/' , id ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testDebuggerContext [
 
 	| evaluation id debugger error |
@@ -710,7 +711,7 @@ WebsideAPITest >> testDebuggerContext [
 		self delete: '/debuggers/' , id asString ]
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testDebuggerFrames [
 
 	| evaluation error id target debugger frames |
@@ -742,14 +743,14 @@ WebsideAPITest >> testDebuggerFrames [
 		ensure: [ self delete: '/debuggers/' , id ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testDialect [
 	| dialect |
 	dialect := self get: 'dialect'.
 	self assert: dialect equals: 'Pharo'
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testFrameBindings [
 
 	| evaluation error id target debugger frames bindings |
@@ -782,7 +783,7 @@ WebsideAPITest >> testFrameBindings [
 		ensure: [ self delete: '/debuggers/' , id ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testImplementors [
 
 	| implementors local |
@@ -801,7 +802,7 @@ WebsideAPITest >> testImplementors [
 		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testInstanceVariables [
 	| variables |
 	variables := self get: 'classes/Fraction/instance-variables'.
@@ -810,7 +811,7 @@ WebsideAPITest >> testInstanceVariables [
 		assert: (variables anySatisfy: [ :v | v name = 'denominator' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testLocalImplementors [
 
 	| methods hierarchy retrieved |
@@ -824,7 +825,7 @@ WebsideAPITest >> testLocalImplementors [
 		assert: (retrieved allSatisfy: [ :n | hierarchy includes: n ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testLocalSenders [
 
 	| methods hierarchy retrieved |
@@ -838,7 +839,7 @@ WebsideAPITest >> testLocalSenders [
 		assert: (retrieved allSatisfy: [ :n | hierarchy includes: n ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testMatchingSelectors [
 	| matching |
 	matching := self get: 'methods?selectorMatching=testMa*'.
@@ -848,7 +849,7 @@ WebsideAPITest >> testMatchingSelectors [
 			anySatisfy: [:m | (m at: 'selector') = 'testMatchingSelectors'])
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testMessageNotUnderstood [
 
 	| change method evaluation error id debugger target frame remotion |
@@ -899,7 +900,7 @@ WebsideAPITest >> testMessageNotUnderstood [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testMethod [
 	| method |
 	method := self get: 'classes/Point/methods/x'.
@@ -910,7 +911,7 @@ WebsideAPITest >> testMethod [
 				or: [ method source includesSubstring: '^ x' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testMethodCount [
 
 	| methods count |
@@ -919,7 +920,7 @@ WebsideAPITest >> testMethodCount [
 	self assert: count equals: methods size
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testMethodFileOut [
 
 	| fileout |
@@ -934,7 +935,7 @@ x
 	^ x! !')
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testMethods [
 
 	| methods |
@@ -944,7 +945,7 @@ WebsideAPITest >> testMethods [
 		assert: (methods allSatisfy: [ :m | (m at: 'methodClass') = 'Point' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testMoveDownInstanceVariable [
 
 	| superclass class movement remotion variables |
@@ -992,7 +993,7 @@ WebsideAPITest >> testMoveDownInstanceVariable [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testMoveUpInstanceVariable [
 
 	| superclass class movement variables remotion |
@@ -1050,7 +1051,7 @@ WebsideAPITest >> testMoveUpInstanceVariable [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testObjectContext [
 
 	| evaluation object |
@@ -1078,7 +1079,7 @@ WebsideAPITest >> testObjectContext [
 		self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testObjectSlotContext [
 
 	| evaluation object |
@@ -1106,7 +1107,7 @@ WebsideAPITest >> testObjectSlotContext [
 		self delete: '/objects/' , (object at: 'id') asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testPackage [
 
 	| package |
@@ -1118,7 +1119,7 @@ WebsideAPITest >> testPackage [
 		assert: (package at: 'categories') notEmpty; assert: ((package at: 'categories') allSatisfy: [ :c | (c includesKey: 'name') and: [ (c at: 'package' ifAbsent: [ '' ]) = 'Webside' ] ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testPackageClasses [
 
 	| classes webside expected retrieved |
@@ -1132,13 +1133,13 @@ WebsideAPITest >> testPackageClasses [
 	self assert:
 		(classes allSatisfy: [ :c | (c at: 'category') = 'Base' ]).
 	classes := self get: 'packages/Webside/classes?category=Extensions'.
-	webside := RPackageOrganizer default packageNamed: 'Webside'.
+	webside :=PackageOrganizer default packageNamed: 'Webside'.
 	expected := webside extendedClassNames.
 	retrieved := classes collect: [ :c | c at: 'name' ].
 	self assertCollection: retrieved hasSameElements: expected
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testPackageMethods [
 
 	| methods |
@@ -1150,7 +1151,7 @@ WebsideAPITest >> testPackageMethods [
 							 (m at: 'selector') = 'asWebsideJson' ] ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testPackages [
 	| packages package |
 	packages := self get: 'packages'.
@@ -1160,7 +1161,7 @@ WebsideAPITest >> testPackages [
 	self assert: ((package at: 'classes') includes: 'WebsideAPI'); assert: ((package at: 'methods') includesKey: 'Object'); assert: (((package at: 'methods') at: 'Object') includes: 'asWebsideJson')
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testPauseAndDebugAsynchronousEvaluation [
 
 	| payload evaluation id attempts target debugger |
@@ -1197,7 +1198,7 @@ WebsideAPITest >> testPauseAndDebugAsynchronousEvaluation [
 			do: [  ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testPauseAndResumeAsynchronousEvaluation [
 
 	| payload evaluation id attempts |
@@ -1236,7 +1237,7 @@ WebsideAPITest >> testPauseAndResumeAsynchronousEvaluation [
 			do: [  ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testPauseDebugAndResumeAsynchronousEvaluation [
 
 	| payload evaluation id attempts target debugger |
@@ -1278,7 +1279,7 @@ WebsideAPITest >> testPauseDebugAndResumeAsynchronousEvaluation [
 			do: [  ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testPauseDebugAndTerminateAsynchronousEvaluation [
 
 	| payload evaluation id attempts target debugger active |
@@ -1321,7 +1322,7 @@ WebsideAPITest >> testPauseDebugAndTerminateAsynchronousEvaluation [
 				do: [  ] ]
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testPinEvaluationResult [
 	| evaluation result |
 	evaluation := NeoJSONObject new
@@ -1337,7 +1338,7 @@ WebsideAPITest >> testPinEvaluationResult [
 		ensure: [ self delete: '/objects/' , (result at: 'id') asString ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinObjectSlot [
 	| evaluation result id uri pinned x |
 	evaluation := NeoJSONObject new
@@ -1362,7 +1363,7 @@ WebsideAPITest >> testPinObjectSlot [
 		assert: (x at: 'printString') equals: '3'
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObject [
 
 	| evaluation result id |
@@ -1383,7 +1384,7 @@ WebsideAPITest >> testPinnedObject [
 		self delete: '/objects/' , id asString ]
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObjectIndexedSlots [
 
 	| evaluation result id slots slot |
@@ -1416,7 +1417,7 @@ WebsideAPITest >> testPinnedObjectIndexedSlots [
 					 (slots first at: 'printString') = '2' ])
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObjectInstanceVariables [
 
 	| evaluation result id vars |
@@ -1441,7 +1442,7 @@ WebsideAPITest >> testPinnedObjectInstanceVariables [
 					 vars anySatisfy: [ :v | (v at: 'name') = n ] ])
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObjectNamedSlots [
 
 	| evaluation result id slots |
@@ -1464,7 +1465,7 @@ WebsideAPITest >> testPinnedObjectNamedSlots [
 					 (s at: 'slot') = 'y' and: [ (s at: 'printString') = '4' ] ])
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObjectSlot [
 
 	| evaluation result id x |
@@ -1482,7 +1483,7 @@ WebsideAPITest >> testPinnedObjectSlot [
 		assert: (x at: 'printString') equals: '3'
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testPinnedObjects [
 
 	| evaluation result id |
@@ -1503,7 +1504,7 @@ WebsideAPITest >> testPinnedObjects [
 		self delete: '/objects/' , id asString ]
 ]
 
-{ #category : #'profiling endpoints' }
+{ #category : 'profiling endpoints' }
 WebsideAPITest >> testProfileExpression [
 
 	| payload evaluation id attempts tree |
@@ -1540,7 +1541,7 @@ WebsideAPITest >> testProfileExpression [
 			do: [  ] ]
 ]
 
-{ #category : #'profiling endpoints' }
+{ #category : 'profiling endpoints' }
 WebsideAPITest >> testProfileExpression2 [
 
 	| payload evaluation id attempts tree |
@@ -1576,7 +1577,7 @@ WebsideAPITest >> testProfileExpression2 [
 			do: [  ] ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testQuickSearch [
 	| results |
 	results := self get: 'search?text=Point&ignoreCase=false'.
@@ -1586,7 +1587,7 @@ WebsideAPITest >> testQuickSearch [
 			anySatisfy: [:r | (r at: 'type') = 'class' and: [(r at: 'text') = 'Point']])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testReferencesToClass [
 	| references |
 	references := self get: 'methods?referencingClass=Fraction'.
@@ -1597,7 +1598,7 @@ WebsideAPITest >> testReferencesToClass [
 				allSatisfy: [ :m | m source includesSubstring: 'Fraction' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testReferencesToString [
 	| references |
 	references := self get: 'methods?referencingString=referencingString'.
@@ -1608,7 +1609,7 @@ WebsideAPITest >> testReferencesToString [
 				allSatisfy: [ :m | m source includesSubstring: 'referencingString' ])
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRemoveCategory [
 
 	| class method methodRemotion categoryRemotion categories remotion |
@@ -1654,7 +1655,7 @@ WebsideAPITest >> testRemoveCategory [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRemoveCategoryWithMethods [
 
 	| class method categories remotion error suggestions |
@@ -1706,7 +1707,7 @@ WebsideAPITest >> testRemoveCategoryWithMethods [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRemoveClass [
 
 	| definition remotion class |
@@ -1727,7 +1728,7 @@ WebsideAPITest >> testRemoveClass [
 	self assert: class isNil
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRemoveInstanceVariable [
 
 	| definition remotion variables |
@@ -1757,7 +1758,7 @@ WebsideAPITest >> testRemoveInstanceVariable [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRemoveMethod [
 
 	| definition remotion method |
@@ -1781,7 +1782,7 @@ WebsideAPITest >> testRemoveMethod [
 	self assert: method isNil
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRenameCategory [
 
 	| class method renaming categories remotion |
@@ -1820,7 +1821,7 @@ WebsideAPITest >> testRenameCategory [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRenameClass [
 
 	| definition renaming class remotion |
@@ -1850,7 +1851,7 @@ WebsideAPITest >> testRenameClass [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRenameInstanceVariable [
 
 	| definition renaming variables remotion |
@@ -1883,7 +1884,7 @@ WebsideAPITest >> testRenameInstanceVariable [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRenamePackage [
 
 	| creation renaming package remotion |
@@ -1913,7 +1914,7 @@ WebsideAPITest >> testRenamePackage [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'changes endpoints' }
+{ #category : 'changes endpoints' }
 WebsideAPITest >> testRenameSelector2 [
 
 	| definition renaming method remotion |
@@ -1948,7 +1949,7 @@ WebsideAPITest >> testRenameSelector2 [
 		self post: '/changes' with: remotion ]
 ]
 
-{ #category : #'testing endpoints' }
+{ #category : 'testing endpoints' }
 WebsideAPITest >> testRunTests [
 
 	| test suite run id results |
@@ -1972,7 +1973,7 @@ WebsideAPITest >> testRunTests [
 		self delete: '/test-runs/' , id asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testSelectorInSource [
 	| selector source |
     source := NeoJSONObject new at: 'source' put: 'to: 2 do: [:i'; yourself.
@@ -1983,7 +1984,7 @@ WebsideAPITest >> testSelectorInSource [
 	self assert: selector equals: 'to:do:'.
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testSenders [
 	| senders local |
 	senders := self get: 'methods?sending=reciprocal'.
@@ -1998,7 +1999,7 @@ WebsideAPITest >> testSenders [
 		assert: (local allSatisfy: [ :m | (m at: 'methodClass') = 'Fraction' ])
 ]
 
-{ #category : #'debugging endpoints' }
+{ #category : 'debugging endpoints' }
 WebsideAPITest >> testStepInto [
 
 	| evaluation error id target debugger frame |
@@ -2030,7 +2031,7 @@ WebsideAPITest >> testStepInto [
 		self delete: '/debuggers/' , id asString ]
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testSubclasses [
 	| subclasses |
 	subclasses := self get: 'classes/Magnitude/subclasses'.
@@ -2039,7 +2040,7 @@ WebsideAPITest >> testSubclasses [
 		assert: (subclasses anySatisfy: [ :c | c name = 'Number' ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testSuperclasses [
 
 	| superclasses |
@@ -2048,7 +2049,7 @@ WebsideAPITest >> testSuperclasses [
 		assert: (Number allSuperclasses allSatisfy: [ :c | superclasses anySatisfy: [:sc | c name = (sc at: 'name')]])
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testSynchronousEvaluation [
 
 	| evaluation result |
@@ -2062,7 +2063,7 @@ WebsideAPITest >> testSynchronousEvaluation [
 		assert: (result at: 'printString') equals: '7'
 ]
 
-{ #category : #'evaluation  endpoints' }
+{ #category : 'evaluation  endpoints' }
 WebsideAPITest >> testSynchronousEvaluationError [
 
 	| synchronous error description |
@@ -2079,7 +2080,7 @@ WebsideAPITest >> testSynchronousEvaluationError [
 		| (description includesSubstring: 'variable or expression expected')
 ]
 
-{ #category : #'objects endpoints' }
+{ #category : 'objects endpoints' }
 WebsideAPITest >> testUnpinObject [
 
 	| evaluation result id pinned |
@@ -2095,7 +2096,7 @@ WebsideAPITest >> testUnpinObject [
 	self assert: (pinned noneSatisfy: [ :o | (o at: 'id') = id ])
 ]
 
-{ #category : #'code endpoints' }
+{ #category : 'code endpoints' }
 WebsideAPITest >> testVariables [
 	| variables |
 	variables := self get: 'classes/Float/variables'.
@@ -2106,7 +2107,7 @@ WebsideAPITest >> testVariables [
 		assert: (variables anySatisfy: [ :v | (v at:'name') = 'denominator' and: [(v at: 'type') = 'instance']])
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 WebsideAPITest >> testWorkspace [
 
 	| response id context assignment evaluation result |
@@ -2134,7 +2135,7 @@ WebsideAPITest >> testWorkspace [
 		self delete: '/workspaces/' , id ]
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 WebsideAPITest >> testWorkspaceBindings [
 
 	| response id bindings context assignment |
@@ -2158,7 +2159,7 @@ WebsideAPITest >> testWorkspaceBindings [
 		ensure: [ self delete: '/workspaces/' , id ]
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 WebsideAPITest >> testWorkspaceEvaluationError [
 
 	| response id context evaluation error description |
@@ -2183,7 +2184,7 @@ WebsideAPITest >> testWorkspaceEvaluationError [
 		ensure: [ self delete: '/workspaces/' , id ]
 ]
 
-{ #category : #'workspaces endpoints' }
+{ #category : 'workspaces endpoints' }
 WebsideAPITest >> testWorkspaces [
 
 	| response id result |

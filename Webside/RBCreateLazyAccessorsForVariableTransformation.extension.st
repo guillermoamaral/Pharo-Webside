@@ -1,6 +1,6 @@
-Extension { #name : #RBCreateLazyAccessorsForVariableTransformation }
+Extension { #name : 'RBCreateLazyAccessorsForVariableTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBCreateLazyAccessorsForVariableTransformation class >> websideExtension [
 
 	^ NeoJSONObject new

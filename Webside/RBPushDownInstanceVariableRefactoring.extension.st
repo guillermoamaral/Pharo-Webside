@@ -1,6 +1,6 @@
-Extension { #name : #RBPushDownInstanceVariableRefactoring }
+Extension { #name : 'RBPushDownInstanceVariableRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBPushDownInstanceVariableRefactoring class >> websideType [
 
 	^ 'MoveDownInstanceVariable'

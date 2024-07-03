@@ -1,13 +1,13 @@
-Extension { #name : #RBMethodRefactoring }
+Extension { #name : 'RBMethodRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMethodRefactoring >> asWebsideJson [
 	^ super asWebsideJson
 		at: 'className' put: class name;
 		yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMethodRefactoring >> fromWebsideJson: json [
 	super fromWebsideJson: json.
 	class := json at: 'className' ifAbsent: nil.

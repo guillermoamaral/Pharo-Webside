@@ -1,6 +1,6 @@
-Extension { #name : #RBMoveMethodToClassSideRefactoring }
+Extension { #name : 'RBMoveMethodToClassSideRefactoring' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMoveMethodToClassSideRefactoring >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -10,7 +10,7 @@ RBMoveMethodToClassSideRefactoring >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMoveMethodToClassSideRefactoring >> fromWebsideJson: json [
 
 
@@ -23,7 +23,7 @@ RBMoveMethodToClassSideRefactoring >> fromWebsideJson: json [
 			method := class realClass compiledMethodAt: s asSymbol ] ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMoveMethodToClassSideRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new

@@ -1,6 +1,6 @@
-Extension { #name : #RBMethodNode }
+Extension { #name : 'RBMethodNode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMethodNode >> asWebsideJson [
 	| children |
 	children := OrderedCollection with: selector asWebsideJson.

@@ -1,6 +1,6 @@
-Extension { #name : #RBExtractToTemporaryTransformation }
+Extension { #name : 'RBExtractToTemporaryTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBExtractToTemporaryTransformation >> asWebsideJson [
 
 	| json |
@@ -16,7 +16,7 @@ RBExtractToTemporaryTransformation >> asWebsideJson [
 	^ json
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBExtractToTemporaryTransformation >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -29,7 +29,7 @@ RBExtractToTemporaryTransformation >> fromWebsideJson: json [
 		at: 'temporaryName' ifPresent: [ :n | newVariableName := n ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBExtractToTemporaryTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
@@ -53,7 +53,7 @@ RBExtractToTemporaryTransformation class >> websideExtension [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBExtractToTemporaryTransformation class >> websideType [
 
 	^ 'ExtractTemporaryVariable'

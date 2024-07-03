@@ -1,6 +1,6 @@
-Extension { #name : #CompiledCode }
+Extension { #name : 'CompiledCode' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 CompiledCode >> websideIndexAccessor [
 
 	^ super websideIndexAccessor
@@ -9,7 +9,7 @@ CompiledCode >> websideIndexAccessor [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 CompiledCode >> websidePresentations [
 
 	| source ast bytecodes |

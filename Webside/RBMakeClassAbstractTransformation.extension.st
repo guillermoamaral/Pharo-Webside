@@ -1,6 +1,6 @@
-Extension { #name : #RBMakeClassAbstractTransformation }
+Extension { #name : 'RBMakeClassAbstractTransformation' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMakeClassAbstractTransformation >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
@@ -10,7 +10,7 @@ RBMakeClassAbstractTransformation >> fromWebsideJson: json [
 		targetClass := self classObjectFor: name asSymbol ]
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBMakeClassAbstractTransformation class >> websideExtension [
 
 	^ NeoJSONObject new

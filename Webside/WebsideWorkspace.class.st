@@ -1,15 +1,17 @@
 Class {
-	#name : #WebsideWorkspace,
-	#superclass : #Object,
+	#name : 'WebsideWorkspace',
+	#superclass : 'Object',
 	#instVars : [
 		'id',
 		'contents',
 		'bindings'
 	],
-	#category : #'Webside-Base'
+	#category : 'Webside-Base',
+	#package : 'Webside',
+	#tag : 'Base'
 }
 
-{ #category : #bindings }
+{ #category : 'bindings' }
 WebsideWorkspace >> asWebsideJson [
 
 	| json |
@@ -18,63 +20,68 @@ WebsideWorkspace >> asWebsideJson [
 	^ json
 ]
 
-{ #category : #binding }
+{ #category : 'bindings' }
 WebsideWorkspace >> bindingOf: aString [
-
 	(bindings includesKey: aString) ifFalse: [
 		bindings add: (WorkspaceVariable key: aString asSymbol) ].
 	^ bindings associationAt: aString
 ]
 
-{ #category : #bindings }
+{ #category : 'bindings' }
 WebsideWorkspace >> bindings [
 
 	^ bindings
 ]
 
-{ #category : #bindings }
+{ #category : 'testing' }
+WebsideWorkspace >> canAddBindingOf: name [
+
+	^ true
+]
+
+{ #category : 'bindings' }
 WebsideWorkspace >> contents [
 
 	^contents
 ]
 
-{ #category : #bindings }
+{ #category : 'bindings' }
 WebsideWorkspace >> contents: aString [
 
 	 contents := aString
 ]
 
-{ #category : #bindings }
+{ #category : 'bindings' }
 WebsideWorkspace >> doItContext [
 
 	^ nil
 ]
 
-{ #category : #bindings }
+{ #category : 'bindings' }
 WebsideWorkspace >> doItReceiver [
 
 	^ nil
 ]
 
-{ #category : #binding }
+{ #category : 'testing' }
 WebsideWorkspace >> hasBindingOf: aString [
 
 	^ bindings includesKey: aString asSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WebsideWorkspace >> id [
 
 	^ id
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WebsideWorkspace >> id: uuid [
 
 	id := uuid
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WebsideWorkspace >> initialize [
 
 	super initialize.
@@ -83,13 +90,29 @@ WebsideWorkspace >> initialize [
 	bindings := Dictionary new
 ]
 
-{ #category : #'interactive error protocol' }
+{ #category : 'testing' }
+WebsideWorkspace >> interactive [
+
+	^false
+]
+
+{ #category : 'testing' }
+WebsideWorkspace >> needRequestorScope [
+
+	^ true
+]
+
+{ #category : 'interactive error protocol' }
 WebsideWorkspace >> notify: message at: location in: code [
-SyntaxErrorNotification
-		             inClass: nil
-		             withCode: code
-		             doitFlag: false
-		             errorMessage: message
-		             location: location.
+
 	
+	| node notice |
+	node := RBParseErrorNode new
+		errorMessage: message; errorPosition: location.
+	notice := RBSyntaxErrorNotice new
+		messageText: message;
+		node: node.
+			CodeError new
+		notice: notice;
+		signal
 ]

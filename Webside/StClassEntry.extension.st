@@ -1,6 +1,6 @@
-Extension { #name : #StClassEntry }
+Extension { #name : 'StClassEntry' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 StClassEntry >> websideType [
 	^'class'
 ]

@@ -1,6 +1,6 @@
-Extension { #name : #RBAddPackageChange }
+Extension { #name : 'RBAddPackageChange' }
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddPackageChange >> asWebsideJson [
 
 	^ super asWebsideJson
@@ -8,7 +8,7 @@ RBAddPackageChange >> asWebsideJson [
 		  yourself
 ]
 
-{ #category : #'*Webside' }
+{ #category : '*Webside' }
 RBAddPackageChange >> fromWebsideJson: json [
 
 	super fromWebsideJson: json.
