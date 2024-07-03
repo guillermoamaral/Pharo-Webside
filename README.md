@@ -1,5 +1,5 @@
 # Pharo-Webside
-[Webside](https://github.com/guillermoamaral/Webside) API implementation for Pharo (currently supported version: Pharo 11).
+[Webside](https://github.com/guillermoamaral/Webside) API implementation for Pharo (currently supported version: Pharo 12).
 
 ## Installation
 
@@ -17,7 +17,7 @@ Metacello new
 You can start `WebsideServer` by evaluating:
 ```smalltalk
 WebsideServer new
-	baseUri: '/pharo/v1';
+	baseUri: '/pharo';
 	port: 9002;
 	start
 ```
