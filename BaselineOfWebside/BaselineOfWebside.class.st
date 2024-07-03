@@ -26,7 +26,7 @@ BaselineOfWebside >> projectClass [
 BaselineOfWebside >> setUpDependencies: spec [
 	spec
 		baseline: 'Teapot'
-		with: [ spec repository: 'github://zeroflag/Teapot:v2.6.0/source' ].
+		with: [ spec repository: 'github://zeroflag/Teapot:v2.7.0/source' ].
 		
 		
 	spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
