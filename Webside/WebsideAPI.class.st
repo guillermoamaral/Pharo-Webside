@@ -228,6 +228,17 @@ WebsideAPI >> changeError: anException from: change [
 	^ (ZnResponse statusCode: 409) entity: entity
 ]
 
+{ #category : 'extensions endpoints' }
+WebsideAPI >> changeExtensions [
+	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
+  For more information, check API documentation at https://github.com/guillermoamaral/Webside."
+
+	^ RBRefactoryChange allSubclasses , RBRefactoring allSubclasses
+	  , CmdCommand allSubclasses , RBTransformation allSubclasses
+		  select: [ :c | c respondsTo: #websideExtension ]
+		  thenCollect: [ :c | c websideExtension ]
+]
+
 { #category : 'changes endpoints' }
 WebsideAPI >> changes [
 
@@ -706,19 +717,13 @@ WebsideAPI >> evaluations [
 ]
 
 { #category : 'extensions endpoints' }
-WebsideAPI >> extensions [
+WebsideAPI >> exportExtensions [
 	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
   For more information, check API documentation at https://github.com/guillermoamaral/Webside."
 
-	| change download |
-	change := RBRefactoryChange allSubclasses
-	          , RBRefactoring allSubclasses , CmdCommand allSubclasses
-	          , RBTransformation allSubclasses
-		          select: [ :c | c respondsTo: #websideExtension ]
-		          thenCollect: [ :c | c websideExtension ].
-
-	download := OrderedCollection new.
-	download
+	| extensions |
+	extensions := OrderedCollection new.
+	extensions
 		add: (self newJsonObject
 				 at: 'extensionType' put: 'export';
 				 at: 'elementType' put: 'method';
@@ -737,7 +742,16 @@ WebsideAPI >> extensions [
 				 at: 'defaultFilename' put: '{element.name}.st';
 				 at: 'section' put: 'Extra';
 				 yourself).
-	^ change , download
+	^ extensions
+]
+
+{ #category : 'extensions endpoints' }
+WebsideAPI >> extensions [
+	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
+  For more information, check API documentation at https://github.com/guillermoamaral/Webside."
+
+	^ self changeExtensions , self exportExtensions
+	  , self searchExtensions
 ]
 
 { #category : 'private' }
@@ -1593,6 +1607,14 @@ WebsideAPI >> search [
 				type = 'all' or: [ r websideType = type ] ] ]
 		thenDo: [ :r | grouped at: r asString ifAbsentPut: [ r ] ].
 	^ grouped values asArray collect: #asWebsideJson
+]
+
+{ #category : 'extensions endpoints' }
+WebsideAPI >> searchExtensions [
+	"The following are examples (yet valid/valuable) of how to extend the set of changes predefined by the API.
+  For more information, check API documentation at https://github.com/guillermoamaral/Webside."
+
+	^ #( )
 ]
 
 { #category : 'code endpoints' }
