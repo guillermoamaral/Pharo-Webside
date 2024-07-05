@@ -287,19 +287,18 @@ WebsideAPI >> classNamed: aString [
 
 { #category : 'code endpoints' }
 WebsideAPI >> classTemplate [
-	| package |
+
+	| package definition |
 	package := self queryAt: 'package'.
-	package ifNil: [ ^self badRequest: 'no package specified'].
-	^self newJsonObject
-		at: 'template' put: true;
-		at: 'name' put: 'MyClass';
-		at: 'definition'
-		put: 'Object
-	subclass: #MyClass
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	package: ''', package , '''';
-		yourself
+	package ifNil: [ ^ self badRequest: 'no package specified' ].
+	definition := ClassDefinitionPrinter fluid
+		              compactClassDefinitionTemplateInPackage: package
+		              tag: nil.
+	^ self newJsonObject
+		  at: 'template' put: true;
+		  at: 'name' put: 'MyClass';
+		  at: 'definition' put: definition;
+		  yourself
 ]
 
 { #category : 'private' }

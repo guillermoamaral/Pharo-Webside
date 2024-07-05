@@ -14,10 +14,14 @@ RBAddClassChange >> fromWebsideJson: json [
 	json
 		at: 'definition'
 		ifPresent: [ :definition | "arbitrary: if definition string is present, it has precendence over the other properties"
-			doit := OpalCompiler new
+			doit := [
+			        OpalCompiler new
 				        isScripting: true;
-				        parse: definition.
+				        parse: definition ]
+				        on: OCUndeclaredVariableWarning , CodeError
+				        do: [ :e |  ].
 			message := doit body statements first value.
+			superclass := message receiver receiver name.
 			className := message receiver arguments first value asString.
 			submessage := message messages
 				              detect: [ :m | m selector == #slots: ]
