@@ -28,7 +28,7 @@ Object >> websideIndexAccessor [
 ]
 
 { #category : '*Webside' }
-Object >> websidePresentations [
+Object >> websideViews [
 
 	^#()
 ]

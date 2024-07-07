@@ -15,7 +15,7 @@ ClassDescription >> asWebsideJson [
 ]
 
 { #category : '*Webside' }
-ClassDescription >> websidePresentations [
+ClassDescription >> websideViews [
 
 	| comment definition |
 	comment := NeoJSONObject new
@@ -30,5 +30,5 @@ ClassDescription >> websidePresentations [
 		              yourself.
 	^ {
 		  comment.
-		  definition } , super websidePresentations
+		  definition } , super websideViews
 ]

@@ -1,7 +1,7 @@
 Extension { #name : 'Dictionary' }
 
 { #category : '*Webside' }
-Dictionary >> websidePresentations [
+Dictionary >> websideViews [
 
 	| columns rows presentation presentations |
 	columns := OrderedCollection new.
@@ -28,7 +28,7 @@ Dictionary >> websidePresentations [
 		                at: 'columns' put: columns;
 		                at: 'rows' put: rows;
 		                yourself.
-	presentations := super websidePresentations reject: [ :p |
+	presentations := super websideViews reject: [ :p |
 		                 (p at: 'type') = 'table' ].
 	^ presentations , { presentation }
 ]

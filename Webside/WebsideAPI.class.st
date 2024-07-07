@@ -497,8 +497,8 @@ WebsideAPI >> created: aNeoJSONObject [
 ]
 
 { #category : 'private' }
-WebsideAPI >> customPresentationsOf: anObject [
-	^anObject websidePresentations
+WebsideAPI >> customViewsOf: anObject [
+	^anObject websideViews
 ]
 
 { #category : 'evaluation  endpoints' }
@@ -1169,8 +1169,7 @@ WebsideAPI >> pinnedObjectSlots [
 		^ self instanceVariablesOf: object ].
 	last = 'named-slots' ifTrue: [ ^ self namedSlotsOf: object ].
 	last = 'indexed-slots' ifTrue: [ ^ self indexedSlotsOf: object ].
-	last = 'custom-presentations' ifTrue: [
-		^ self customPresentationsOf: object ].
+	last = 'custom-views' ifTrue: [ ^ self customViewsOf: object ].
 	object := self slot: last of: object ifAbsent: [ ^ self notFound ].
 	^ object asWebsideJson
 ]

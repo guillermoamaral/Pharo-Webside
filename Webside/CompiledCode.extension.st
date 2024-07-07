@@ -10,7 +10,7 @@ CompiledCode >> websideIndexAccessor [
 ]
 
 { #category : '*Webside' }
-CompiledCode >> websidePresentations [
+CompiledCode >> websideViews [
 
 	| source ast bytecodes |
 	source := NeoJSONObject new
@@ -42,5 +42,5 @@ CompiledCode >> websidePresentations [
 	^ {
 		  source.
 		  ast.
-		  bytecodes } , super websidePresentations
+		  bytecodes } , super websideViews
 ]
