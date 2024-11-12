@@ -1557,7 +1557,7 @@ WebsideAPI >> runTests [
 	suite ifNil: [ ^ self badRequest: 'Invalid test suite' ].
 	id := self newID.
 	result := suite resultClass new.
-	[ suite run: result ]
+	[ suite run: result. result updateResultsInHistory ]
 		forkAt: Processor userBackgroundPriority
 		named: 'Test Run ' , id asString.
 	self testRuns at: id put: suite -> result.
