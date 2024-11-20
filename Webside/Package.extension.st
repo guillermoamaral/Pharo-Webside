@@ -8,9 +8,9 @@ Package >> asWebsideJson [
 	extensionSelectors keysAndValuesDo: [ :c :m |
 		methods at: c asString put: m ].
 	categories := self tagsForClasses.
-	(extensionSelectors notEmpty ) ifTrue: [
+	extensionSelectors notEmpty ifTrue: [
 		categories := categories , { 'Extensions' } ].
-	categories := categories collect: [ :c |
+	categories := categories asArray sort collect: [ :c |
 		              NeoJSONObject new
 			              at: 'name' put: c;
 			              at: 'package' put: name;

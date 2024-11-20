@@ -1103,14 +1103,14 @@ WebsideAPI >> packageNamed: aString [
 WebsideAPI >> packages [
 
 	| packages names tree categories |
-	packages := PackageOrganizer default packages.
+	packages := PackageOrganizer default packages sort.
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [ ^ packages collect: [ :p | p name ] ].
 	tree := self queryAt: 'tree'.
 	tree = 'true' ifTrue: [
 		^ packages collect: [ :p |
-			  categories := p tagsForClasses collect: [ :c |
-				                NeoJSONObject new
+			  categories := p tagsForClasses asArray sort collect: [ :c |
+				                self newJsonObject
 					                at: 'name' put: c;
 					                at: 'package' put: p name;
 					                yourself ].
