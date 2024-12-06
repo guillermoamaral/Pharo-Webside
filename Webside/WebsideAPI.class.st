@@ -894,15 +894,26 @@ WebsideAPI >> instanceVariablesOf: anObject [
 
 { #category : 'private' }
 WebsideAPI >> jsonFromMethods: aCollection [
-     | ast  annotations  json | 
+
+	| ast annotations json |
+	(self queryAt: 'basic') = 'true' ifTrue: [
+		^ aCollection collect: [ :m |
+			  self newJsonObject
+				  at: 'selector' put: m selector;
+				  at: 'methodClass'
+				  put: (m methodClass ifNotNil: [ :c | c name ]);
+				  at: 'category' put: m protocolName;
+				  at: 'package' put: (m package ifNotNil: [ :p | p name ]);
+				  at: 'source' put: m sourceCode;
+				  yourself ] ].
 	ast := (self queryAt: 'ast') = 'true'.
 	annotations := (self queryAt: 'annotations') = 'true'.
-	^ aCollection collect: [ :m | 
+	^ aCollection collect: [ :m |
 		  json := m asWebsideJson.
 		  ast ifTrue: [ json at: 'ast' put: m ast asWebsideJson ].
-		  annotations
-			ifTrue: [json at: 'annotations' put: (self annotationsForMethod: m)].
-			 json ]
+		  annotations ifTrue: [
+			  json at: 'annotations' put: (self annotationsForMethod: m) ].
+		  json ]
 ]
 
 { #category : 'general endpoints' }
