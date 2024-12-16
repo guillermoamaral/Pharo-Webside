@@ -965,7 +965,11 @@ WebsideAPI >> methodTemplate [
 { #category : 'code endpoints' }
 WebsideAPI >> methods [
 
-	| methods class |
+	| name methods class |
+	name := self urlAt: 'name'.
+	name ifNotNil: [
+		class := self classNamed: name.
+		class ifNil: [ ^ self notFound ] ].
 	self queriedSelectorMatching ifNotNil: [ :pattern |
 		methods := self methodsWithSelectorMatching: pattern ].
 	self queriedReferencingString ifNotNil: [ :string |
@@ -987,7 +991,7 @@ WebsideAPI >> methods [
 			           ifNil: [ self referencesToClass: global ]
 			           ifNotNil: [
 			           self referencesToClass: global among: methods ] ].
-	class := self requestedClass ifNil: [ self queriedClass ].
+	class ifNil: [ class := self queriedClass ].
 	(class notNil and: [ methods notNil ]) ifTrue: [
 		methods := methods select: [ :m | m methodClass == class ] ].
 	methods ifNil: [
