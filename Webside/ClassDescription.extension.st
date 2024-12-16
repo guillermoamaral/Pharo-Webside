@@ -11,6 +11,7 @@ ClassDescription >> asWebsideJson [
 		  at: 'category' put: self packageTag name;
 		  at: 'variable' put: self isVariable;
 		  at: 'package' put: self package name;
+			at: 'iconName' put: self systemIconName;
 		  yourself
 ]
 

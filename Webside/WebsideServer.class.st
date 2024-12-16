@@ -213,7 +213,8 @@ WebsideServer >> initializeGeneralRoutes [
 		routeGET: '/colors' to: #colors;
 		routePOST: '/save' to: #saveImage;
 		routeGET: '/stats' to: #stats;
-		routeGET: '/themes' to: #themes
+		routeGET: '/themes' to: #themes;
+		routeGET: '/icons' to: #icons 
 ]
 
 { #category : 'initialization' }

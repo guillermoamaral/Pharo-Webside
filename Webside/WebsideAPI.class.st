@@ -273,16 +273,17 @@ WebsideAPI >> classFileOut [
 
 { #category : 'private' }
 WebsideAPI >> classNamed: aString [
-	| name metaclass class |
+
+	| name metaclass traitClass class |
 	name := aString.
 	metaclass := name endsWith: ' class'.
-	metaclass
-		ifTrue: [ name := name withoutSuffix: ' class' ].
-	class := Smalltalk at: name asSymbol ifAbsent: [ ^ nil 
-		].
-	^ metaclass
-		ifTrue: [ class class ]
-		ifFalse: [ class ]
+	traitClass := name endsWith: ' classTrait'.
+	metaclass ifTrue: [ name := name withoutSuffix: ' class' ].
+	traitClass ifTrue: [ name := name withoutSuffix: ' classTrait' ].
+	class := Smalltalk classOrTraitNamed: name.
+	^ (metaclass or: [ traitClass ])
+		  ifTrue: [ class class ]
+		  ifFalse: [ class ]
 ]
 
 { #category : 'code endpoints' }
@@ -303,21 +304,22 @@ WebsideAPI >> classTemplate [
 
 { #category : 'private' }
 WebsideAPI >> classTreeFrom: aClass depth: anInteger [
+
 	| json subclasses depth names |
 	names := self queryAt: 'names'.
 	json := names = 'true'
-		ifTrue: [ self newJsonObject
-			
-				at: 'name' put: aClass name;
-				at: 'superclass'
-					put: (aClass superclass ifNotNil: [ :c | c name ]); yourself ]
-		ifFalse: [ aClass asWebsideJson ].
-	(anInteger notNil and: [ anInteger = 0 ])
-		ifTrue: [ ^ json ].
-	depth := anInteger notNil
-		ifTrue: [ anInteger - 1 ].
+		        ifTrue: [
+			        self newJsonObject
+				        at: 'name' put: aClass name;
+				        at: 'superclass'
+				        put: (aClass superclass ifNotNil: [ :c | c name ]);
+				        at: 'iconName' put: aClass systemIconName;
+				        yourself ]
+		        ifFalse: [ aClass asWebsideJson ].
+	(anInteger notNil and: [ anInteger = 0 ]) ifTrue: [ ^ json ].
+	depth := anInteger notNil ifTrue: [ anInteger - 1 ].
 	subclasses := (aClass subclasses sort: [ :a :b | a name <= b name ])
-		collect: [ :c | self classTreeFrom: c depth: depth ].
+		              collect: [ :c | self classTreeFrom: c depth: depth ].
 	json at: 'subclasses' put: subclasses.
 	^ json
 ]
@@ -332,6 +334,7 @@ WebsideAPI >> classTreeFromClasses: aCollection [
 		do: [ :c |
 			json := self newJsonObject
 				        at: 'name' put: c name;
+				        at: 'iconName' put: c systemIconName;
 				        yourself.
 			roots at: c name put: json ];
 		select: [ :c | c superclass notNil ] thenDo: [ :c |
@@ -343,9 +346,7 @@ WebsideAPI >> classTreeFromClasses: aCollection [
 					              a name <= b name ] ].
 			subclasses add: (roots at: c name).
 			removable add: c name ] ].
-		removable do: [ :n |
-		
-			roots removeKey: n ] .
+	removable do: [ :n | roots removeKey: n ].
 	^ roots asArray sort: [ :a :b | a name <= b name ]
 ]
 
@@ -833,6 +834,23 @@ WebsideAPI >> frameBindings [
 		  self newJsonObject
 			  at: 'name' put: b key asString;
 			  at: 'value' put: b value printString;
+			  yourself ]
+]
+
+{ #category : 'general endpoints' }
+WebsideAPI >> icons [
+
+	^ #( #class #classAbstract #trait #exception #collection #string
+	     #magnitude ) collect: [ :s |
+		  | icon stream |
+		  icon := Smalltalk ui icons iconNamed: s.
+		  stream := ByteArray new writeStream.
+		  (PNGReadWriter on: stream)
+			  nextPutImage: icon;
+			  close.
+		  self newJsonObject
+			  at: 'name' put: s asString;
+			  at: 'data' put: stream contents base64Encoded;
 			  yourself ]
 ]
 
