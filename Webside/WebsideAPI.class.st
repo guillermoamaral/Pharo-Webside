@@ -840,7 +840,7 @@ WebsideAPI >> frameBindings [
 { #category : 'general endpoints' }
 WebsideAPI >> icons [
 
-	^ #( #class #classAbstract #trait #exception #collection #string
+	^ #( #package #class #classAbstract #trait #exception #collection #string
 	     #magnitude ) collect: [ :s |
 		  | icon stream |
 		  icon := Smalltalk ui icons iconNamed: s.
@@ -1150,6 +1150,7 @@ WebsideAPI >> packages [
 			  self newJsonObject
 				  at: 'name' put: p name;
 				  at: 'categories' put: categories;
+				  at: 'iconName' put: #package;
 				  yourself ] ].
 	^ packages collect: [ :p | p asWebsideJson ]
 ]

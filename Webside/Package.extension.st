@@ -20,5 +20,6 @@ Package >> asWebsideJson [
 		  at: 'classes' put: self definedClassNames;
 		  at: 'methods' put: methods;
 		  at: 'categories' put: categories;
+		  at: 'iconName' put: #package;
 		  yourself
 ]
