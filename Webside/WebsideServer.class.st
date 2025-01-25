@@ -209,12 +209,13 @@ WebsideServer >> initializeGeneralRoutes [
 
 	self
 		routeGET: '/dialect' to: #dialect;
+		routeGET: '/version' to: #version;
 		routeGET: '/logo' to: #logo;
 		routeGET: '/colors' to: #colors;
 		routePOST: '/save' to: #saveImage;
 		routeGET: '/stats' to: #stats;
 		routeGET: '/themes' to: #themes;
-		routeGET: '/icons' to: #icons 
+		routeGET: '/icons' to: #icons
 ]
 
 { #category : 'initialization' }

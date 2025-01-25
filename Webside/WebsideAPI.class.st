@@ -1963,6 +1963,12 @@ WebsideAPI >> variables [
 	^ self instanceVariables , self classVariables
 ]
 
+{ #category : 'general endpoints' }
+WebsideAPI >> version [
+
+	^ SystemVersion current major asString
+]
+
 { #category : 'workspaces endpoints' }
 WebsideAPI >> workspace [
 
