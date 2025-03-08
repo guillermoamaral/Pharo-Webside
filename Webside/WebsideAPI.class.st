@@ -419,7 +419,6 @@ WebsideAPI >> commandDefinitions [
 								   at: 'defaultValue' put: 'MyImage';
 								   at: 'type' put: 'input';
 								   yourself));
-				 at: 'needsConfirmation' put: true;
 				 yourself).
 	^ extensions
 ]
