@@ -417,7 +417,7 @@ WebsideAPI >> commandDefinitions [
 								   at: 'name' put: 'imageName';
 								   at: 'label' put: 'Image name';
 								   at: 'defaultValue' put: 'MyImage';
-								   at: 'type' put: 'input';
+								   at: 'type' put: 'text';
 								   yourself));
 				 yourself).
 	^ extensions
