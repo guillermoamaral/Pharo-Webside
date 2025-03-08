@@ -886,8 +886,9 @@ WebsideAPI >> icons [
 
 { #category : 'command endpoints' }
 WebsideAPI >> imageCleanup [
-	
-	Smalltalk cleanUp: false
+
+	Smalltalk cleanUp: false.
+	^true
 ]
 
 { #category : 'private' }
@@ -1657,8 +1658,9 @@ WebsideAPI >> saveImage [
 WebsideAPI >> saveImageAs [
 
 	| name |
-	name := self bodyAt: 'name' .
-	Smalltalk saveAs: name
+	name := self bodyAt: 'name'.
+	Smalltalk saveAs: name.
+	^ true
 ]
 
 { #category : 'code endpoints' }
