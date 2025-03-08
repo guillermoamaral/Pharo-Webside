@@ -403,7 +403,6 @@ WebsideAPI >> commandDefinitions [
 	extensions := OrderedCollection new.
 	extensions
 		add: (self newJsonObject
-				 at: 'type' put: 'command';
 				 at: 'name' put: 'imageCleanup';
 				 at: 'elementType' put: 'system';
 				 at: 'label' put: 'Do image cleanup';
@@ -411,7 +410,6 @@ WebsideAPI >> commandDefinitions [
 				 at: 'needsConfirmation' put: true;
 				 yourself);
 		add: (self newJsonObject
-				 at: 'type' put: 'command';
 				 at: 'name' put: 'saveImageAs';
 				 at: 'elementType' put: 'system';
 				 at: 'label' put: 'Save image as';
