@@ -4,7 +4,7 @@ Extension { #name : 'RBCreateLazyAccessorsForVariableTransformation' }
 RBCreateLazyAccessorsForVariableTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'variable';
 		  at: 'label' put: 'Generate lazy accessors';
 		  at: 'properties' put: (NeoJSONObject new

@@ -30,7 +30,7 @@ RBInsertNewClassRefactoring >> fromWebsideJson: json [
 RBInsertNewClassRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'class';
 		  at: 'label' put: 'Insert superclass';
 		  at: 'properties' put: (NeoJSONObject new

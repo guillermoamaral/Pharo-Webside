@@ -23,7 +23,7 @@ RBPullUpMethodRefactoring >> fromWebsideJson: json [
 RBPullUpMethodRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'method';
 		  at: 'label' put: 'Push up';
 		  at: 'properties' put: (NeoJSONObject new

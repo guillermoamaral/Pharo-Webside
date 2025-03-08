@@ -22,7 +22,7 @@ SycDuplicateClassCommand >> fromWebsideJson: json [
 SycDuplicateClassCommand class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'class';
 		  at: 'label' put: 'Duplicate';
 		  at: 'properties' put: (NeoJSONObject new
@@ -36,6 +36,6 @@ SycDuplicateClassCommand class >> websideExtension [
 			   at: 'type' put: 'text';
 			   at: 'defaultValue' put: '{element.name}Copy';
 			   yourself) };
-			at: 'section' put: 'Refactorings';
+		  at: 'section' put: 'Refactorings';
 		  yourself
 ]

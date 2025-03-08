@@ -163,6 +163,14 @@ WebsideServer >> initializeCodeRoutes [
 ]
 
 { #category : 'initialization' }
+WebsideServer >> initializeCommandsRoutes [
+
+	self
+		routeGET: '/command-definitions' to: #commandDefinitions;
+		routePOST: '/commands' to: #processCommand
+]
+
+{ #category : 'initialization' }
 WebsideServer >> initializeDebuggingRoutes [
 
 	self
@@ -200,8 +208,7 @@ WebsideServer >> initializeEvaluationRoutes [
 { #category : 'initialization' }
 WebsideServer >> initializeExtensionsRoutes [
 
-	self
-		routeGET: '/extensions' to: #extensions
+	self routeGET: '/extensions' to: #extensions
 ]
 
 { #category : 'initialization' }
@@ -282,7 +289,8 @@ WebsideServer >> initializeRoutes [
 		initializeDebuggingRoutes;
 		initializeTestsRoutes;
 		initializeProfilingRoutes;
-		initializeExtensionsRoutes
+		initializeExtensionsRoutes;
+		initializeCommandsRoutes
 ]
 
 { #category : 'initialization' }

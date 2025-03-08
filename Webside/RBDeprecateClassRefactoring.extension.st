@@ -19,7 +19,7 @@ RBDeprecateClassRefactoring >> fromWebsideJson: json [
 RBDeprecateClassRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'class';
 		  at: 'label' put: 'Deprecate';
 		  at: 'properties' put: (NeoJSONObject new
@@ -34,5 +34,5 @@ RBDeprecateClassRefactoring class >> websideExtension [
 			   at: 'options' put: '{classes}';
 			   yourself) };
 		  at: 'section' put: 'Refactorings';
-		  yourself 
+		  yourself
 ]

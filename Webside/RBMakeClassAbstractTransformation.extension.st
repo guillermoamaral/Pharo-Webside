@@ -14,7 +14,7 @@ RBMakeClassAbstractTransformation >> fromWebsideJson: json [
 RBMakeClassAbstractTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'class';
 		  at: 'label' put: 'Make abstract';
 		  at: 'properties' put: (NeoJSONObject new

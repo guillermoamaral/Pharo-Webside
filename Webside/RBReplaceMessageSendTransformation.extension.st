@@ -30,7 +30,7 @@ RBReplaceMessageSendTransformation >> fromWebsideJson: json [
 RBReplaceMessageSendTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'method';
 		  at: 'label' put: 'Replace senders';
 		  at: 'properties' put: (NeoJSONObject new
@@ -38,19 +38,22 @@ RBReplaceMessageSendTransformation class >> websideExtension [
 				   at: 'className' put: '{element.methodClass}';
 				   at: 'selector' put: '{element.selector}';
 				   at: 'newSelector' put: '{parameters.newSelector}';
-				at: 'replaceInAllClasses' put: '{parameters.replaceInAllClasses}';
+				   at: 'replaceInAllClasses'
+				   put: '{parameters.replaceInAllClasses}';
 				   yourself);
-		  at: 'parameters' put: { (NeoJSONObject new
-			   at: 'name' put: 'newSelector';
-			   at: 'label' put: 'New selector';
-			   at: 'type' put: 'text';
-			   at: 'defaultValue' put: '{element.selector}';
-			   yourself). (NeoJSONObject new
-			   at: 'name' put: 'replaceInAllClasses';
-			   at: 'label' put: 'Replace in all classes';
-			   at: 'type' put: 'boolean';
-			   at: 'defaultValue' put: true;
-			   yourself) };
+		  at: 'parameters' put: {
+			  (NeoJSONObject new
+				   at: 'name' put: 'newSelector';
+				   at: 'label' put: 'New selector';
+				   at: 'type' put: 'text';
+				   at: 'defaultValue' put: '{element.selector}';
+				   yourself).
+			  (NeoJSONObject new
+				   at: 'name' put: 'replaceInAllClasses';
+				   at: 'label' put: 'Replace in all classes';
+				   at: 'type' put: 'boolean';
+				   at: 'defaultValue' put: true;
+				   yourself) };
 		  at: 'section' put: 'Refactorings';
 		  yourself
 ]

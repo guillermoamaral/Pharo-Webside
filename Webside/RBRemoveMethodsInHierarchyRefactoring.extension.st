@@ -24,7 +24,7 @@ RBRemoveMethodsInHierarchyRefactoring >> fromWebsideJson: json [
 RBRemoveMethodsInHierarchyRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'method';
 		  at: 'label' put: 'Remove and the ones in subclasses';
 		  at: 'properties' put: (NeoJSONObject new

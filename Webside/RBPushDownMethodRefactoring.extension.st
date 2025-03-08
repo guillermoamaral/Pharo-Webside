@@ -21,7 +21,7 @@ RBPushDownMethodRefactoring >> fromWebsideJson: json [
 RBPushDownMethodRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'method';
 		  at: 'label' put: 'Push down';
 		  at: 'properties' put: (NeoJSONObject new

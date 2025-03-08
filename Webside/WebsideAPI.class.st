@@ -394,6 +394,38 @@ WebsideAPI >> colors [
 		yourself
 ]
 
+{ #category : 'command endpoints' }
+WebsideAPI >> commandDefinitions [
+	"The following are examples (yet valid/valuable) of how to define commands.
+  For more information, check API documentation at https://github.com/guillermoamaral/Webside."
+
+	| extensions |
+	extensions := OrderedCollection new.
+	extensions
+		add: (self newJsonObject
+				 at: 'type' put: 'command';
+				 at: 'name' put: 'imageCleanup';
+				 at: 'elementType' put: 'system';
+				 at: 'label' put: 'Do image cleanup';
+				 at: 'parameters' put: #(  );
+				 at: 'needsConfirmation' put: true;
+				 yourself);
+		add: (self newJsonObject
+				 at: 'type' put: 'command';
+				 at: 'name' put: 'saveImageAs';
+				 at: 'elementType' put: 'system';
+				 at: 'label' put: 'Save image as';
+				 at: 'parameters' put: (Array with: (self newJsonObject
+								   at: 'name' put: 'imageName';
+								   at: 'label' put: 'Image name';
+								   at: 'defaultValue' put: 'MyImage';
+								   at: 'type' put: 'input';
+								   yourself));
+				 at: 'needsConfirmation' put: true;
+				 yourself).
+	^ extensions
+]
+
 { #category : 'private' }
 WebsideAPI >> compiler [
 
@@ -725,7 +757,7 @@ WebsideAPI >> exportExtensions [
 	extensions := OrderedCollection new.
 	extensions
 		add: (self newJsonObject
-				 at: 'extensionType' put: 'export';
+				 at: 'type' put: 'export';
 				 at: 'elementType' put: 'method';
 				 at: 'label' put: 'File Out';
 				 at: 'get'
@@ -735,7 +767,7 @@ WebsideAPI >> exportExtensions [
 				 at: 'section' put: 'Extra';
 				 yourself);
 		add: (self newJsonObject
-				 at: 'extensionType' put: 'export';
+				 at: 'type' put: 'export';
 				 at: 'elementType' put: 'class';
 				 at: 'label' put: 'File Out';
 				 at: 'get' put: '/classes/{element.name}/fileout';
@@ -852,6 +884,12 @@ WebsideAPI >> icons [
 			  at: 'name' put: s asString;
 			  at: 'data' put: stream contents base64Encoded;
 			  yourself ]
+]
+
+{ #category : 'command endpoints' }
+WebsideAPI >> imageCleanup [
+	
+	Smalltalk cleanUp: false
 ]
 
 { #category : 'private' }
@@ -1215,6 +1253,16 @@ WebsideAPI >> pinnedObjects [
 			a value asWebsideJson
 				at: 'id' put: a key asString;
 				yourself ]
+]
+
+{ #category : 'command endpoints' }
+WebsideAPI >> processCommand [
+	| command |
+	command := self bodyAt: 'command'.
+	(self respondsTo: command asSymbol)
+		ifFalse: [^self badRequest: 'Invalid command'].
+	^self perform: command asSymbol
+
 ]
 
 { #category : 'profiling endpoints' }
@@ -1605,6 +1653,14 @@ WebsideAPI >> saveImage [
 
 	SessionManager default snapshot: true andQuit: false.
 	^ true
+]
+
+{ #category : 'command endpoints' }
+WebsideAPI >> saveImageAs [
+
+	| name |
+	name := self bodyAt: 'name' .
+	Smalltalk saveAs: name
 ]
 
 { #category : 'code endpoints' }

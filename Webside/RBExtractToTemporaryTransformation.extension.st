@@ -33,7 +33,7 @@ RBExtractToTemporaryTransformation >> fromWebsideJson: json [
 RBExtractToTemporaryTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'code';
 		  at: 'label' put: 'Extract temp';
 		  at: 'properties' put: (NeoJSONObject new

@@ -29,7 +29,7 @@ ClyMoveClassToGroupCommand >> fromWebsideJson: json [
 ClyMoveClassToGroupCommand class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'class';
 		  at: 'label' put: 'Move to package';
 		  at: 'properties' put: (NeoJSONObject new

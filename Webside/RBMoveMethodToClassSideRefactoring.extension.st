@@ -27,7 +27,7 @@ RBMoveMethodToClassSideRefactoring >> fromWebsideJson: json [
 RBMoveMethodToClassSideRefactoring class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'method';
 		  at: 'label' put: 'Move to class side';
 		  at: 'properties' put: (NeoJSONObject new

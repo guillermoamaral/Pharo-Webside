@@ -22,7 +22,7 @@ RBCreateAccessorsForVariableTransformation >> fromWebsideJson: json [
 RBCreateAccessorsForVariableTransformation class >> websideExtension [
 
 	^ NeoJSONObject new
-		  at: 'extensionType' put: 'change';
+		  at: 'type' put: 'change';
 		  at: 'elementType' put: 'variable';
 		  at: 'label' put: 'Generate accessors';
 		  at: 'properties' put: (NeoJSONObject new
