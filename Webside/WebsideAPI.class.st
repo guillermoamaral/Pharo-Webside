@@ -1657,7 +1657,7 @@ WebsideAPI >> saveImage [
 WebsideAPI >> saveImageAs [
 
 	| name |
-	name := self bodyAt: 'name'.
+	name := self bodyAt: 'imageName'.
 	Smalltalk saveAs: name
 ]
 
