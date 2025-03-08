@@ -886,8 +886,7 @@ WebsideAPI >> icons [
 { #category : 'command endpoints' }
 WebsideAPI >> imageCleanup [
 
-	Smalltalk cleanUp: false.
-	^true
+	Smalltalk cleanUp: false
 ]
 
 { #category : 'private' }
@@ -1255,12 +1254,13 @@ WebsideAPI >> pinnedObjects [
 
 { #category : 'command endpoints' }
 WebsideAPI >> processCommand [
+
 	| command |
 	command := self bodyAt: 'command'.
-	(self respondsTo: command asSymbol)
-		ifFalse: [^self badRequest: 'Invalid command'].
-	^self perform: command asSymbol
-
+	(self respondsTo: command asSymbol) ifFalse: [
+		^ self badRequest: 'Invalid command' ].
+	self perform: command asSymbol.
+	^ true
 ]
 
 { #category : 'profiling endpoints' }
@@ -1658,8 +1658,7 @@ WebsideAPI >> saveImageAs [
 
 	| name |
 	name := self bodyAt: 'name'.
-	Smalltalk saveAs: name.
-	^ true
+	Smalltalk saveAs: name
 ]
 
 { #category : 'code endpoints' }
