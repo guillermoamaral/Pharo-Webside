@@ -4,19 +4,23 @@ Class {
 	#instVars : [
 		'id',
 		'contents',
-		'bindings'
+		'bindings',
+		'name'
 	],
 	#category : 'Webside-Base',
 	#package : 'Webside',
 	#tag : 'Base'
 }
 
-{ #category : 'bindings' }
+{ #category : 'json' }
 WebsideWorkspace >> asWebsideJson [
 
 	| json |
 	json := super asWebsideJson.
-	json at: 'id' put: id asString;   at: 'source' put: contents.
+	json
+		at: 'id' put: id asString;
+		at: 'name' put: (name ifNil: [ 'Unnamed' ]);
+		at: 'source' put: contents.
 	^ json
 ]
 
@@ -27,7 +31,7 @@ WebsideWorkspace >> bindingOf: aString [
 	^ bindings associationAt: aString
 ]
 
-{ #category : 'bindings' }
+{ #category : 'accessing' }
 WebsideWorkspace >> bindings [
 
 	^ bindings
@@ -39,7 +43,7 @@ WebsideWorkspace >> canAddBindingOf: name [
 	^ true
 ]
 
-{ #category : 'bindings' }
+{ #category : 'accessing' }
 WebsideWorkspace >> contents [
 
 	^contents
@@ -94,6 +98,18 @@ WebsideWorkspace >> initialize [
 WebsideWorkspace >> interactive [
 
 	^false
+]
+
+{ #category : 'accessing' }
+WebsideWorkspace >> name [
+
+	^ name
+]
+
+{ #category : 'accessing' }
+WebsideWorkspace >> name: aString [
+
+	name := aString
 ]
 
 { #category : 'testing' }

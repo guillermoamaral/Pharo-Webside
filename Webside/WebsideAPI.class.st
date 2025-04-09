@@ -1986,10 +1986,14 @@ WebsideAPI >> unpinObject [
 { #category : 'workspaces endpoints' }
 WebsideAPI >> updateWorkspace [
 
-	| workspace source |
-	workspace := self workspaces at: self requestedId ifAbsent: [ ^ self notFound ].
-	source := self bodyAt: 'source' ifAbsent: ''.
-	workspace contents: source.
+	| workspace name source |
+	workspace := self workspaces
+		             at: self requestedId
+		             ifAbsent: [ ^ self notFound ].
+	name := self bodyAt: 'name' ifAbsent: nil.
+	name ifNotNil: [ workspace name: name ].
+	source := self bodyAt: 'source' ifAbsent: nil.
+	source ifNotNil: [ workspace contents: source ].
 	^ workspace asWebsideJson
 ]
 
