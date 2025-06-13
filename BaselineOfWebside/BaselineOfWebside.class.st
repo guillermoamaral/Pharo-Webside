@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfWebside,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfWebside
+	#name : 'BaselineOfWebside',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfWebside',
+	#package : 'BaselineOfWebside'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWebside >> baseline: spec [
 	<baseline>
 	spec
@@ -16,18 +17,21 @@ BaselineOfWebside >> baseline: spec [
 				package: 'Webside-Tests' with: [ spec requires: #('Webside') ] ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWebside >> projectClass [
 
 ^ MetacelloCypressBaselineProject 
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWebside >> setUpDependencies: spec [
+
 	spec
 		baseline: 'Teapot'
-		with: [ spec repository: 'github://zeroflag/Teapot:v2.7.0/source' ].
-		
-		
-	spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
+		with: [ spec repository: 'github://zeroflag/Teapot/source' ].
+
+
+	spec
+		baseline: 'NeoJSON'
+		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ]
 ]
